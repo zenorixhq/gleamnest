@@ -1,0 +1,94 @@
+@import url('https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.font-serif-luxury {
+  font-family: 'Playfair Display', Georgia, serif;
+}
+.font-editorial {
+  font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
+}
+.font-script {
+  font-family: 'Alex Brush', cursive;
+}
+
+@layer base {
+  :root {
+    /* GleamNest Warm Champagne Ivory & Gold Luxury Theme */
+    --primary: 38 58% 46%;          /* Elegant Champagne Gold #BA9241 */
+    --primary-hover: 38 65% 38%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 40 30% 93%;        /* Soft Ivory Stone */
+    --secondary-foreground: 24 10% 15%;
+
+    --accent: 38 75% 52%;           /* Sparkling Gold Accent */
+    --accent-foreground: 0 0% 100%;
+
+    --background: 40 33% 97%;       /* Warm Champagne Ivory #FAF7F2 */
+    --foreground: 24 10% 11%;       /* Rich Charcoal #1C1917 */
+
+    --card: 0 0% 100%;
+    --card-foreground: 24 10% 11%;
+
+    --muted: 40 22% 93%;
+    --muted-foreground: 30 10% 46%;
+
+    --border: 38 25% 88%;           /* Warm Champagne Border */
+    --input: 38 25% 88%;
+    --ring: 38 58% 46%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    --radius: 0.75rem;
+
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-heading: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+
+  .dark {
+    --background: 24 10% 10%;
+    --foreground: 40 30% 96%;
+
+    --card: 24 10% 14%;
+    --card-foreground: 40 30% 96%;
+
+    --muted: 24 10% 18%;
+    --muted-foreground: 40 15% 65%;
+
+    --border: 38 20% 25%;
+    --input: 38 20% 25%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased selection:bg-primary/20 selection:text-primary;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading), var(--font-sans), sans-serif;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.2);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.4);
+}
