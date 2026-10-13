@@ -24,6 +24,7 @@ import {
   Search,
   Image as ImageIcon,
   Database,
+  Upload,
 } from "lucide-react";
 
 export default function AdminDashboardPage() {
@@ -129,6 +130,23 @@ export default function AdminDashboardPage() {
     if (confirm("Are you sure you want to delete this product from your catalog?")) {
       await deleteProduct(productId);
     }
+  };
+
+  const handleImageFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert("Image is larger than 5MB. Please choose an optimized image under 5MB.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const dataUrl = reader.result as string;
+      setFormState((prev) => ({ ...prev, imageUrl: dataUrl }));
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleSaveProduct = async (e: React.FormEvent) => {
@@ -629,20 +647,63 @@ export default function AdminDashboardPage() {
                 />
               </div>
 
-              {/* Image URL */}
-              <div className="space-y-1">
-                <label className="text-xs font-semibold text-foreground">Product Image URL</label>
-                <input
-                  type="url"
-                  required
-                  placeholder="https://images.unsplash.com/..."
-                  value={formState.imageUrl}
-                  onChange={(e) => setFormState({ ...formState, imageUrl: e.target.value })}
-                  className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none font-mono"
-                />
+              {/* Product Image (Upload from Device or Web URL) */}
+              <div className="space-y-2 border border-border p-3.5 rounded-xl bg-muted/20">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                    <ImageIcon className="w-3.5 h-3.5 text-primary" />
+                    <span>Product Image *</span>
+                  </label>
+                  <span className="text-[11px] text-muted-foreground">Device upload or URL</span>
+                </div>
+
+                {/* File picker */}
+                <div>
+                  <label
+                    htmlFor="admin-file-upload"
+                    className="w-full px-3 py-2.5 rounded-lg border border-dashed border-border hover:border-primary bg-background hover:bg-muted/40 cursor-pointer flex items-center justify-center gap-2 text-xs font-medium text-foreground transition-colors"
+                  >
+                    <Upload className="w-4 h-4 text-primary" />
+                    <span>Choose Photo from Device / Phone</span>
+                  </label>
+                  <input
+                    id="admin-file-upload"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageFileUpload}
+                    className="hidden"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[11px] text-muted-foreground">Or paste public Image URL:</label>
+                  <input
+                    type="url"
+                    placeholder="https://... or bucket link"
+                    value={formState.imageUrl.startsWith("data:") ? "" : formState.imageUrl}
+                    onChange={(e) => setFormState({ ...formState, imageUrl: e.target.value })}
+                    className="w-full px-3 py-1.5 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none font-mono"
+                  />
+                </div>
+
+                {/* Preview Thumbnail */}
                 {formState.imageUrl && (
-                  <div className="mt-2 w-16 h-20 rounded-md overflow-hidden border border-border">
-                    <img src={formState.imageUrl} alt="Preview" className="w-full h-full object-cover" />
+                  <div className="flex items-center gap-3 pt-1">
+                    <div className="w-16 h-20 rounded-md overflow-hidden border border-border bg-card">
+                      <img src={formState.imageUrl} alt="Preview" className="w-full h-full object-cover" />
+                    </div>
+                    <div className="text-xs space-y-1">
+                      <p className="font-medium text-foreground">
+                        {formState.imageUrl.startsWith("data:") ? "Photo Selected ✓" : "Web URL Linked ✓"}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => setFormState({ ...formState, imageUrl: "" })}
+                        className="text-[11px] text-red-600 hover:underline"
+                      >
+                        Remove Photo
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>
