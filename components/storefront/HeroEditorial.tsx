@@ -19,15 +19,15 @@ export function HeroEditorial() {
         <div className="lg:hidden absolute inset-0 bg-[#E6E4DF]/40 backdrop-blur-[0.5px]" />
       </div>
 
-      {/* 2. Top-Right Brand Philosophy & Link (Exactly Matching Reference Image 2) */}
+      {/* 2. Top-Right Brand Philosophy & Link */}
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 pt-6 sm:pt-8 flex justify-end">
         <div className="space-y-1.5 text-right max-w-xs sm:max-w-sm">
           <span className="text-[10px] sm:text-xs tracking-[0.25em] uppercase font-bold text-[#8C847A] block">
-            {storeConfig.meta.name || "TRACE"}
+            {storeConfig.meta.name || "GLEAMNEST"}
           </span>
           <p className="text-xs sm:text-sm text-[#4E473F] font-light leading-snug">
-            Made for skin, not display. <br />
-            Made to order. Worn every day.
+            Fine jewelry for the skin, not the vault. <br />
+            18K gold finish. Worn every day.
           </p>
           <div className="pt-0.5">
             <Link
@@ -43,29 +43,29 @@ export function HeroEditorial() {
         </div>
       </div>
 
-      {/* 3. Center Signature Editorial Headline (Exactly Matching Reference Image 2) */}
+      {/* 3. Center Signature Editorial Headline (Strictly 2 Lines) */}
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 my-auto">
         <div className="max-w-5xl">
-          {/* Line 1: NOT FOR SOMEDAY */}
-          <div className="flex items-baseline gap-3 sm:gap-6 flex-wrap">
-            <span className="font-editorial text-4xl sm:text-6xl md:text-7xl lg:text-[5.4vw] xl:text-[6.6rem] font-normal tracking-tight text-[#1C1917] uppercase leading-[0.92]">
-              NOT FOR
+          {/* Line 1: NEVER SAVED FOR SOMEDAY (Strictly 1 line, nowrap) */}
+          <div className="flex items-baseline gap-2.5 sm:gap-4 md:gap-5 whitespace-nowrap">
+            <span className="font-editorial text-3xl sm:text-5xl md:text-6xl lg:text-[4.6vw] xl:text-[5.6rem] font-normal tracking-tight text-[#1C1917] uppercase leading-[0.92]">
+              NEVER SAVED
             </span>
-            <span className="font-editorial text-4xl sm:text-6xl md:text-7xl lg:text-[5.4vw] xl:text-[6.6rem] font-light tracking-wide uppercase text-[#948D85]/60 font-outline-editorial leading-[0.92]">
-              SOMEDAY
+            <span className="font-editorial text-3xl sm:text-5xl md:text-6xl lg:text-[4.6vw] xl:text-[5.6rem] font-light tracking-wide uppercase text-[#948D85]/60 font-outline-editorial leading-[0.92]">
+              FOR SOMEDAY
             </span>
           </div>
 
-          {/* Line 2: MADE TO LIVE IN (Indented to start under second word) */}
-          <div className="pl-6 sm:pl-20 md:pl-32 lg:pl-48 xl:pl-56 mt-0.5 sm:mt-1">
-            <h1 className="font-editorial text-4xl sm:text-6xl md:text-7xl lg:text-[5.4vw] xl:text-[6.6rem] font-normal tracking-tight text-[#1C1917] uppercase leading-[0.92]">
-              MADE TO LIVE IN
+          {/* Line 2: CRAFTED TO LIVE IN (Indented towards the center, strictly 1 line, nowrap) */}
+          <div className="pl-4 sm:pl-16 md:pl-28 lg:pl-36 xl:pl-44 mt-0.5 sm:mt-1 whitespace-nowrap">
+            <h1 className="font-editorial text-3xl sm:text-5xl md:text-6xl lg:text-[4.6vw] xl:text-[5.6rem] font-normal tracking-tight text-[#1C1917] uppercase leading-[0.92]">
+              CRAFTED TO LIVE IN
             </h1>
           </div>
         </div>
       </div>
 
-      {/* 4. Bottom Right Floating Product Cards & Bottom White Dock (Exactly Matching Reference Image 2) */}
+      {/* 4. Bottom Right Floating Product Cards & Bottom White Dock */}
       <div className="relative z-10 w-full">
         {/* Floating Cards (Bottom Right Quadrant) */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 pb-3 sm:pb-4 flex justify-end">
@@ -120,13 +120,13 @@ export function HeroEditorial() {
           </div>
         </div>
 
-        {/* 5. Bottom White Curved Dock / Floating Bar (Exactly Matching Reference Image 2) */}
+        {/* 5. Bottom White Curved Dock / Floating Bar */}
         <div className="w-full bg-white rounded-t-[1.75rem] sm:rounded-t-[2.25rem] md:rounded-t-[2.75rem] shadow-[0_-8px_30px_rgba(0,0,0,0.03)] border-t border-[#EAE5DD]">
           <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 py-3.5 sm:py-4 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-6">
             {/* Left: 3-line lower-case motto */}
             <div className="text-[10px] sm:text-[11px] text-[#8C847B] font-normal lowercase leading-tight text-center sm:text-left">
-              <div>made to order.</div>
-              <div>fitted in person.</div>
+              <div>waterproof & anti-tarnish.</div>
+              <div>surgical-grade 316L steel.</div>
               <div>worn every day after.</div>
             </div>
 
