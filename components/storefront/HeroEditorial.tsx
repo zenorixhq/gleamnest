@@ -5,7 +5,7 @@ import { storeConfig } from "@/config/store.config";
 
 export function HeroEditorial() {
   return (
-    <section className="relative w-full h-[calc(100svh-5.5rem)] sm:h-[calc(100vh-6.5rem)] min-h-[580px] max-h-[920px] bg-[#CBBFB1] text-[#1C1917] overflow-hidden select-none flex flex-col justify-between">
+    <section className="relative w-full h-[calc(100svh-5.5rem)] sm:h-[calc(100vh-6.5rem)] min-h-[580px] max-h-[920px] bg-gradient-to-r from-[#F7EEDD] via-[#F5EAD6] to-[#E9D9C1] text-[#1C1917] overflow-hidden select-none flex flex-col justify-between">
       {/* 1. Left Editorial Model Image (From Uploaded Image 1 on Warm Studio Canvas) */}
       <div className="absolute inset-y-0 left-0 w-full lg:w-[48%] xl:w-[46%] h-full pointer-events-none select-none z-0 overflow-hidden">
         <img
@@ -14,9 +14,9 @@ export function HeroEditorial() {
           className="w-full h-full object-cover object-[center_center]"
         />
         {/* Soft edge blend into right studio backdrop on desktop */}
-        <div className="hidden lg:block absolute inset-y-0 right-0 w-32 bg-gradient-to-r from-transparent to-[#CBBFB1]" />
+        <div className="hidden lg:block absolute inset-y-0 right-0 w-36 bg-gradient-to-r from-transparent to-[#F5EAD6]" />
         {/* Mobile soft contrast overlay */}
-        <div className="lg:hidden absolute inset-0 bg-[#CBBFB1]/20 backdrop-blur-[0.5px]" />
+        <div className="lg:hidden absolute inset-0 bg-[#F7EEDD]/20 backdrop-blur-[0.5px]" />
       </div>
 
       {/* 2. Top-Right Brand Philosophy & Link */}
@@ -121,7 +121,7 @@ export function HeroEditorial() {
         </div>
 
         {/* 5. Bottom White Curved Dock / Floating Bar */}
-        <div className="w-full bg-white rounded-t-[1.75rem] sm:rounded-t-[2.25rem] md:rounded-t-[2.75rem] shadow-[0_-8px_30px_rgba(0,0,0,0.03)] border-t border-[#BDB1A4]">
+        <div className="w-full bg-white rounded-t-[1.75rem] sm:rounded-t-[2.25rem] md:rounded-t-[2.75rem] shadow-[0_-8px_30px_rgba(0,0,0,0.03)] border-t border-[#E3D7C5]">
           <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 py-3.5 sm:py-4 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-6">
             {/* Left: 3-line lower-case motto */}
             <div className="text-[10px] sm:text-[11px] text-[#8C847B] font-normal lowercase leading-tight text-center sm:text-left">
