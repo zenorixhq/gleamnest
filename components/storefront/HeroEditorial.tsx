@@ -6,21 +6,14 @@ import { storeConfig } from "@/config/store.config";
 
 export function HeroEditorial() {
   return (
-    <section className="relative w-full h-[calc(100svh-4rem)] sm:h-[calc(100vh-4.5rem)] min-h-[620px] max-h-[980px] bg-[#EDE8E1] text-[#1C1917] overflow-hidden select-none flex flex-col justify-between">
-      {/* 1. Background Editorial Model Photography on Left */}
-      <div className="absolute inset-0 w-full h-full pointer-events-none overflow-hidden">
+    <section className="relative w-full h-[calc(100svh-4rem)] sm:h-[calc(100vh-4.5rem)] min-h-[620px] max-h-[980px] bg-white text-[#1C1917] overflow-hidden select-none flex flex-col justify-between">
+      {/* 1. Isolated Jewelry Cutout: Focused on Layered Gold Necklace & Emerald Ring (No Dark Background, No Gradients) */}
+      <div className="absolute left-0 sm:left-4 lg:left-8 top-1/2 -translate-y-1/2 w-[340px] sm:w-[420px] lg:w-[480px] xl:w-[560px] h-[75%] max-h-[640px] pointer-events-none select-none z-0 flex items-center">
         <img
-          src="/images/hero-jewelry-closeup.jpg"
-          alt="GleamNest Fine Waterproof Jewelry - Macro closeup of layered gold necklace and emerald eternity ring"
-          className="w-full h-full object-cover object-[center_35%] sm:object-[center_30%] lg:object-[25%_center] xl:object-[28%_center] opacity-95"
+          src="/images/hero-jewelry-cutout.jpg"
+          alt="GleamNest Fine Waterproof Jewelry - Layered gold necklace with rectangular pendant and emerald eternity ring"
+          className="w-full h-full object-contain object-left drop-shadow-[0_15px_30px_rgba(0,0,0,0.04)]"
         />
-
-        {/* Desktop Smooth Horizontal Fade into Warm Linen Background */}
-        <div className="hidden lg:block absolute inset-y-0 left-[35%] xl:left-[38%] w-[22%] bg-gradient-to-r from-transparent via-[#EDE8E1]/50 to-[#EDE8E1]" />
-        <div className="hidden lg:block absolute inset-y-0 right-0 w-[45%] bg-[#EDE8E1]" />
-
-        {/* Mobile/Tablet Legibility Layer */}
-        <div className="lg:hidden absolute inset-0 bg-gradient-to-r from-[#EDE8E1]/20 via-[#EDE8E1]/65 to-[#EDE8E1]/95" />
       </div>
 
       {/* 2. Top-Right Brand Philosophy & CTA */}
@@ -75,7 +68,7 @@ export function HeroEditorial() {
             {/* Card 1: Bracelet · Line */}
             <Link
               href="/products?category=bracelets"
-              className="relative w-36 sm:w-48 md:w-56 h-24 sm:h-28 md:h-32 rounded-xl overflow-hidden shadow-lg border border-white/40 group flex-shrink-0 transition-transform duration-300 hover:-translate-y-1"
+              className="relative w-36 sm:w-48 md:w-56 h-24 sm:h-28 md:h-32 rounded-xl overflow-hidden shadow-md border border-[#EAE5DD] group flex-shrink-0 transition-transform duration-300 hover:-translate-y-1"
             >
               <img
                 src="/images/hero-card-bracelet.png"
@@ -99,7 +92,7 @@ export function HeroEditorial() {
             {/* Card 2: Necklace · Rivière */}
             <Link
               href="/products?category=necklaces"
-              className="relative w-36 sm:w-48 md:w-56 h-24 sm:h-28 md:h-32 rounded-xl overflow-hidden shadow-lg border border-white/40 group flex-shrink-0 transition-transform duration-300 hover:-translate-y-1"
+              className="relative w-36 sm:w-48 md:w-56 h-24 sm:h-28 md:h-32 rounded-xl overflow-hidden shadow-md border border-[#EAE5DD] group flex-shrink-0 transition-transform duration-300 hover:-translate-y-1"
             >
               <img
                 src="/images/hero-card-necklace.png"
@@ -123,7 +116,7 @@ export function HeroEditorial() {
         </div>
 
         {/* 5. Bottom White Curved Dock / Floating Bar */}
-        <div className="w-full bg-white rounded-t-[1.75rem] sm:rounded-t-[2.25rem] md:rounded-t-[2.75rem] shadow-[0_-8px_30px_rgba(0,0,0,0.04)] border-t border-[#EAE5DD]">
+        <div className="w-full bg-white rounded-t-[1.75rem] sm:rounded-t-[2.25rem] md:rounded-t-[2.75rem] shadow-[0_-8px_30px_rgba(0,0,0,0.03)] border-t border-[#EAE5DD]">
           <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 py-3.5 sm:py-4 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-6">
             {/* Left: 3-line lower-case motto */}
             <div className="text-[10px] sm:text-[11px] text-[#8C847B] font-normal lowercase leading-tight text-center sm:text-left">
