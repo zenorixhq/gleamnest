@@ -5,7 +5,7 @@ import { storeConfig } from "@/config/store.config";
 
 export function HeroEditorial() {
   return (
-    <section className="relative w-full h-[calc(100svh-4rem)] sm:h-[calc(100vh-4.5rem)] min-h-[620px] max-h-[980px] bg-[#E6E4DF] text-[#1C1917] overflow-hidden select-none flex flex-col justify-between">
+    <section className="relative w-full h-[calc(100svh-5.5rem)] sm:h-[calc(100vh-6.5rem)] min-h-[580px] max-h-[920px] bg-[#CBBFB1] text-[#1C1917] overflow-hidden select-none flex flex-col justify-between">
       {/* 1. Left Editorial Model Image (From Uploaded Image 1 on Warm Studio Canvas) */}
       <div className="absolute inset-y-0 left-0 w-full lg:w-[48%] xl:w-[46%] h-full pointer-events-none select-none z-0 overflow-hidden">
         <img
@@ -14,18 +14,18 @@ export function HeroEditorial() {
           className="w-full h-full object-cover object-[center_center]"
         />
         {/* Soft edge blend into right studio backdrop on desktop */}
-        <div className="hidden lg:block absolute inset-y-0 right-0 w-24 bg-gradient-to-r from-transparent to-[#E6E4DF]" />
+        <div className="hidden lg:block absolute inset-y-0 right-0 w-32 bg-gradient-to-r from-transparent to-[#CBBFB1]" />
         {/* Mobile soft contrast overlay */}
-        <div className="lg:hidden absolute inset-0 bg-[#E6E4DF]/40 backdrop-blur-[0.5px]" />
+        <div className="lg:hidden absolute inset-0 bg-[#CBBFB1]/20 backdrop-blur-[0.5px]" />
       </div>
 
       {/* 2. Top-Right Brand Philosophy & Link */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 pt-6 sm:pt-8 flex justify-end">
-        <div className="space-y-1.5 text-right max-w-xs sm:max-w-sm">
-          <span className="text-[10px] sm:text-xs tracking-[0.25em] uppercase font-bold text-[#8C847A] block">
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 pt-5 sm:pt-7 flex justify-end">
+        <div className="space-y-1 text-right max-w-xs sm:max-w-sm">
+          <span className="text-[10px] sm:text-xs tracking-[0.25em] uppercase font-bold text-[#5C5349] block">
             {storeConfig.meta.name || "GLEAMNEST"}
           </span>
-          <p className="text-xs sm:text-sm text-[#4E473F] font-light leading-snug">
+          <p className="text-xs sm:text-sm text-[#383129] font-normal leading-snug">
             Fine jewelry for the skin, not the vault. <br />
             18K gold finish. Worn every day.
           </p>
@@ -34,7 +34,7 @@ export function HeroEditorial() {
               href="https://wa.me/916238920442?text=Hello%20GleamNest!%20I%20would%20like%20to%20book%20a%20private%20fitting%20and%20consultation."
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#1C1917] hover:text-primary transition-colors group"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#1C1917] hover:text-black transition-colors group"
             >
               <span>Book a fitting</span>
               <span className="group-hover:translate-x-1 transition-transform">→</span>
@@ -121,7 +121,7 @@ export function HeroEditorial() {
         </div>
 
         {/* 5. Bottom White Curved Dock / Floating Bar */}
-        <div className="w-full bg-white rounded-t-[1.75rem] sm:rounded-t-[2.25rem] md:rounded-t-[2.75rem] shadow-[0_-8px_30px_rgba(0,0,0,0.03)] border-t border-[#EAE5DD]">
+        <div className="w-full bg-white rounded-t-[1.75rem] sm:rounded-t-[2.25rem] md:rounded-t-[2.75rem] shadow-[0_-8px_30px_rgba(0,0,0,0.03)] border-t border-[#BDB1A4]">
           <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 py-3.5 sm:py-4 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-6">
             {/* Left: 3-line lower-case motto */}
             <div className="text-[10px] sm:text-[11px] text-[#8C847B] font-normal lowercase leading-tight text-center sm:text-left">
