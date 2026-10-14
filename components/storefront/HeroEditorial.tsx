@@ -1,147 +1,174 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import { storeConfig } from "@/config/store.config";
 
 export function HeroEditorial() {
-  const categoryLinks = [
-    { name: "RINGS", href: "/products?category=rings" },
-    { name: "BANGLES & BRACELETS", href: "/products?category=bracelets" },
-    { name: "CHAINS & NECKLACES", href: "/products?category=necklaces" },
-    { name: "EARRINGS", href: "/products?category=earrings" },
-    { name: "ANKLETS", href: "/products?category=anklets" },
-  ];
-
   return (
-    <section className="relative w-full min-h-[calc(100svh-4rem)] sm:min-h-[calc(100vh-5rem)] flex flex-col justify-between bg-[#FAF6EF] text-[#1C1917] overflow-hidden select-none border-b border-[#E7DECB]/80">
-      {/* Subtle Warm Champagne Glow Gradients */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-gradient-to-b from-[#F4E8D1]/50 via-[#FAF4E6]/30 to-transparent blur-3xl pointer-events-none" />
+    <section className="relative w-full h-[calc(100svh-4rem)] sm:h-[calc(100vh-4.5rem)] min-h-[620px] max-h-[980px] bg-[#E6E4DF] text-[#181513] overflow-hidden select-none flex flex-col justify-between">
+      {/* 1. Background Editorial Model Photography on Left */}
+      <div className="absolute inset-0 w-full h-full pointer-events-none overflow-hidden">
+        <img
+          src="/images/hero-model-editorial.jpg"
+          alt="GleamNest Fine Jewelry Editorial - Model wearing pear diamond ring"
+          className="w-full h-full object-cover object-[18%_center] sm:object-[22%_center] lg:object-[25%_center] xl:object-[30%_center] opacity-95"
+        />
 
-      {/* Main Container - Fills the Full Screen Viewport */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex-1 flex flex-col justify-between pt-4 pb-4 sm:pt-6 sm:pb-6 relative z-10">
-        
-        {/* 1. Top Area: Brand Script Tagline & Celéstique Serif Title Banner */}
-        <div className="space-y-2 sm:space-y-3">
-          <div className="text-center">
-            <p className="font-script text-xl sm:text-2xl md:text-3xl text-[#C5A059] tracking-wide">
-              The place where elegance and sparkle come together.
-            </p>
+        {/* Desktop Smooth Horizontal Fade into Background */}
+        <div className="hidden lg:block absolute inset-y-0 left-[38%] xl:left-[42%] w-[28%] bg-gradient-to-r from-transparent via-[#E6E4DF]/60 to-[#E6E4DF]" />
+        <div className="hidden lg:block absolute inset-y-0 right-0 w-[42%] bg-[#E6E4DF]" />
+
+        {/* Mobile/Tablet Soft Legibility Layer */}
+        <div className="lg:hidden absolute inset-0 bg-gradient-to-r from-transparent via-[#E6E4DF]/50 to-[#E6E4DF]/90" />
+      </div>
+
+      {/* 2. Top-Right Brand Philosophy & CTA */}
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 pt-6 sm:pt-8 flex justify-end">
+        <div className="space-y-1.5 text-right max-w-xs sm:max-w-sm">
+          <span className="text-[10px] sm:text-xs tracking-[0.25em] uppercase font-bold text-[#7A746B] block">
+            {storeConfig.meta.name || "GLEAMNEST"}
+          </span>
+          <p className="text-xs sm:text-sm text-[#4A453E] font-light leading-snug">
+            Made for skin, not display. <br />
+            Made to order. Worn every day.
+          </p>
+          <div className="pt-0.5">
+            <Link
+              href="/products"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#181513] hover:text-primary transition-colors group"
+            >
+              <span>Explore collection</span>
+              <span className="group-hover:translate-x-1 transition-transform">→</span>
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* 3. Center Signature Editorial Headline */}
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 my-auto">
+        <div className="max-w-5xl">
+          {/* Line 1: NOT FOR SOMEDAY */}
+          <div className="flex items-baseline gap-3 sm:gap-6 flex-wrap">
+            <span className="font-editorial text-4xl sm:text-6xl md:text-7xl lg:text-[5.5rem] xl:text-[6.8rem] font-normal tracking-tight text-[#181513] uppercase leading-[0.92]">
+              NOT FOR
+            </span>
+            <span className="font-editorial text-4xl sm:text-6xl md:text-7xl lg:text-[5.5rem] xl:text-[6.8rem] font-light tracking-wide uppercase text-[#8F8880]/60 font-outline-editorial leading-[0.92]">
+              SOMEDAY
+            </span>
           </div>
 
-          <div className="text-center relative pb-4 sm:pb-6 border-b border-[#D8CBB6]/60">
-            <h1 className="font-editorial text-[10vw] sm:text-[9vw] md:text-[8vw] lg:text-[7vw] font-normal tracking-[0.05em] uppercase leading-none text-[#1C1917] flex items-center justify-center gap-1.5 sm:gap-3 flex-wrap">
-              <span>G</span>
-              <span>L</span>
-              <span>E</span>
-              <span className="inline-flex items-center justify-center relative">
-                A
-                <span className="absolute -top-1 sm:-top-2 text-xs sm:text-base text-[#C5A059]">✦</span>
-              </span>
-              <span>M</span>
-              <span>N</span>
-              <span>E</span>
-              <span>S</span>
-              <span>T</span>
+          {/* Line 2: MADE TO LIVE IN (Indented to start under SOMEDAY) */}
+          <div className="pl-6 sm:pl-20 md:pl-32 lg:pl-48 xl:pl-56 mt-0.5 sm:mt-1">
+            <h1 className="font-editorial text-4xl sm:text-6xl md:text-7xl lg:text-[5.5rem] xl:text-[6.8rem] font-normal tracking-tight text-[#181513] uppercase leading-[0.92]">
+              MADE TO LIVE IN
             </h1>
-
-            {/* Subtitle placed on top right below headline (Desktop & Tablet) */}
-            <div className="hidden md:block absolute right-0 bottom-2 text-right max-w-xs">
-              <p className="font-editorial text-xs lg:text-sm uppercase tracking-[0.2em] text-[#8C7A5E] leading-relaxed font-medium">
-                A CELESTIAL TOUCH <br />
-                FOR TIMELESS MOMENTS
-              </p>
-            </div>
           </div>
         </div>
+      </div>
 
-        {/* 2. Middle Area: Left Info + Centerpiece Transparent Necklace + Right Navigation */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 lg:gap-8 items-center py-4 sm:py-6">
-          {/* Left Column: Collection Kicker & CTAs */}
-          <div className="md:col-span-4 order-2 md:order-1 space-y-4 text-left">
-            <div>
-              <span className="font-editorial text-xl sm:text-2xl font-medium tracking-wide uppercase text-[#8C7A5E] block">
-                COLLECTION
-              </span>
-              <span className="font-editorial text-2xl sm:text-3xl lg:text-4xl font-semibold tracking-wider text-[#1C1917] block -mt-1">
-                2025
-              </span>
-            </div>
-
-            <p className="text-xs sm:text-sm text-[#5C5346] leading-relaxed max-w-sm font-light">
-              Exquisite waterproof & anti-tarnish jewelry crafted in surgical-grade 316L stainless steel with 18K gold vacuum PVD plating. Designed to never fade, rust, or lose its sparkle.
-            </p>
-
-            <div className="pt-1 flex flex-col sm:flex-row items-start sm:items-center gap-3">
-              <Link
-                href="/products"
-                className="inline-flex items-center gap-2.5 px-6 py-2.5 rounded-full bg-[#1C1917] hover:bg-[#C5A059] text-white text-xs font-semibold tracking-widest uppercase transition-all shadow-md hover:scale-105 active:scale-95 group"
-              >
-                <span>DISCOVER ALL</span>
-                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-              </Link>
-
-              <Link
-                href="https://wa.me/916238920442"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full border border-[#C5A059] text-[#7A602B] hover:bg-[#C5A059]/10 text-xs font-medium tracking-wide transition-all"
-              >
-                <Sparkles className="w-3.5 h-3.5 text-[#C5A059]" />
-                <span>WhatsApp Order</span>
-              </Link>
-            </div>
-          </div>
-
-          {/* Center Column: Transparent Gold Necklace Centerpiece */}
-          <div className="md:col-span-4 order-1 md:order-2 flex justify-center items-center relative">
-            <div className="relative w-64 h-64 sm:w-80 sm:h-80 lg:w-96 lg:h-96 xl:w-[420px] xl:h-[420px] max-h-[46vh] flex items-center justify-center">
-              {/* Soft Warm Champagne Ambient Glow behind the transparent necklace */}
-              <div className="absolute w-56 h-56 sm:w-72 sm:h-72 rounded-full bg-gradient-to-tr from-[#EED39E]/45 via-[#FCECC9]/30 to-transparent blur-2xl pointer-events-none" />
-
-              {/* High-Resolution Transparent Background Gold Necklace */}
+      {/* 4. Bottom Right Floating Product Cards & Bottom White Dock */}
+      <div className="relative z-10 w-full">
+        {/* Floating Cards (Bottom Right Quadrant) */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 pb-3 sm:pb-4 flex justify-end">
+          <div className="flex items-center gap-3 sm:gap-4 overflow-x-auto no-scrollbar max-w-full">
+            {/* Card 1: Bracelet · Line */}
+            <Link
+              href="/products?category=bracelets"
+              className="relative w-36 sm:w-48 md:w-56 h-24 sm:h-28 md:h-32 rounded-xl overflow-hidden shadow-lg border border-white/40 group flex-shrink-0 transition-transform duration-300 hover:-translate-y-1"
+            >
               <img
-                src="/images/hero-necklace.png"
-                alt="GleamNest 18K Gold Plated Waterproof Necklace"
-                className="relative z-10 w-full h-full object-contain drop-shadow-[0_20px_25px_rgba(184,142,56,0.22)] transition-transform duration-700 hover:scale-105 filter hover:brightness-105"
+                src="/images/hero-card-bracelet.png"
+                alt="Bracelet Line - GleamNest"
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
-            </div>
-          </div>
-
-          {/* Right Column: Category Navigation Menu with Dividers */}
-          <div className="md:col-span-4 order-3 space-y-1 text-right">
-            {/* Mobile Subtitle Display */}
-            <div className="md:hidden pb-3 text-left border-b border-[#D8CBB6]/50">
-              <p className="font-editorial text-xs uppercase tracking-[0.2em] text-[#8C7A5E] font-medium">
-                A Celestial Touch for Timeless Moments
-              </p>
-            </div>
-
-            {categoryLinks.map((cat) => (
-              <Link
-                key={cat.name}
-                href={cat.href}
-                className="group flex items-center justify-between py-2 sm:py-2.5 border-b border-[#E0D4C0] hover:border-[#C5A059] transition-colors"
-              >
-                <span className="font-editorial text-xs sm:text-sm font-semibold tracking-widest uppercase text-[#3C3428] group-hover:text-[#C5A059] transition-colors">
-                  {cat.name}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-black/30 pointer-events-none" />
+              <div className="absolute inset-0 p-2.5 sm:p-3 flex flex-col justify-between text-white">
+                <span className="text-[10px] sm:text-xs font-serif tracking-wide text-white/95">
+                  Bracelet · Line
                 </span>
-                <span className="text-[#8C7A5E] group-hover:text-[#C5A059] group-hover:translate-x-1 transition-all text-xs">
-                  →
+                <div className="flex items-center justify-between text-[9px] sm:text-[10px]">
+                  <span className="text-white/80 font-light italic">many, worn as one</span>
+                  <span className="text-white/95 font-medium group-hover:translate-x-0.5 transition-transform">
+                    See more →
+                  </span>
+                </div>
+              </div>
+            </Link>
+
+            {/* Card 2: Necklace · Rivière */}
+            <Link
+              href="/products?category=necklaces"
+              className="relative w-36 sm:w-48 md:w-56 h-24 sm:h-28 md:h-32 rounded-xl overflow-hidden shadow-lg border border-white/40 group flex-shrink-0 transition-transform duration-300 hover:-translate-y-1"
+            >
+              <img
+                src="/images/hero-card-necklace.png"
+                alt="Necklace Rivière - GleamNest"
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-black/30 pointer-events-none" />
+              <div className="absolute inset-0 p-2.5 sm:p-3 flex flex-col justify-between text-white">
+                <span className="text-[10px] sm:text-xs font-serif tracking-wide text-white/95">
+                  Necklace · Rivière
                 </span>
-              </Link>
-            ))}
+                <div className="flex items-center justify-between text-[9px] sm:text-[10px]">
+                  <span className="text-white/80 font-light italic">a single stone, close to the skin</span>
+                  <span className="text-white/95 font-medium group-hover:translate-x-0.5 transition-transform">
+                    See more →
+                  </span>
+                </div>
+              </div>
+            </Link>
           </div>
         </div>
 
-        {/* 3. Bottom Area: Subtle Scroll Prompt to Enclosed About Us Section */}
-        <div className="pt-2 sm:pt-4 pb-1 flex justify-center items-center">
-          <a
-            href="#about-us"
-            className="inline-flex items-center gap-2 text-[10px] sm:text-xs uppercase tracking-[0.25em] text-[#8C7A5E] hover:text-[#1C1917] transition-colors group"
-          >
-            <span>Scroll for About Us</span>
-            <span className="group-hover:translate-y-1 transition-transform">↓</span>
-          </a>
+        {/* 5. Bottom White Curved Dock / Floating Bar */}
+        <div className="w-full bg-white rounded-t-[1.75rem] sm:rounded-t-[2.25rem] md:rounded-t-[2.75rem] shadow-[0_-8px_30px_rgba(0,0,0,0.04)] border-t border-[#EAE6DE]">
+          <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 py-3.5 sm:py-4 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-6">
+            {/* Left: 3-line lower-case motto */}
+            <div className="text-[10px] sm:text-[11px] text-[#8C857D] font-normal lowercase leading-tight text-center sm:text-left">
+              <div>made to order.</div>
+              <div>fitted in person.</div>
+              <div>worn every day after.</div>
+            </div>
+
+            {/* Center: Scroll button */}
+            <a
+              href="#about-us"
+              className="flex flex-col items-center justify-center text-[9px] sm:text-[10px] uppercase tracking-[0.25em] text-[#7A736A] hover:text-[#181513] transition-colors group cursor-pointer"
+            >
+              <span className="text-xs group-hover:translate-y-0.5 transition-transform">↓</span>
+              <span className="font-semibold tracking-[0.2em]">SCROLL</span>
+            </a>
+
+            {/* Right: Category navigation links */}
+            <div className="flex items-center gap-4 sm:gap-6 md:gap-8 text-xs sm:text-sm lowercase">
+              <Link
+                href="/products?category=rings"
+                className="text-[#181513] font-semibold border-b-2 border-[#181513] pb-0.5 transition-colors"
+              >
+                rings
+              </Link>
+              <Link
+                href="/products?category=earrings"
+                className="text-[#7A736A] hover:text-[#181513] hover:border-b-2 hover:border-[#7A736A] pb-0.5 transition-all"
+              >
+                earrings
+              </Link>
+              <Link
+                href="/products?category=necklaces"
+                className="text-[#7A736A] hover:text-[#181513] hover:border-b-2 hover:border-[#7A736A] pb-0.5 transition-all"
+              >
+                necklaces
+              </Link>
+              <Link
+                href="/products?category=bracelets"
+                className="text-[#7A736A] hover:text-[#181513] hover:border-b-2 hover:border-[#7A736A] pb-0.5 transition-all"
+              >
+                bracelets
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
     </section>
