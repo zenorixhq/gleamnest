@@ -1,66 +1,71 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
 import { storeConfig } from "@/config/store.config";
 
 export function HeroEditorial() {
   return (
-    <section className="relative w-full h-[calc(100svh-4rem)] sm:h-[calc(100vh-4.5rem)] min-h-[620px] max-h-[980px] bg-white text-[#1C1917] overflow-hidden select-none flex flex-col justify-between">
-      {/* 1. Isolated Jewelry Cutout: Focused on Layered Gold Necklace & Emerald Ring (No Dark Background, No Gradients) */}
-      <div className="absolute left-0 sm:left-4 lg:left-8 top-1/2 -translate-y-1/2 w-[340px] sm:w-[420px] lg:w-[480px] xl:w-[560px] h-[75%] max-h-[640px] pointer-events-none select-none z-0 flex items-center">
+    <section className="relative w-full h-[calc(100svh-4rem)] sm:h-[calc(100vh-4.5rem)] min-h-[620px] max-h-[980px] bg-[#E6E4DF] text-[#1C1917] overflow-hidden select-none flex flex-col justify-between">
+      {/* 1. Left Editorial Model Image (From Uploaded Image 1 on Warm Studio Canvas) */}
+      <div className="absolute inset-y-0 left-0 w-full lg:w-[48%] xl:w-[46%] h-full pointer-events-none select-none z-0 overflow-hidden">
         <img
-          src="/images/hero-jewelry-cutout.jpg"
-          alt="GleamNest Fine Waterproof Jewelry - Layered gold necklace with rectangular pendant and emerald eternity ring"
-          className="w-full h-full object-contain object-left drop-shadow-[0_15px_30px_rgba(0,0,0,0.04)]"
+          src="/images/hero-model-light-bg.jpg"
+          alt="GleamNest Fine Jewelry - Model wearing layered gold necklace and gemstone eternity rings"
+          className="w-full h-full object-cover object-[center_center]"
         />
+        {/* Soft edge blend into right studio backdrop on desktop */}
+        <div className="hidden lg:block absolute inset-y-0 right-0 w-24 bg-gradient-to-r from-transparent to-[#E6E4DF]" />
+        {/* Mobile soft contrast overlay */}
+        <div className="lg:hidden absolute inset-0 bg-[#E6E4DF]/40 backdrop-blur-[0.5px]" />
       </div>
 
-      {/* 2. Top-Right Brand Philosophy & CTA */}
+      {/* 2. Top-Right Brand Philosophy & Link (Exactly Matching Reference Image 2) */}
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 pt-6 sm:pt-8 flex justify-end">
         <div className="space-y-1.5 text-right max-w-xs sm:max-w-sm">
           <span className="text-[10px] sm:text-xs tracking-[0.25em] uppercase font-bold text-[#8C847A] block">
-            {storeConfig.meta.name || "GLEAMNEST"}
+            {storeConfig.meta.name || "TRACE"}
           </span>
           <p className="text-xs sm:text-sm text-[#4E473F] font-light leading-snug">
-            Fine jewelry for the skin, not the vault. <br />
-            18K gold finish. Worn every day.
+            Made for skin, not display. <br />
+            Made to order. Worn every day.
           </p>
           <div className="pt-0.5">
             <Link
-              href="/products"
+              href="https://wa.me/916238920442?text=Hello%20GleamNest!%20I%20would%20like%20to%20book%20a%20private%20fitting%20and%20consultation."
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#1C1917] hover:text-primary transition-colors group"
             >
-              <span>Explore collection</span>
+              <span>Book a fitting</span>
               <span className="group-hover:translate-x-1 transition-transform">→</span>
             </Link>
           </div>
         </div>
       </div>
 
-      {/* 3. Center Signature Editorial Headline */}
+      {/* 3. Center Signature Editorial Headline (Exactly Matching Reference Image 2) */}
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 my-auto">
         <div className="max-w-5xl">
-          {/* Line 1: NEVER SAVED FOR SOMEDAY */}
+          {/* Line 1: NOT FOR SOMEDAY */}
           <div className="flex items-baseline gap-3 sm:gap-6 flex-wrap">
-            <span className="font-editorial text-4xl sm:text-6xl md:text-7xl lg:text-[5.4vw] xl:text-[6.4rem] font-normal tracking-tight text-[#1C1917] uppercase leading-[0.92]">
-              NEVER SAVED
+            <span className="font-editorial text-4xl sm:text-6xl md:text-7xl lg:text-[5.4vw] xl:text-[6.6rem] font-normal tracking-tight text-[#1C1917] uppercase leading-[0.92]">
+              NOT FOR
             </span>
-            <span className="font-editorial text-4xl sm:text-6xl md:text-7xl lg:text-[5.4vw] xl:text-[6.4rem] font-light tracking-wide uppercase text-[#948D85]/60 font-outline-editorial leading-[0.92]">
-              FOR SOMEDAY
+            <span className="font-editorial text-4xl sm:text-6xl md:text-7xl lg:text-[5.4vw] xl:text-[6.6rem] font-light tracking-wide uppercase text-[#948D85]/60 font-outline-editorial leading-[0.92]">
+              SOMEDAY
             </span>
           </div>
 
-          {/* Line 2: CRAFTED TO LIVE IN (Indented to start under second word) */}
+          {/* Line 2: MADE TO LIVE IN (Indented to start under second word) */}
           <div className="pl-6 sm:pl-20 md:pl-32 lg:pl-48 xl:pl-56 mt-0.5 sm:mt-1">
-            <h1 className="font-editorial text-4xl sm:text-6xl md:text-7xl lg:text-[5.4vw] xl:text-[6.4rem] font-normal tracking-tight text-[#1C1917] uppercase leading-[0.92]">
-              CRAFTED TO LIVE IN
+            <h1 className="font-editorial text-4xl sm:text-6xl md:text-7xl lg:text-[5.4vw] xl:text-[6.6rem] font-normal tracking-tight text-[#1C1917] uppercase leading-[0.92]">
+              MADE TO LIVE IN
             </h1>
           </div>
         </div>
       </div>
 
-      {/* 4. Bottom Right Floating Product Cards & Bottom White Dock */}
+      {/* 4. Bottom Right Floating Product Cards & Bottom White Dock (Exactly Matching Reference Image 2) */}
       <div className="relative z-10 w-full">
         {/* Floating Cards (Bottom Right Quadrant) */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 pb-3 sm:pb-4 flex justify-end">
@@ -68,7 +73,7 @@ export function HeroEditorial() {
             {/* Card 1: Bracelet · Line */}
             <Link
               href="/products?category=bracelets"
-              className="relative w-36 sm:w-48 md:w-56 h-24 sm:h-28 md:h-32 rounded-xl overflow-hidden shadow-md border border-[#EAE5DD] group flex-shrink-0 transition-transform duration-300 hover:-translate-y-1"
+              className="relative w-36 sm:w-48 md:w-56 h-24 sm:h-28 md:h-32 rounded-xl overflow-hidden shadow-lg border border-white/40 group flex-shrink-0 transition-transform duration-300 hover:-translate-y-1"
             >
               <img
                 src="/images/hero-card-bracelet.png"
@@ -92,7 +97,7 @@ export function HeroEditorial() {
             {/* Card 2: Necklace · Rivière */}
             <Link
               href="/products?category=necklaces"
-              className="relative w-36 sm:w-48 md:w-56 h-24 sm:h-28 md:h-32 rounded-xl overflow-hidden shadow-md border border-[#EAE5DD] group flex-shrink-0 transition-transform duration-300 hover:-translate-y-1"
+              className="relative w-36 sm:w-48 md:w-56 h-24 sm:h-28 md:h-32 rounded-xl overflow-hidden shadow-lg border border-white/40 group flex-shrink-0 transition-transform duration-300 hover:-translate-y-1"
             >
               <img
                 src="/images/hero-card-necklace.png"
@@ -115,13 +120,13 @@ export function HeroEditorial() {
           </div>
         </div>
 
-        {/* 5. Bottom White Curved Dock / Floating Bar */}
+        {/* 5. Bottom White Curved Dock / Floating Bar (Exactly Matching Reference Image 2) */}
         <div className="w-full bg-white rounded-t-[1.75rem] sm:rounded-t-[2.25rem] md:rounded-t-[2.75rem] shadow-[0_-8px_30px_rgba(0,0,0,0.03)] border-t border-[#EAE5DD]">
           <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 py-3.5 sm:py-4 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-6">
             {/* Left: 3-line lower-case motto */}
             <div className="text-[10px] sm:text-[11px] text-[#8C847B] font-normal lowercase leading-tight text-center sm:text-left">
-              <div>waterproof & anti-tarnish.</div>
-              <div>surgical-grade 316L steel.</div>
+              <div>made to order.</div>
+              <div>fitted in person.</div>
               <div>worn every day after.</div>
             </div>
 
