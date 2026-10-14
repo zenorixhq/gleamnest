@@ -10,9 +10,9 @@ export function HeroEditorial() {
       {/* 1. Background Editorial Model Photography on Left */}
       <div className="absolute inset-0 w-full h-full pointer-events-none overflow-hidden">
         <img
-          src="/images/hero-model-portrait.jpg"
-          alt="GleamNest Fine Waterproof Jewelry - Model wearing layered gold necklace and emerald eternity ring"
-          className="w-full h-full object-cover object-[center_15%] sm:object-[center_18%] lg:object-[left_center] xl:object-[left_center] opacity-95"
+          src="/images/hero-jewelry-closeup.jpg"
+          alt="GleamNest Fine Waterproof Jewelry - Macro closeup of layered gold necklace and emerald eternity ring"
+          className="w-full h-full object-cover object-[center_35%] sm:object-[center_30%] lg:object-[25%_center] xl:object-[28%_center] opacity-95"
         />
 
         {/* Desktop Smooth Horizontal Fade into Warm Linen Background */}
