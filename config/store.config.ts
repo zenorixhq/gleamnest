@@ -90,14 +90,14 @@ export const storeConfig: StoreConfig = {
     },
     contact: {
       email: "gleamnest.in@gmail.com",
-      phone: "+91 62389 20442",
-      whatsappNumber: "916238920442",
+      phone: "+91 96339 56222",
+      whatsappNumber: "919633956222",
       address: "Kerala, India • Pan-India Express Delivery",
       hours: "Mon – Sat: 9:30 AM – 8:00 PM IST",
     },
     socials: {
       instagram: "https://instagram.com/gleamnest.in",
-      whatsapp: "https://wa.me/916238920442",
+      whatsapp: "https://wa.me/919633956222",
       facebook: "https://facebook.com",
     },
   },

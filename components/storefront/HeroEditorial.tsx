@@ -7,11 +7,11 @@ export function HeroEditorial() {
   return (
     <section className="relative w-full h-[calc(100svh-5.5rem)] sm:h-[calc(100vh-6.5rem)] min-h-[580px] max-h-[920px] bg-gradient-to-r from-[#F7EEDD] via-[#F5EAD6] to-[#E9D9C1] text-[#1C1917] overflow-hidden select-none flex flex-col justify-between">
       {/* 1. Left Editorial Model Image (From Uploaded Image 1 on Warm Studio Canvas) */}
-      <div className="absolute inset-y-0 left-0 w-full lg:w-[48%] xl:w-[46%] h-full pointer-events-none select-none z-0 overflow-hidden">
+      <div className="absolute top-0 bottom-32 sm:bottom-16 lg:bottom-20 left-0 w-full lg:w-[48%] xl:w-[46%] pointer-events-none select-none z-0 overflow-hidden">
         <img
           src="/images/hero-model-light-bg.jpg"
           alt="GleamNest Fine Jewelry - Model wearing layered gold necklace and gemstone eternity rings"
-          className="w-full h-full object-cover object-[center_center]"
+          className="w-full h-full object-cover object-[0%_bottom] sm:object-[15%_bottom]"
         />
         {/* Soft edge blend into right studio backdrop on desktop */}
         <div className="hidden lg:block absolute inset-y-0 right-0 w-36 bg-gradient-to-r from-transparent to-[#F5EAD6]" />
@@ -31,7 +31,7 @@ export function HeroEditorial() {
           </p>
           <div className="pt-0.5">
             <Link
-              href="https://wa.me/916238920442?text=Hello%20GleamNest!%20I%20would%20like%20to%20book%20a%20private%20fitting%20and%20consultation."
+              href={`https://wa.me/${storeConfig.brand.contact.whatsappNumber}?text=Hello%20GleamNest!%20I%20would%20like%20to%20book%20a%20private%20fitting%20and%20consultation.`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#1C1917] hover:text-black transition-colors group"
