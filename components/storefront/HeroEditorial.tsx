@@ -6,37 +6,37 @@ import { storeConfig } from "@/config/store.config";
 
 export function HeroEditorial() {
   return (
-    <section className="relative w-full h-[calc(100svh-4rem)] sm:h-[calc(100vh-4.5rem)] min-h-[620px] max-h-[980px] bg-[#E6E4DF] text-[#181513] overflow-hidden select-none flex flex-col justify-between">
+    <section className="relative w-full h-[calc(100svh-4rem)] sm:h-[calc(100vh-4.5rem)] min-h-[620px] max-h-[980px] bg-[#EDE8E1] text-[#1C1917] overflow-hidden select-none flex flex-col justify-between">
       {/* 1. Background Editorial Model Photography on Left */}
       <div className="absolute inset-0 w-full h-full pointer-events-none overflow-hidden">
         <img
-          src="/images/hero-model-editorial.jpg"
-          alt="GleamNest Fine Jewelry Editorial - Model wearing pear diamond ring"
-          className="w-full h-full object-cover object-[18%_center] sm:object-[22%_center] lg:object-[25%_center] xl:object-[30%_center] opacity-95"
+          src="/images/hero-model-portrait.jpg"
+          alt="GleamNest Fine Waterproof Jewelry - Model wearing layered gold necklace and emerald eternity ring"
+          className="w-full h-full object-cover object-[center_15%] sm:object-[center_18%] lg:object-[left_center] xl:object-[left_center] opacity-95"
         />
 
-        {/* Desktop Smooth Horizontal Fade into Background */}
-        <div className="hidden lg:block absolute inset-y-0 left-[38%] xl:left-[42%] w-[28%] bg-gradient-to-r from-transparent via-[#E6E4DF]/60 to-[#E6E4DF]" />
-        <div className="hidden lg:block absolute inset-y-0 right-0 w-[42%] bg-[#E6E4DF]" />
+        {/* Desktop Smooth Horizontal Fade into Warm Linen Background */}
+        <div className="hidden lg:block absolute inset-y-0 left-[35%] xl:left-[38%] w-[22%] bg-gradient-to-r from-transparent via-[#EDE8E1]/50 to-[#EDE8E1]" />
+        <div className="hidden lg:block absolute inset-y-0 right-0 w-[45%] bg-[#EDE8E1]" />
 
-        {/* Mobile/Tablet Soft Legibility Layer */}
-        <div className="lg:hidden absolute inset-0 bg-gradient-to-r from-transparent via-[#E6E4DF]/50 to-[#E6E4DF]/90" />
+        {/* Mobile/Tablet Legibility Layer */}
+        <div className="lg:hidden absolute inset-0 bg-gradient-to-r from-[#EDE8E1]/20 via-[#EDE8E1]/65 to-[#EDE8E1]/95" />
       </div>
 
       {/* 2. Top-Right Brand Philosophy & CTA */}
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 pt-6 sm:pt-8 flex justify-end">
         <div className="space-y-1.5 text-right max-w-xs sm:max-w-sm">
-          <span className="text-[10px] sm:text-xs tracking-[0.25em] uppercase font-bold text-[#7A746B] block">
+          <span className="text-[10px] sm:text-xs tracking-[0.25em] uppercase font-bold text-[#8C847A] block">
             {storeConfig.meta.name || "GLEAMNEST"}
           </span>
-          <p className="text-xs sm:text-sm text-[#4A453E] font-light leading-snug">
-            Made for skin, not display. <br />
-            Made to order. Worn every day.
+          <p className="text-xs sm:text-sm text-[#4E473F] font-light leading-snug">
+            Fine jewelry for the skin, not the vault. <br />
+            18K gold finish. Worn every day.
           </p>
           <div className="pt-0.5">
             <Link
               href="/products"
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#181513] hover:text-primary transition-colors group"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#1C1917] hover:text-primary transition-colors group"
             >
               <span>Explore collection</span>
               <span className="group-hover:translate-x-1 transition-transform">→</span>
@@ -48,20 +48,20 @@ export function HeroEditorial() {
       {/* 3. Center Signature Editorial Headline */}
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 my-auto">
         <div className="max-w-5xl">
-          {/* Line 1: NOT FOR SOMEDAY */}
+          {/* Line 1: NEVER SAVED FOR SOMEDAY */}
           <div className="flex items-baseline gap-3 sm:gap-6 flex-wrap">
-            <span className="font-editorial text-4xl sm:text-6xl md:text-7xl lg:text-[5.5rem] xl:text-[6.8rem] font-normal tracking-tight text-[#181513] uppercase leading-[0.92]">
-              NOT FOR
+            <span className="font-editorial text-4xl sm:text-6xl md:text-7xl lg:text-[5.4vw] xl:text-[6.4rem] font-normal tracking-tight text-[#1C1917] uppercase leading-[0.92]">
+              NEVER SAVED
             </span>
-            <span className="font-editorial text-4xl sm:text-6xl md:text-7xl lg:text-[5.5rem] xl:text-[6.8rem] font-light tracking-wide uppercase text-[#8F8880]/60 font-outline-editorial leading-[0.92]">
-              SOMEDAY
+            <span className="font-editorial text-4xl sm:text-6xl md:text-7xl lg:text-[5.4vw] xl:text-[6.4rem] font-light tracking-wide uppercase text-[#948D85]/60 font-outline-editorial leading-[0.92]">
+              FOR SOMEDAY
             </span>
           </div>
 
-          {/* Line 2: MADE TO LIVE IN (Indented to start under SOMEDAY) */}
+          {/* Line 2: CRAFTED TO LIVE IN (Indented to start under second word) */}
           <div className="pl-6 sm:pl-20 md:pl-32 lg:pl-48 xl:pl-56 mt-0.5 sm:mt-1">
-            <h1 className="font-editorial text-4xl sm:text-6xl md:text-7xl lg:text-[5.5rem] xl:text-[6.8rem] font-normal tracking-tight text-[#181513] uppercase leading-[0.92]">
-              MADE TO LIVE IN
+            <h1 className="font-editorial text-4xl sm:text-6xl md:text-7xl lg:text-[5.4vw] xl:text-[6.4rem] font-normal tracking-tight text-[#1C1917] uppercase leading-[0.92]">
+              CRAFTED TO LIVE IN
             </h1>
           </div>
         </div>
@@ -123,19 +123,19 @@ export function HeroEditorial() {
         </div>
 
         {/* 5. Bottom White Curved Dock / Floating Bar */}
-        <div className="w-full bg-white rounded-t-[1.75rem] sm:rounded-t-[2.25rem] md:rounded-t-[2.75rem] shadow-[0_-8px_30px_rgba(0,0,0,0.04)] border-t border-[#EAE6DE]">
+        <div className="w-full bg-white rounded-t-[1.75rem] sm:rounded-t-[2.25rem] md:rounded-t-[2.75rem] shadow-[0_-8px_30px_rgba(0,0,0,0.04)] border-t border-[#EAE5DD]">
           <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 py-3.5 sm:py-4 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-6">
             {/* Left: 3-line lower-case motto */}
-            <div className="text-[10px] sm:text-[11px] text-[#8C857D] font-normal lowercase leading-tight text-center sm:text-left">
-              <div>made to order.</div>
-              <div>fitted in person.</div>
+            <div className="text-[10px] sm:text-[11px] text-[#8C847B] font-normal lowercase leading-tight text-center sm:text-left">
+              <div>waterproof & anti-tarnish.</div>
+              <div>surgical-grade 316L steel.</div>
               <div>worn every day after.</div>
             </div>
 
             {/* Center: Scroll button */}
             <a
               href="#about-us"
-              className="flex flex-col items-center justify-center text-[9px] sm:text-[10px] uppercase tracking-[0.25em] text-[#7A736A] hover:text-[#181513] transition-colors group cursor-pointer"
+              className="flex flex-col items-center justify-center text-[9px] sm:text-[10px] uppercase tracking-[0.25em] text-[#7A7269] hover:text-[#1C1917] transition-colors group cursor-pointer"
             >
               <span className="text-xs group-hover:translate-y-0.5 transition-transform">↓</span>
               <span className="font-semibold tracking-[0.2em]">SCROLL</span>
@@ -145,25 +145,25 @@ export function HeroEditorial() {
             <div className="flex items-center gap-4 sm:gap-6 md:gap-8 text-xs sm:text-sm lowercase">
               <Link
                 href="/products?category=rings"
-                className="text-[#181513] font-semibold border-b-2 border-[#181513] pb-0.5 transition-colors"
+                className="text-[#1C1917] font-semibold border-b-2 border-[#1C1917] pb-0.5 transition-colors"
               >
                 rings
               </Link>
               <Link
                 href="/products?category=earrings"
-                className="text-[#7A736A] hover:text-[#181513] hover:border-b-2 hover:border-[#7A736A] pb-0.5 transition-all"
+                className="text-[#7A7269] hover:text-[#1C1917] hover:border-b-2 hover:border-[#7A7269] pb-0.5 transition-all"
               >
                 earrings
               </Link>
               <Link
                 href="/products?category=necklaces"
-                className="text-[#7A736A] hover:text-[#181513] hover:border-b-2 hover:border-[#7A736A] pb-0.5 transition-all"
+                className="text-[#7A7269] hover:text-[#1C1917] hover:border-b-2 hover:border-[#7A7269] pb-0.5 transition-all"
               >
                 necklaces
               </Link>
               <Link
                 href="/products?category=bracelets"
-                className="text-[#7A736A] hover:text-[#181513] hover:border-b-2 hover:border-[#7A736A] pb-0.5 transition-all"
+                className="text-[#7A7269] hover:text-[#1C1917] hover:border-b-2 hover:border-[#7A7269] pb-0.5 transition-all"
               >
                 bracelets
               </Link>
