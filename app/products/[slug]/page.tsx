@@ -5,7 +5,7 @@ import Link from "next/link";
 import { notFound, useRouter } from "next/navigation";
 import { useProductStore } from "@/store/useProductStore";
 import { useCartStore } from "@/store/useCartStore";
-import { formatPrice, calculateDiscountPercent } from "@/lib/utils";
+import { formatPrice, calculateDiscountPercent, getProductPrices } from "@/lib/utils";
 import { ProductCard } from "@/components/storefront/ProductCard";
 import {
   Star,
@@ -79,9 +79,10 @@ export default function ProductDetailPage({
     });
   }
 
-  const discountPercent = product.salePrice
-    ? calculateDiscountPercent(product.price, product.salePrice)
-    : 0;
+  const { regularPrice, salePrice, effectivePrice, discountPercent, isQatar } = getProductPrices(
+    product,
+    selectedCurrency
+  );
 
   const handleAddToCart = () => {
     const hasVariants =
@@ -122,8 +123,12 @@ export default function ProductDetailPage({
       .map(([k, v]) => `${k}: ${v}`)
       .join(", ");
 
-    const price = product.salePrice || product.price;
     const phone = storeConfig.brand.contact.whatsappNumber;
+    const itemTotalFormatted = formatPrice(effectivePrice * quantity, selectedCurrency);
+
+    const greetingMessage = isQatar
+      ? "I want to order this piece from your website! Please confirm availability and share payment/delivery details for Qatar (Free Delivery). Thank you! 💖"
+      : "I want to order this piece from your website! Please confirm availability and share your *UPI QR code* so I can pay and confirm my delivery. Thank you! 💖";
 
     const message = `━━━━━━━━━━━━━━━━━━━━━
 ✨ *G L E A M N E S T* ✨
@@ -133,10 +138,11 @@ _Instant Order Inquiry_
 💍 *SELECTED PIECE*
 • *Title:* *${product.title}*
 ${selectedVariantSummary ? `• *Selection:* ${selectedVariantSummary}\n` : ""}• *Quantity:* ${quantity}
-• *Item Total:* *₹${(price * quantity).toFixed(0)}*
+• *Item Total:* *${itemTotalFormatted}*
+• *Destination:* *${isQatar ? "Qatar (Complimentary Delivery)" : "India"}*
 
 💬 *Hello GleamNest Team!*
-I want to order this piece from your website! Please confirm availability and share your *UPI QR code* so I can pay and confirm my delivery. Thank you! 💖
+${greetingMessage}
 ━━━━━━━━━━━━━━━━━━━━━`;
 
     const encodedMessage = encodeURIComponent(message);
@@ -251,14 +257,16 @@ I want to order this piece from your website! Please confirm availability and sh
           {/* Pricing */}
           <div className="flex items-baseline gap-3 p-4 rounded-xl bg-muted/40 border border-border">
             <span className="text-2xl sm:text-3xl font-black text-foreground">
-              {formatPrice(product.salePrice || product.price, selectedCurrency)}
+              {formatPrice(effectivePrice, selectedCurrency)}
             </span>
-            {product.salePrice && (
+            {salePrice && (
               <span className="text-base text-muted-foreground line-through">
-                {formatPrice(product.price, selectedCurrency)}
+                {formatPrice(regularPrice, selectedCurrency)}
               </span>
             )}
-            <span className="text-xs text-muted-foreground ml-auto">Tax included at checkout</span>
+            <span className="text-xs text-muted-foreground ml-auto">
+              {isQatar ? "Free Delivery in Qatar Included" : "Tax included at checkout"}
+            </span>
           </div>
 
           <p className="text-sm text-muted-foreground leading-relaxed">
@@ -385,8 +393,10 @@ I want to order this piece from your website! Please confirm availability and sh
             </div>
             <div className="space-y-1">
               <Truck className="w-4 h-4 mx-auto text-primary" />
-              <p className="font-semibold text-foreground">Pan-India Courier</p>
-              <p>Free on ₹799+</p>
+              <p className="font-semibold text-foreground">
+                {isQatar ? "Qatar Delivery" : "Pan-India Courier"}
+              </p>
+              <p>{isQatar ? "100% Free Shipping" : "Free on ₹799+"}</p>
             </div>
           </div>
         </div>

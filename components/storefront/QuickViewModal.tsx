@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useCartStore } from "@/store/useCartStore";
-import { formatPrice } from "@/lib/utils";
+import { formatPrice, getProductPrices } from "@/lib/utils";
 import { X, Star, ShoppingBag, Plus, Minus, ArrowRight } from "lucide-react";
 
 export function QuickViewModal() {
@@ -16,6 +16,11 @@ export function QuickViewModal() {
   const [selectedOptions, setSelectedOptions] = useState<{ [key: string]: string }>({});
 
   if (!product) return null;
+
+  const { regularPrice, salePrice, effectivePrice } = getProductPrices(
+    product,
+    selectedCurrency
+  );
 
   // Initialize default options
   const currentOptions = { ...selectedOptions };
@@ -110,11 +115,11 @@ export function QuickViewModal() {
               {/* Price */}
               <div className="flex items-baseline gap-2">
                 <span className="text-xl font-black text-foreground">
-                  {formatPrice(product.salePrice || product.price, selectedCurrency)}
+                  {formatPrice(effectivePrice, selectedCurrency)}
                 </span>
-                {product.salePrice && (
+                {salePrice && (
                   <span className="text-sm text-muted-foreground line-through">
-                    {formatPrice(product.price, selectedCurrency)}
+                    {formatPrice(regularPrice, selectedCurrency)}
                   </span>
                 )}
               </div>

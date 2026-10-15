@@ -66,7 +66,13 @@ export const useCartStore = create<CartStore>()(
           (item) => item.id === itemIdentifier
         );
 
-        const unitPrice = product.salePrice || product.price;
+        const indiaPrice = product.salePrice || product.price;
+        const qatarPrice =
+          product.salePriceQatar !== undefined && product.salePriceQatar !== null
+            ? product.salePriceQatar
+            : product.priceQatar !== undefined && product.priceQatar !== null
+            ? product.priceQatar
+            : Math.max(10, Math.round(indiaPrice / 20));
 
         if (existingIndex > -1) {
           const updated = [...currentItems];
@@ -78,7 +84,8 @@ export const useCartStore = create<CartStore>()(
             productId: product.id,
             title: product.title,
             slug: product.slug,
-            price: unitPrice,
+            price: indiaPrice,
+            priceQatar: qatarPrice,
             image: product.images[0],
             quantity,
             selectedVariant: normalizedVariant,
@@ -155,10 +162,15 @@ export const useCartStore = create<CartStore>()(
       closeQuickView: () => set({ quickViewProduct: null }),
 
       getSubtotal: () => {
-        return get().items.reduce(
-          (sum, item) => sum + item.price * item.quantity,
-          0
-        );
+        const isQatar = get().selectedCurrency === "QAR";
+        return get().items.reduce((sum, item) => {
+          const itemPrice = isQatar
+            ? item.priceQatar !== undefined && item.priceQatar !== null
+              ? item.priceQatar
+              : Math.max(10, Math.round(item.price / 20))
+            : item.price;
+          return sum + itemPrice * item.quantity;
+        }, 0);
       },
 
       getDiscountAmount: () => {
@@ -175,6 +187,8 @@ export const useCartStore = create<CartStore>()(
       getShippingFee: () => {
         const subtotal = get().getSubtotal();
         if (subtotal === 0) return 0;
+        // FREE Delivery anywhere in Qatar on all orders!
+        if (get().selectedCurrency === "QAR") return 0;
         const threshold = storeConfig.commerce.freeShippingThreshold;
         if (subtotal >= threshold) return 0;
         return storeConfig.commerce.flatShippingFee;

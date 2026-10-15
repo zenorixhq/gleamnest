@@ -37,7 +37,7 @@ export interface StoreConfig {
   };
   commerce: {
     defaultCurrency: "INR";
-    supportedCurrencies: { code: string; symbol: string; rate: number }[];
+    supportedCurrencies: { code: string; symbol: string; name?: string; flag?: string; rate: number }[];
     freeShippingThreshold: number;
     flatShippingFee: number;
     taxRatePercent: number;
@@ -104,8 +104,8 @@ export const storeConfig: StoreConfig = {
   commerce: {
     defaultCurrency: "INR",
     supportedCurrencies: [
-      { code: "INR", symbol: "₹", rate: 1.0 },
-      { code: "USD", symbol: "$", rate: 0.012 },
+      { code: "INR", symbol: "₹", name: "India (₹)", flag: "🇮🇳", rate: 1.0 },
+      { code: "QAR", symbol: "QAR", name: "Qatar (QAR)", flag: "🇶🇦", rate: 1.0 },
     ],
     freeShippingThreshold: 799,
     flatShippingFee: 60,
@@ -134,7 +134,7 @@ export const storeConfig: StoreConfig = {
     enableQuickView: true,
     enableStockBadges: true,
     enableAnnouncementBar: true,
-    announcementText: "✨ 100% Anti-Tarnish & Waterproof Jewelry Starting at ₹118 • Free Pan-India Delivery on orders above ₹799 • Order on WhatsApp",
+    announcementText: "✨ 100% Anti-Tarnish & Waterproof Jewelry • Free Delivery in Qatar & Pan-India on Orders Above ₹799 • Order on WhatsApp",
     enableWhatsAppFloat: true,
     enableCurrencySwitcher: true,
   },

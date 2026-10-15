@@ -22,6 +22,8 @@ function formatProduct(p: any) {
     description: p.description,
     price: p.price,
     salePrice: p.salePrice || undefined,
+    priceQatar: p.priceQatar !== null && p.priceQatar !== undefined ? p.priceQatar : undefined,
+    salePriceQatar: p.salePriceQatar !== null && p.salePriceQatar !== undefined ? p.salePriceQatar : undefined,
     category: p.category,
     tags: safeJsonParse<string[]>(p.tags, [p.category]),
     images: safeJsonParse<string[]>(p.images, [
@@ -85,6 +87,12 @@ export async function POST(req: Request) {
         description: body.description || "",
         price: parseFloat(body.price),
         salePrice: body.salePrice ? parseFloat(body.salePrice) : null,
+        priceQatar: body.priceQatar !== undefined && body.priceQatar !== "" && body.priceQatar !== null
+          ? parseFloat(body.priceQatar)
+          : body.price ? Math.max(10, Math.round(parseFloat(body.price) / 20)) : null,
+        salePriceQatar: body.salePriceQatar !== undefined && body.salePriceQatar !== "" && body.salePriceQatar !== null
+          ? parseFloat(body.salePriceQatar)
+          : null,
         category: body.category || "necklaces",
         tags: JSON.stringify(Array.isArray(body.tags) ? body.tags : [body.category || "jewelry", "New"]),
         images: JSON.stringify(imageUrls),

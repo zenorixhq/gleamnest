@@ -25,6 +25,7 @@ export default function CheckoutPage() {
   const items = useCartStore((s) => s.items);
   const clearCart = useCartStore((s) => s.clearCart);
   const selectedCurrency = useCartStore((s) => s.selectedCurrency);
+  const setCurrency = useCartStore((s) => s.setCurrency);
   const appliedCoupon = useCartStore((s) => s.appliedCoupon);
   const applyCoupon = useCartStore((s) => s.applyCoupon);
   const removeCoupon = useCartStore((s) => s.removeCoupon);
@@ -33,6 +34,7 @@ export default function CheckoutPage() {
     setMounted(true);
   }, []);
 
+  const isQatar = selectedCurrency === "QAR";
   const subtotal = useCartStore((s) => s.getSubtotal)();
   const discount = useCartStore((s) => s.getDiscountAmount)();
   const shipping = useCartStore((s) => s.getShippingFee)();
@@ -42,14 +44,24 @@ export default function CheckoutPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [formData, setFormData] = useState({
+    country: selectedCurrency === "QAR" ? "Qatar" : "India",
     fullName: "",
     phone: "",
     address: "",
     city: "",
-    state: "Kerala",
+    state: selectedCurrency === "QAR" ? "Doha" : "Kerala",
     postalCode: "",
     notes: "",
   });
+
+  const handleCountryChange = (country: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      country,
+      state: country === "Qatar" ? "Doha" : "Kerala",
+    }));
+    setCurrency(country === "Qatar" ? "QAR" : "INR");
+  };
 
   const grandTotal = Math.max(0, subtotal - discount + shipping);
 
@@ -108,10 +120,29 @@ export default function CheckoutPage() {
         const variantInfo = item.selectedVariant
           ? ` (${Object.values(item.selectedVariant.options).join(", ")})`
           : "";
+        const itemUnit = isQatar
+          ? item.priceQatar !== undefined && item.priceQatar !== null
+            ? item.priceQatar
+            : Math.max(10, Math.round(item.price / 20))
+          : item.price;
         return `*${idx + 1}. ${item.title}*${variantInfo}
-   • Qty: ${item.quantity}  |  ₹${(item.price * item.quantity).toFixed(0)}`;
+   • Qty: ${item.quantity}  |  ${formatPrice(itemUnit * item.quantity, selectedCurrency)}`;
       })
       .join("\n\n");
+
+    const shippingText = isQatar
+      ? "FREE (Complimentary Qatar Delivery)"
+      : shipping === 0
+      ? "FREE (Pan-India Express)"
+      : `${formatPrice(shipping, selectedCurrency)} (Pan-India Express)`;
+
+    const greetingMessage = isQatar
+      ? `💬 *Hello GleamNest Team!*
+I have placed this order on your website for delivery in Qatar (Free Delivery). 
+Please share payment details (Card / Bank Transfer / Cash on Delivery) so I can complete my order! 💖`
+      : `💬 *Hello GleamNest Team!*
+I have placed this order on your website. 
+Please share your *UPI QR Code / Payment details (GPay / PhonePe / Paytm)* so I can complete payment and confirm shipping! 💖`;
 
     const message = `━━━━━━━━━━━━━━━━━━━━━
 ✨ *G L E A M N E S T* ✨
@@ -121,6 +152,7 @@ _Everyday Anti-Tarnish & Waterproof Jewelry_
 🛍️ *NEW ORDER CONFIRMATION*
 • *Order Ref:* #${orderNumber}
 • *Date:* ${orderDate}
+• *Destination:* *${formData.country}*
 
 ━━━━━━━━━━━━━━━━━━━━━
 👤 *CUSTOMER DETAILS*
@@ -129,8 +161,9 @@ _Everyday Anti-Tarnish & Waterproof Jewelry_
 • *WhatsApp:* ${formData.phone}
 • *Shipping Address:*
   ${formData.address}
-  ${[formData.city, formData.state].filter(Boolean).join(", ")}${formData.postalCode ? ` - ${formData.postalCode}` : ""}${formData.notes ? `\n• *Special Note:* ${formData.notes}` : ""}
-
+  ${[formData.city, formData.state].filter(Boolean).join(", ")}${formData.postalCode ? ` - ${formData.postalCode}` : ""}
+  Country: ${formData.country}
+${formData.notes ? `• *Special Note:* ${formData.notes}\n` : ""}
 ━━━━━━━━━━━━━━━━━━━━━
 💍 *ITEMS ORDERED (${items.reduce((s, i) => s + i.quantity, 0)})*
 ━━━━━━━━━━━━━━━━━━━━━
@@ -139,15 +172,13 @@ ${itemsText}
 ━━━━━━━━━━━━━━━━━━━━━
 💳 *PAYMENT SUMMARY*
 ━━━━━━━━━━━━━━━━━━━━━
-• Subtotal: ₹${subtotal.toFixed(0)}
-${discount > 0 ? `• Coupon Discount (${appliedCoupon?.code}): -₹${discount.toFixed(0)}\n` : ""}• Shipping: ${shipping === 0 ? "FREE (Pan-India Express)" : `₹${shipping.toFixed(0)} (Pan-India Express)`}
+• Subtotal: ${formatPrice(subtotal, selectedCurrency)}
+${discount > 0 ? `• Coupon Discount (${appliedCoupon?.code}): -${formatPrice(discount, selectedCurrency)}\n` : ""}• Shipping: ${shippingText}
 ─────────────────────
-✨ *TOTAL AMOUNT PAYABLE:* *₹${grandTotal.toFixed(0)}*
+✨ *TOTAL AMOUNT PAYABLE:* *${formatPrice(grandTotal, selectedCurrency)}*
 ─────────────────────
 
-💬 *Hello GleamNest Team!*
-I have placed this order on your website. 
-Please share your *UPI QR Code / Payment details (GPay / PhonePe / Paytm)* so I can complete payment and confirm shipping! 💖
+${greetingMessage}
 ━━━━━━━━━━━━━━━━━━━━━`;
 
     const encodedMessage = encodeURIComponent(message);
@@ -176,11 +207,15 @@ Please share your *UPI QR Code / Payment details (GPay / PhonePe / Paytm)* so I 
         orderNumber,
         customerName: formData.fullName,
         customerPhone: formData.phone,
-        shippingAddress: `${formData.address}, ${formData.city}, ${formData.state} - ${formData.postalCode}`,
+        shippingAddress: `${formData.address}, ${formData.city}, ${formData.state}${formData.postalCode ? ` - ${formData.postalCode}` : ""}, ${formData.country}`,
         items: items.map((i) => ({
           productId: i.id,
           title: i.title,
-          price: i.price,
+          price: isQatar
+            ? i.priceQatar !== undefined && i.priceQatar !== null
+              ? i.priceQatar
+              : Math.max(10, Math.round(i.price / 20))
+            : i.price,
           quantity: i.quantity,
           image: i.image,
           selectedVariant: i.selectedVariant,
@@ -189,7 +224,7 @@ Please share your *UPI QR Code / Payment details (GPay / PhonePe / Paytm)* so I 
         discountTotal: discount,
         shippingFee: shipping,
         grandTotal,
-        paymentMethod: "WhatsApp Direct UPI",
+        paymentMethod: isQatar ? "WhatsApp Direct (Qatar)" : "WhatsApp Direct UPI",
         paymentStatus: "pending",
         orderStatus: "processing",
       }),
@@ -202,7 +237,7 @@ Please share your *UPI QR Code / Payment details (GPay / PhonePe / Paytm)* so I 
 
     setTimeout(() => {
       clearCart();
-      router.push(`/checkout/success?orderNumber=${orderNumber}&total=${grandTotal.toFixed(0)}&phone=${formData.phone}`);
+      router.push(`/checkout/success?orderNumber=${orderNumber}&total=${encodeURIComponent(formatPrice(grandTotal, selectedCurrency))}&phone=${formData.phone}`);
     }, 600);
   };
 
@@ -227,11 +262,52 @@ Please share your *UPI QR Code / Payment details (GPay / PhonePe / Paytm)* so I 
           {/* Left Column: Delivery Details Form */}
           <div className="lg:col-span-7 space-y-6">
             <div className="bg-card p-6 sm:p-8 rounded-2xl border border-border shadow-sm space-y-5">
-              <div className="flex items-center gap-2 pb-3 border-b border-border">
-                <MapPin className="w-5 h-5 text-primary" />
-                <h3 className="text-sm font-bold text-foreground uppercase tracking-wider">
-                  Shipping & Delivery Information
-                </h3>
+              <div className="flex items-center justify-between pb-3 border-b border-border">
+                <div className="flex items-center gap-2">
+                  <MapPin className="w-5 h-5 text-primary" />
+                  <h3 className="text-sm font-bold text-foreground uppercase tracking-wider">
+                    Shipping & Delivery Information
+                  </h3>
+                </div>
+                {isQatar && (
+                  <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                    ✨ Free Delivery in Qatar
+                  </span>
+                )}
+              </div>
+
+              {/* Destination Country Selector */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-foreground flex items-center justify-between">
+                  <span>Delivery Destination Country *</span>
+                  <span className="text-[10px] text-muted-foreground">Select your shipping destination</span>
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => handleCountryChange("India")}
+                    className={`py-2.5 px-4 rounded-xl border text-xs font-bold flex items-center justify-center gap-2 transition-all ${
+                      formData.country === "India"
+                        ? "border-primary bg-primary/10 text-primary shadow-sm"
+                        : "border-border bg-background text-muted-foreground hover:bg-muted"
+                    }`}
+                  >
+                    <span>🇮🇳</span>
+                    <span>India (₹ INR)</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleCountryChange("Qatar")}
+                    className={`py-2.5 px-4 rounded-xl border text-xs font-bold flex items-center justify-center gap-2 transition-all ${
+                      formData.country === "Qatar"
+                        ? "border-emerald-600 bg-emerald-50 text-emerald-800 shadow-sm"
+                        : "border-border bg-background text-muted-foreground hover:bg-muted"
+                    }`}
+                  >
+                    <span>🇶🇦</span>
+                    <span>Qatar (QAR) • Free Shipping</span>
+                  </button>
+                </div>
               </div>
 
               {/* Full Name */}
@@ -243,7 +319,7 @@ Please share your *UPI QR Code / Payment details (GPay / PhonePe / Paytm)* so I 
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Ananya Sharma"
+                  placeholder={isQatar ? "e.g. Fatima Al-Kuwari" : "e.g. Ananya Sharma"}
                   value={formData.fullName}
                   onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                   className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-background border border-border focus:ring-1 focus:ring-primary outline-none"
@@ -259,39 +335,47 @@ Please share your *UPI QR Code / Payment details (GPay / PhonePe / Paytm)* so I 
                 <input
                   type="tel"
                   required
-                  placeholder="e.g. 9876543210 (without +91)"
+                  placeholder={isQatar ? "e.g. 55123456 (Qatar +974)" : "e.g. 9876543210 (India +91)"}
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                   className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-background border border-border focus:ring-1 focus:ring-primary outline-none font-medium"
                 />
                 <p className="text-[11px] text-muted-foreground">
-                  GleamNest will send order tracking updates & payment QR to this WhatsApp number.
+                  GleamNest will send order tracking updates & payment details to this WhatsApp number.
                 </p>
               </div>
 
               {/* Street Address */}
               <div className="space-y-1">
                 <label className="text-xs font-semibold text-foreground">
-                  House / Flat No., Building & Street Address *
+                  {isQatar
+                    ? "Building No., Street & Flat / Villa Address *"
+                    : "House / Flat No., Building & Street Address *"}
                 </label>
                 <textarea
                   rows={2}
                   required
-                  placeholder="e.g. Flat 402, Lotus Towers, MG Road, Near Central Mall"
+                  placeholder={
+                    isQatar
+                      ? "e.g. Villa 12, Street 840, Zone 55, Al Aziziya"
+                      : "e.g. Flat 402, Lotus Towers, MG Road, Near Central Mall"
+                  }
                   value={formData.address}
                   onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                   className="w-full px-3.5 py-2 text-xs rounded-xl bg-background border border-border focus:ring-1 focus:ring-primary outline-none"
                 />
               </div>
 
-              {/* City, State, PIN */}
+              {/* City, State / Municipality, Postal */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-foreground">City / Town *</label>
+                  <label className="text-xs font-semibold text-foreground">
+                    {isQatar ? "City / Town *" : "City / Town *"}
+                  </label>
                   <input
                     type="text"
                     required
-                    placeholder="e.g. Kochi"
+                    placeholder={isQatar ? "e.g. Doha" : "e.g. Kochi"}
                     value={formData.city}
                     onChange={(e) => setFormData({ ...formData, city: e.target.value })}
                     className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-background border border-border focus:ring-1 focus:ring-primary outline-none"
@@ -299,11 +383,13 @@ Please share your *UPI QR Code / Payment details (GPay / PhonePe / Paytm)* so I 
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-foreground">State *</label>
+                  <label className="text-xs font-semibold text-foreground">
+                    {isQatar ? "Municipality / Zone *" : "State *"}
+                  </label>
                   <input
                     type="text"
                     required
-                    placeholder="e.g. Kerala"
+                    placeholder={isQatar ? "e.g. Al Rayyan" : "e.g. Kerala"}
                     value={formData.state}
                     onChange={(e) => setFormData({ ...formData, state: e.target.value })}
                     className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-background border border-border focus:ring-1 focus:ring-primary outline-none"
@@ -311,12 +397,14 @@ Please share your *UPI QR Code / Payment details (GPay / PhonePe / Paytm)* so I 
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-foreground">PIN Code *</label>
+                  <label className="text-xs font-semibold text-foreground">
+                    {isQatar ? "Zone / P.O. Box (Optional)" : "PIN Code *"}
+                  </label>
                   <input
                     type="text"
-                    required
-                    maxLength={6}
-                    placeholder="e.g. 682001"
+                    required={!isQatar}
+                    maxLength={10}
+                    placeholder={isQatar ? "e.g. Zone 55" : "e.g. 682001"}
                     value={formData.postalCode}
                     onChange={(e) => setFormData({ ...formData, postalCode: e.target.value })}
                     className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-background border border-border focus:ring-1 focus:ring-primary outline-none font-mono"
@@ -331,7 +419,7 @@ Please share your *UPI QR Code / Payment details (GPay / PhonePe / Paytm)* so I 
                 </label>
                 <input
                   type="text"
-                  placeholder="e.g. Please pack as a birthday gift / deliver before Saturday"
+                  placeholder="e.g. Please pack as a gift / deliver in the evening"
                   value={formData.notes}
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                   className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-background border border-border focus:ring-1 focus:ring-primary outline-none"
@@ -347,8 +435,17 @@ Please share your *UPI QR Code / Payment details (GPay / PhonePe / Paytm)* so I 
               </div>
               <ol className="text-xs text-foreground/80 space-y-1.5 list-decimal pl-4">
                 <li>Clicking <strong>&ldquo;Complete Order on WhatsApp&rdquo;</strong> will open WhatsApp with your item list and delivery address already prepared.</li>
-                <li>GleamNest concierge will confirm available stock and send their **GPay / PhonePe / Paytm UPI QR code**.</li>
-                <li>Send the payment screenshot on WhatsApp to confirm dispatch with your DTDC/India Post tracking code.</li>
+                {isQatar ? (
+                  <>
+                    <li>GleamNest concierge will confirm available stock and coordinate <strong>Complimentary Express Delivery in Qatar</strong>.</li>
+                    <li>Pay conveniently via Card / Bank Transfer or Cash on Delivery upon receiving your order.</li>
+                  </>
+                ) : (
+                  <>
+                    <li>GleamNest concierge will confirm available stock and send their <strong>GPay / PhonePe / Paytm UPI QR code</strong>.</li>
+                    <li>Send the payment screenshot on WhatsApp to confirm dispatch with your DTDC/India Post tracking code.</li>
+                  </>
+                )}
               </ol>
             </div>
           </div>
@@ -383,7 +480,14 @@ Please share your *UPI QR Code / Payment details (GPay / PhonePe / Paytm)* so I 
                       <p className="text-[11px] text-muted-foreground">Qty: {item.quantity}</p>
                     </div>
                     <span className="text-xs font-bold text-foreground">
-                      {formatPrice(item.price * item.quantity, selectedCurrency)}
+                      {formatPrice(
+                        (isQatar
+                          ? item.priceQatar !== undefined && item.priceQatar !== null
+                            ? item.priceQatar
+                            : Math.max(10, Math.round(item.price / 20))
+                          : item.price) * item.quantity,
+                        selectedCurrency
+                      )}
                     </span>
                   </div>
                 ))}
@@ -450,8 +554,8 @@ Please share your *UPI QR Code / Payment details (GPay / PhonePe / Paytm)* so I 
                   </div>
                 )}
                 <div className="flex justify-between text-muted-foreground">
-                  <span>Pan-India Delivery</span>
-                  <span>{shipping === 0 ? "FREE" : formatPrice(shipping, selectedCurrency)}</span>
+                  <span>{isQatar ? "Qatar Express Delivery" : "Pan-India Delivery"}</span>
+                  <span>{shipping === 0 ? (isQatar ? "FREE (Qatar)" : "FREE") : formatPrice(shipping, selectedCurrency)}</span>
                 </div>
                 <div className="flex justify-between text-base font-black text-foreground pt-3 border-t border-border">
                   <span>Total Payable</span>

@@ -36,9 +36,10 @@ export default function CartPage() {
   const tax = useCartStore((s) => s.getTaxAmount)();
   const total = useCartStore((s) => s.getTotal)();
 
+  const isQatar = selectedCurrency === "QAR";
   const freeShippingThreshold = storeConfig.commerce.freeShippingThreshold;
-  const progressPercent = Math.min(100, Math.round((subtotal / freeShippingThreshold) * 100));
-  const amountNeeded = Math.max(0, freeShippingThreshold - subtotal);
+  const progressPercent = isQatar ? 100 : Math.min(100, Math.round((subtotal / freeShippingThreshold) * 100));
+  const amountNeeded = isQatar ? 0 : Math.max(0, freeShippingThreshold - subtotal);
 
   if (!mounted) {
     return (
@@ -83,7 +84,12 @@ export default function CartPage() {
         <div className="flex items-center justify-between text-xs font-semibold mb-2">
           <span className="flex items-center gap-2 text-foreground">
             <Truck className="w-4 h-4 text-primary" />
-            {amountNeeded === 0 ? (
+            {isQatar ? (
+              <span className="text-emerald-700 font-bold flex items-center gap-1">
+                <Sparkles className="w-3.5 h-3.5" />
+                Congratulations! Free Delivery across Qatar is included on all orders.
+              </span>
+            ) : amountNeeded === 0 ? (
               <span className="text-emerald-600 font-bold flex items-center gap-1">
                 <Sparkles className="w-3.5 h-3.5" />
                 Congratulations! You qualified for Complimentary Shipping.
@@ -174,7 +180,14 @@ export default function CartPage() {
                   </div>
 
                   <span className="text-sm font-black text-foreground">
-                    {formatPrice(item.price * item.quantity, selectedCurrency)}
+                    {formatPrice(
+                      (isQatar
+                        ? item.priceQatar !== undefined && item.priceQatar !== null
+                          ? item.priceQatar
+                          : Math.max(10, Math.round(item.price / 20))
+                        : item.price) * item.quantity,
+                      selectedCurrency
+                    )}
                   </span>
                 </div>
               </div>
@@ -201,7 +214,7 @@ export default function CartPage() {
             )}
             <div className="flex justify-between text-muted-foreground">
               <span>Shipping</span>
-              <span>{shipping === 0 ? "FREE" : formatPrice(shipping, selectedCurrency)}</span>
+              <span>{shipping === 0 ? (isQatar ? "FREE (Qatar Express)" : "FREE") : formatPrice(shipping, selectedCurrency)}</span>
             </div>
             <div className="flex justify-between text-muted-foreground">
               <span>Estimated Tax</span>

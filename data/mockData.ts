@@ -51,6 +51,7 @@ export const products: Product[] = [
     "shortDescription": "Bold gold-finish statement ring designed for modern daily styling. Hypoallergenic and lightweight.",
     "description": "Bold gold-finish statement ring designed for modern daily styling. Hypoallergenic and lightweight. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 140,
+    "priceQatar": 12,
     "category": "rings",
     "tags": [
       "Rings",
@@ -75,6 +76,7 @@ export const products: Product[] = [
     "shortDescription": "Easy comfort fit adjustable gold ring. Fits all finger sizes seamlessly.",
     "description": "Easy comfort fit adjustable gold ring. Fits all finger sizes seamlessly. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 230,
+    "priceQatar": 18,
     "category": "rings",
     "tags": [
       "Rings",
@@ -99,6 +101,7 @@ export const products: Product[] = [
     "shortDescription": "Delicate floral bloom motif ring crafted in 18K gold PVD finish. Beautiful solo or stacked.",
     "description": "Delicate floral bloom motif ring crafted in 18K gold PVD finish. Beautiful solo or stacked. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 230,
+    "priceQatar": 18,
     "category": "rings",
     "tags": [
       "Rings",
@@ -123,6 +126,7 @@ export const products: Product[] = [
     "shortDescription": "Subtle open band design offering flexible sizing and daily wear durability.",
     "description": "Subtle open band design offering flexible sizing and daily wear durability. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 240,
+    "priceQatar": 20,
     "category": "rings",
     "tags": [
       "Rings",
@@ -147,6 +151,7 @@ export const products: Product[] = [
     "shortDescription": "Clean aesthetic ring with polished luster that resists tarnish and sweat.",
     "description": "Clean aesthetic ring with polished luster that resists tarnish and sweat. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 250,
+    "priceQatar": 20,
     "category": "rings",
     "tags": [
       "Rings",
@@ -171,6 +176,7 @@ export const products: Product[] = [
     "shortDescription": "Curated stackable multi-ring combo set. Mix, match, and stack across multiple fingers.",
     "description": "Curated stackable multi-ring combo set. Mix, match, and stack across multiple fingers. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 290,
+    "priceQatar": 25,
     "category": "rings",
     "tags": [
       "Rings",
@@ -195,6 +201,7 @@ export const products: Product[] = [
     "shortDescription": "Smooth domed contour gold band. Elegant mirror shine that stays brilliant every day.",
     "description": "Smooth domed contour gold band. Elegant mirror shine that stays brilliant every day. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 300,
+    "priceQatar": 25,
     "category": "rings",
     "tags": [
       "Rings",
@@ -219,6 +226,7 @@ export const products: Product[] = [
     "shortDescription": "Timeless ring silhouette designed to withstand daily chores, sanitizing, and water exposure.",
     "description": "Timeless ring silhouette designed to withstand daily chores, sanitizing, and water exposure. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 310,
+    "priceQatar": 29,
     "category": "rings",
     "tags": [
       "Rings",
@@ -243,6 +251,7 @@ export const products: Product[] = [
     "shortDescription": "Premium 18K gold-plated adjustable ring featuring open comfort band construction.",
     "description": "Premium 18K gold-plated adjustable ring featuring open comfort band construction. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 310,
+    "priceQatar": 29,
     "category": "rings",
     "tags": [
       "Rings",
@@ -267,6 +276,7 @@ export const products: Product[] = [
     "shortDescription": "Pastel lavender enamel inlay paired with high-shine gold plating. A charming pop of color.",
     "description": "Pastel lavender enamel inlay paired with high-shine gold plating. A charming pop of color. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 310,
+    "priceQatar": 29,
     "category": "rings",
     "tags": [
       "Rings",
@@ -291,6 +301,7 @@ export const products: Product[] = [
     "shortDescription": "Vibrant sapphire blue accent adjustable ring with anti-tarnish stainless steel base.",
     "description": "Vibrant sapphire blue accent adjustable ring with anti-tarnish stainless steel base. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 310,
+    "priceQatar": 29,
     "category": "rings",
     "tags": [
       "Rings",
@@ -315,6 +326,7 @@ export const products: Product[] = [
     "shortDescription": "Playful multicoloured enamel stone round centerpiece on an adjustable golden shank.",
     "description": "Playful multicoloured enamel stone round centerpiece on an adjustable golden shank. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 310,
+    "priceQatar": 29,
     "category": "rings",
     "tags": [
       "Rings",
@@ -339,6 +351,7 @@ export const products: Product[] = [
     "shortDescription": "Iconic four-leaf clover motif with black onyx-style inlay on a dainty gold cable chain.",
     "description": "Iconic four-leaf clover motif with black onyx-style inlay on a dainty gold cable chain. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 150,
+    "priceQatar": 12,
     "category": "bracelets",
     "tags": [
       "Bracelets",
@@ -364,6 +377,7 @@ export const products: Product[] = [
     "shortDescription": "Full gold-finish lucky clover motif bracelet. Lightweight, dainty, and effortlessly layerable.",
     "description": "Full gold-finish lucky clover motif bracelet. Lightweight, dainty, and effortlessly layerable. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 150,
+    "priceQatar": 12,
     "category": "bracelets",
     "tags": [
       "Bracelets",
@@ -388,6 +402,7 @@ export const products: Product[] = [
     "shortDescription": "Alternating mother-of-pearl white and black clover motifs along a shimmering golden chain.",
     "description": "Alternating mother-of-pearl white and black clover motifs along a shimmering golden chain. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 150,
+    "priceQatar": 12,
     "category": "bracelets",
     "tags": [
       "Bracelets",
@@ -412,6 +427,7 @@ export const products: Product[] = [
     "shortDescription": "Protective evil eye emblem centered on a sleek open cuff bangle. Ward off negativity in style.",
     "description": "Protective evil eye emblem centered on a sleek open cuff bangle. Ward off negativity in style. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 210,
+    "priceQatar": 18,
     "category": "bracelets",
     "tags": [
       "Bangles",
@@ -436,6 +452,7 @@ export const products: Product[] = [
     "shortDescription": "Freshwater-style green pearl beads interspersed with golden accents. SKU: GNBR003.",
     "description": "Freshwater-style green pearl beads interspersed with golden accents. SKU: GNBR003. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 218,
+    "priceQatar": 18,
     "category": "bracelets",
     "tags": [
       "Bracelets",
@@ -461,6 +478,7 @@ export const products: Product[] = [
     "shortDescription": "Playful dangling golden charms that chime softly with movement. Daily anti-tarnish finish.",
     "description": "Playful dangling golden charms that chime softly with movement. Daily anti-tarnish finish. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 249,
+    "priceQatar": 20,
     "category": "bracelets",
     "tags": [
       "Bracelets",
@@ -485,6 +503,7 @@ export const products: Product[] = [
     "shortDescription": "Tailored fit charm bracelet sized specifically for standard 2.4 to 2.6 wrist dimensions.",
     "description": "Tailored fit charm bracelet sized specifically for standard 2.4 to 2.6 wrist dimensions. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 249,
+    "priceQatar": 20,
     "category": "bracelets",
     "tags": [
       "Bracelets",
@@ -509,6 +528,7 @@ export const products: Product[] = [
     "shortDescription": "Richly detailed charms with pavé cubic zirconia micro-accents. 18K gold luster.",
     "description": "Richly detailed charms with pavé cubic zirconia micro-accents. 18K gold luster. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 270,
+    "priceQatar": 22,
     "category": "bracelets",
     "tags": [
       "Bracelets",
@@ -533,6 +553,7 @@ export const products: Product[] = [
     "shortDescription": "Architectural structured statement bangle. Precision clasp closure. SKU: GNBL001.",
     "description": "Architectural structured statement bangle. Precision clasp closure. SKU: GNBL001. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 270,
+    "priceQatar": 22,
     "category": "bracelets",
     "tags": [
       "Bangles",
@@ -557,6 +578,7 @@ export const products: Product[] = [
     "shortDescription": "Modern minimalist sculpted statement bangle. Smooth mirror gold polish. SKU: GNBL002.",
     "description": "Modern minimalist sculpted statement bangle. Smooth mirror gold polish. SKU: GNBL002. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 270,
+    "priceQatar": 22,
     "category": "bracelets",
     "tags": [
       "Bangles",
@@ -581,6 +603,7 @@ export const products: Product[] = [
     "shortDescription": "Twisted textured statement bangle designed for effortless stacking. SKU: GNBL003.",
     "description": "Twisted textured statement bangle designed for effortless stacking. SKU: GNBL003. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 270,
+    "priceQatar": 22,
     "category": "bracelets",
     "tags": [
       "Bangles",
@@ -605,6 +628,7 @@ export const products: Product[] = [
     "shortDescription": "Emerald green crystal faceted beads on an anti-tarnish stainless steel link chain.",
     "description": "Emerald green crystal faceted beads on an anti-tarnish stainless steel link chain. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 280,
+    "priceQatar": 25,
     "category": "bracelets",
     "tags": [
       "Bracelets",
@@ -629,6 +653,7 @@ export const products: Product[] = [
     "shortDescription": "Organically contoured bamboo node links highlighted with white & black enamel (per piece).",
     "description": "Organically contoured bamboo node links highlighted with white & black enamel (per piece). Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 299,
+    "priceQatar": 25,
     "category": "bracelets",
     "tags": [
       "Bracelets",
@@ -653,6 +678,7 @@ export const products: Product[] = [
     "shortDescription": "Upgraded multi-motif black clover bracelet with weighted gold cable links.",
     "description": "Upgraded multi-motif black clover bracelet with weighted gold cable links. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 299,
+    "priceQatar": 25,
     "category": "bracelets",
     "tags": [
       "Bracelets",
@@ -678,6 +704,7 @@ export const products: Product[] = [
     "shortDescription": "Romantic puffed heart pendant suspended from a glossy paperclip chain.",
     "description": "Romantic puffed heart pendant suspended from a glossy paperclip chain. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 299,
+    "priceQatar": 25,
     "category": "bracelets",
     "tags": [
       "Bracelets",
@@ -702,6 +729,7 @@ export const products: Product[] = [
     "shortDescription": "Iridescent mother-of-pearl white clover motifs bordered in beaded golden edging.",
     "description": "Iridescent mother-of-pearl white clover motifs bordered in beaded golden edging. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 299,
+    "priceQatar": 25,
     "category": "bracelets",
     "tags": [
       "Bracelets",
@@ -726,6 +754,7 @@ export const products: Product[] = [
     "shortDescription": "Bezel-set brilliant white cubic zirconia stones with continuous everyday brilliance.",
     "description": "Bezel-set brilliant white cubic zirconia stones with continuous everyday brilliance. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 320,
+    "priceQatar": 29,
     "category": "bracelets",
     "tags": [
       "Bracelets",
@@ -750,6 +779,7 @@ export const products: Product[] = [
     "shortDescription": "Rigid hinged oval bangle featuring delicate dangling charm accents.",
     "description": "Rigid hinged oval bangle featuring delicate dangling charm accents. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 340,
+    "priceQatar": 29,
     "category": "bracelets",
     "tags": [
       "Bangles",
@@ -774,6 +804,7 @@ export const products: Product[] = [
     "shortDescription": "Lush emerald green stone centerpiece set into a polished golden cuff bangle.",
     "description": "Lush emerald green stone centerpiece set into a polished golden cuff bangle. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 350,
+    "priceQatar": 29,
     "category": "bracelets",
     "tags": [
       "Bangles",
@@ -798,6 +829,7 @@ export const products: Product[] = [
     "shortDescription": "Fine enamel and crystal evil eye embedded in a solid anti-tarnish bangle.",
     "description": "Fine enamel and crystal evil eye embedded in a solid anti-tarnish bangle. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 350,
+    "priceQatar": 29,
     "category": "bracelets",
     "tags": [
       "Bangles",
@@ -822,6 +854,7 @@ export const products: Product[] = [
     "shortDescription": "Sculpted floral petals forming the focal point of a luxury golden wrist cuff.",
     "description": "Sculpted floral petals forming the focal point of a luxury golden wrist cuff. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 350,
+    "priceQatar": 29,
     "category": "bracelets",
     "tags": [
       "Bangles",
@@ -846,6 +879,7 @@ export const products: Product[] = [
     "shortDescription": "Intertwined heart motif bangle celebrating affection. Secure click-lock clasp.",
     "description": "Intertwined heart motif bangle celebrating affection. Secure click-lock clasp. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 350,
+    "priceQatar": 29,
     "category": "bracelets",
     "tags": [
       "Bangles",
@@ -870,6 +904,7 @@ export const products: Product[] = [
     "shortDescription": "Minimalist seamless gold oval bangle that pairs effortlessly with all outfits.",
     "description": "Minimalist seamless gold oval bangle that pairs effortlessly with all outfits. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 350,
+    "priceQatar": 29,
     "category": "bracelets",
     "tags": [
       "Bangles",
@@ -894,6 +929,7 @@ export const products: Product[] = [
     "shortDescription": "Artistic blue tulip blossom charms set in warm 18K gold. Signature GN piece.",
     "description": "Artistic blue tulip blossom charms set in warm 18K gold. Signature GN piece. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 350,
+    "priceQatar": 29,
     "category": "bracelets",
     "tags": [
       "Bracelets",
@@ -919,6 +955,7 @@ export const products: Product[] = [
     "shortDescription": "Channel-set green cubic zirconia diamonds glittering along a sleek gold bangle.",
     "description": "Channel-set green cubic zirconia diamonds glittering along a sleek gold bangle. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 360,
+    "priceQatar": 32,
     "category": "bracelets",
     "tags": [
       "Bangles",
@@ -943,6 +980,7 @@ export const products: Product[] = [
     "shortDescription": "Pavé white diamonds line this luxury bangle for an elevated evening and daily sparkle.",
     "description": "Pavé white diamonds line this luxury bangle for an elevated evening and daily sparkle. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 360,
+    "priceQatar": 32,
     "category": "bracelets",
     "tags": [
       "Bangles",
@@ -967,6 +1005,7 @@ export const products: Product[] = [
     "shortDescription": "Heavyweight mirror polished oval cuff with smooth beveled edges.",
     "description": "Heavyweight mirror polished oval cuff with smooth beveled edges. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 360,
+    "priceQatar": 32,
     "category": "bracelets",
     "tags": [
       "Bangles",
@@ -991,6 +1030,7 @@ export const products: Product[] = [
     "shortDescription": "Solitaire and accent white stones mounted on a refined gold-plated framework.",
     "description": "Solitaire and accent white stones mounted on a refined gold-plated framework. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 360,
+    "priceQatar": 32,
     "category": "bracelets",
     "tags": [
       "Bangles",
@@ -1015,6 +1055,7 @@ export const products: Product[] = [
     "shortDescription": "Crisp white enamel flower blossoms with golden pistil centers on a luxury cuff.",
     "description": "Crisp white enamel flower blossoms with golden pistil centers on a luxury cuff. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 370,
+    "priceQatar": 32,
     "category": "bracelets",
     "tags": [
       "Bangles",
@@ -1039,6 +1080,7 @@ export const products: Product[] = [
     "shortDescription": "Intricately hammered tactile finish capturing and diffusing ambient light beautifully.",
     "description": "Intricately hammered tactile finish capturing and diffusing ambient light beautifully. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 390,
+    "priceQatar": 32,
     "category": "bracelets",
     "tags": [
       "Bangles",
@@ -1063,6 +1105,7 @@ export const products: Product[] = [
     "shortDescription": "High-end designer inspired cuff with engraved Roman numerals and center crystal.",
     "description": "High-end designer inspired cuff with engraved Roman numerals and center crystal. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 390,
+    "priceQatar": 32,
     "category": "bracelets",
     "tags": [
       "Bangles",
@@ -1087,6 +1130,7 @@ export const products: Product[] = [
     "shortDescription": "Opulent multi-drop charm bangle featuring hearts, stars, and celestial motifs.",
     "description": "Opulent multi-drop charm bangle featuring hearts, stars, and celestial motifs. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 450,
+    "priceQatar": 40,
     "category": "bracelets",
     "tags": [
       "Bangles",
@@ -1111,6 +1155,7 @@ export const products: Product[] = [
     "shortDescription": "Versatile lightweight golden chain that pairs seamlessly with any shirt, dress, or tee.",
     "description": "Versatile lightweight golden chain that pairs seamlessly with any shirt, dress, or tee. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 120,
+    "priceQatar": 10,
     "category": "necklaces",
     "tags": [
       "Necklaces",
@@ -1135,6 +1180,7 @@ export const products: Product[] = [
     "shortDescription": "Lustrous white freshwater-style pearl drop on a whisper-thin golden cable link.",
     "description": "Lustrous white freshwater-style pearl drop on a whisper-thin golden cable link. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 150,
+    "priceQatar": 12,
     "category": "necklaces",
     "tags": [
       "Necklaces",
@@ -1159,6 +1205,7 @@ export const products: Product[] = [
     "shortDescription": "Delicate crystalline snowflake pendant with micro zircon sparkle in the core.",
     "description": "Delicate crystalline snowflake pendant with micro zircon sparkle in the core. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 150,
+    "priceQatar": 12,
     "category": "necklaces",
     "tags": [
       "Necklaces",
@@ -1183,6 +1230,7 @@ export const products: Product[] = [
     "shortDescription": "Meaningful intertwined heart and cross motif suspended from a delicate chain.",
     "description": "Meaningful intertwined heart and cross motif suspended from a delicate chain. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 160,
+    "priceQatar": 14,
     "category": "necklaces",
     "tags": [
       "Necklaces",
@@ -1207,6 +1255,7 @@ export const products: Product[] = [
     "shortDescription": "Deep ruby red faceted solitaire gem set in a 4-prong golden basket pendant.",
     "description": "Deep ruby red faceted solitaire gem set in a 4-prong golden basket pendant. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 160,
+    "priceQatar": 14,
     "category": "necklaces",
     "tags": [
       "Necklaces",
@@ -1231,6 +1280,7 @@ export const products: Product[] = [
     "shortDescription": "Polished hollow heart charm that slides effortlessly along a sleek gold chain.",
     "description": "Polished hollow heart charm that slides effortlessly along a sleek gold chain. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 200,
+    "priceQatar": 16,
     "category": "necklaces",
     "tags": [
       "Necklaces",
@@ -1255,6 +1305,7 @@ export const products: Product[] = [
     "shortDescription": "Deep obsidian black stone set in a geometric gold bezel. SKU: GNCN001.",
     "description": "Deep obsidian black stone set in a geometric gold bezel. SKU: GNCN001. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 220,
+    "priceQatar": 18,
     "category": "necklaces",
     "tags": [
       "Necklaces",
@@ -1279,6 +1330,7 @@ export const products: Product[] = [
     "shortDescription": "Graceful sculpted flower blossom pendant on a glistening 18K gold chain.",
     "description": "Graceful sculpted flower blossom pendant on a glistening 18K gold chain. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 240,
+    "priceQatar": 20,
     "category": "necklaces",
     "tags": [
       "Necklaces",
@@ -1303,6 +1355,7 @@ export const products: Product[] = [
     "shortDescription": "Iridescent white mother-of-pearl disc pendant framed by textured gold edging.",
     "description": "Iridescent white mother-of-pearl disc pendant framed by textured gold edging. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 260,
+    "priceQatar": 22,
     "category": "necklaces",
     "tags": [
       "Necklaces",
@@ -1327,6 +1380,7 @@ export const products: Product[] = [
     "shortDescription": "Pre-layered two-tier necklace providing an instant stacked collarbone look.",
     "description": "Pre-layered two-tier necklace providing an instant stacked collarbone look. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 270,
+    "priceQatar": 22,
     "category": "necklaces",
     "tags": [
       "Necklaces",
@@ -1351,6 +1405,7 @@ export const products: Product[] = [
     "shortDescription": "Organic freeform baroque pearl centerpiece with warm gold satellite beads.",
     "description": "Organic freeform baroque pearl centerpiece with warm gold satellite beads. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 270,
+    "priceQatar": 22,
     "category": "necklaces",
     "tags": [
       "Necklaces",
@@ -1375,6 +1430,7 @@ export const products: Product[] = [
     "shortDescription": "Sleek flat liquid herringbone snake chain resting flush against the collarbone.",
     "description": "Sleek flat liquid herringbone snake chain resting flush against the collarbone. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 280,
+    "priceQatar": 25,
     "category": "necklaces",
     "tags": [
       "Necklaces",
@@ -1399,6 +1455,7 @@ export const products: Product[] = [
     "shortDescription": "Tiny white enamel charm drop necklace. Dainty, understated, and waterproof.",
     "description": "Tiny white enamel charm drop necklace. Dainty, understated, and waterproof. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 290,
+    "priceQatar": 25,
     "category": "necklaces",
     "tags": [
       "Necklaces",
@@ -1423,6 +1480,7 @@ export const products: Product[] = [
     "shortDescription": "Modern elongated paperclip links in rich 18K gold finish. Wear solo or add charms.",
     "description": "Modern elongated paperclip links in rich 18K gold finish. Wear solo or add charms. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 290,
+    "priceQatar": 25,
     "category": "necklaces",
     "tags": [
       "Necklaces",
@@ -1447,6 +1505,7 @@ export const products: Product[] = [
     "shortDescription": "Chunky puffed 3D heart pendant suspended from a substantial trending chain.",
     "description": "Chunky puffed 3D heart pendant suspended from a substantial trending chain. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 320,
+    "priceQatar": 29,
     "category": "necklaces",
     "tags": [
       "Necklaces",
@@ -1471,6 +1530,7 @@ export const products: Product[] = [
     "shortDescription": "Coordinated dual necklace set designed for complementary everyday layering.",
     "description": "Coordinated dual necklace set designed for complementary everyday layering. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 320,
+    "priceQatar": 29,
     "category": "necklaces",
     "tags": [
       "Necklaces",
@@ -1495,6 +1555,7 @@ export const products: Product[] = [
     "shortDescription": "Shimmering multi-facet white zircon charm on luxury link chain. SKU: GNCN series.",
     "description": "Shimmering multi-facet white zircon charm on luxury link chain. SKU: GNCN series. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 350,
+    "priceQatar": 29,
     "category": "necklaces",
     "tags": [
       "Necklaces",
@@ -1519,6 +1580,7 @@ export const products: Product[] = [
     "shortDescription": "Streamlined linear drop earrings offering gentle sway and modern refinement.",
     "description": "Streamlined linear drop earrings offering gentle sway and modern refinement. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 118,
+    "priceQatar": 10,
     "category": "earrings",
     "tags": [
       "Earrings",
@@ -1543,6 +1605,7 @@ export const products: Product[] = [
     "shortDescription": "Petite heart silhouette earrings designed for sensitive ears and everyday comfort.",
     "description": "Petite heart silhouette earrings designed for sensitive ears and everyday comfort. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 118,
+    "priceQatar": 10,
     "category": "earrings",
     "tags": [
       "Earrings",
@@ -1567,6 +1630,7 @@ export const products: Product[] = [
     "shortDescription": "Sharp geometric square studs with high-polish mirror gold finish.",
     "description": "Sharp geometric square studs with high-polish mirror gold finish. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 118,
+    "priceQatar": 10,
     "category": "earrings",
     "tags": [
       "Earrings",
@@ -1591,6 +1655,7 @@ export const products: Product[] = [
     "shortDescription": "Minimalist triangular posts that add subtle edge to any casual or formal outfit.",
     "description": "Minimalist triangular posts that add subtle edge to any casual or formal outfit. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 118,
+    "priceQatar": 10,
     "category": "earrings",
     "tags": [
       "Earrings",
@@ -1615,6 +1680,7 @@ export const products: Product[] = [
     "shortDescription": "Everyday gold ball stud earrings (per pair). Sleep-safe, shower-safe, and hypoallergenic.",
     "description": "Everyday gold ball stud earrings (per pair). Sleep-safe, shower-safe, and hypoallergenic. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 120,
+    "priceQatar": 10,
     "category": "earrings",
     "tags": [
       "Earrings",
@@ -1639,6 +1705,7 @@ export const products: Product[] = [
     "shortDescription": "Golden blossom flower stud earrings with delicate petal detailing.",
     "description": "Golden blossom flower stud earrings with delicate petal detailing. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 150,
+    "priceQatar": 12,
     "category": "earrings",
     "tags": [
       "Earrings",
@@ -1663,6 +1730,7 @@ export const products: Product[] = [
     "shortDescription": "Substantial polished heart studs with secure comfort butterfly backs.",
     "description": "Substantial polished heart studs with secure comfort butterfly backs. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 200,
+    "priceQatar": 16,
     "category": "earrings",
     "tags": [
       "Earrings",
@@ -1687,6 +1755,7 @@ export const products: Product[] = [
     "shortDescription": "Dangling golden hearts on lever-back hoops for lightweight movement.",
     "description": "Dangling golden hearts on lever-back hoops for lightweight movement. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 230,
+    "priceQatar": 18,
     "category": "earrings",
     "tags": [
       "Earrings",
@@ -1711,6 +1780,7 @@ export const products: Product[] = [
     "shortDescription": "Ornate floral motif drop earrings with fine botanical curves in 18K gold.",
     "description": "Ornate floral motif drop earrings with fine botanical curves in 18K gold. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 250,
+    "priceQatar": 20,
     "category": "earrings",
     "tags": [
       "Earrings",
@@ -1735,6 +1805,7 @@ export const products: Product[] = [
     "shortDescription": "Swirling dimensional spiral studs that catch sunlight from every angle.",
     "description": "Swirling dimensional spiral studs that catch sunlight from every angle. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 240,
+    "priceQatar": 20,
     "category": "earrings",
     "tags": [
       "Earrings",
@@ -1759,6 +1830,7 @@ export const products: Product[] = [
     "shortDescription": "Authentic Xuping huggie hoops studded with vibrant multicolour rainbow crystals.",
     "description": "Authentic Xuping huggie hoops studded with vibrant multicolour rainbow crystals. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 269,
+    "priceQatar": 22,
     "category": "earrings",
     "tags": [
       "Earrings",
@@ -1784,6 +1856,7 @@ export const products: Product[] = [
     "shortDescription": "Chunky hollow croissant twist hoop earrings. Ultra-lightweight for all-day wear.",
     "description": "Chunky hollow croissant twist hoop earrings. Ultra-lightweight for all-day wear. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 270,
+    "priceQatar": 22,
     "category": "earrings",
     "tags": [
       "Earrings",
@@ -1808,6 +1881,7 @@ export const products: Product[] = [
     "shortDescription": "Pavé micro-zircon paved heart earrings delivering extraordinary luxury sparkle.",
     "description": "Pavé micro-zircon paved heart earrings delivering extraordinary luxury sparkle. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 320,
+    "priceQatar": 29,
     "category": "earrings",
     "tags": [
       "Earrings",
@@ -1833,6 +1907,7 @@ export const products: Product[] = [
     "shortDescription": "Bohemian golden bead accents strung along a strong waterproof stainless steel chain.",
     "description": "Bohemian golden bead accents strung along a strong waterproof stainless steel chain. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 440,
+    "priceQatar": 40,
     "category": "anklets",
     "tags": [
       "Anklets",
@@ -1858,6 +1933,7 @@ export const products: Product[] = [
     "shortDescription": "Dainty gentle bell charm anklet sized safely and comfortably for children.",
     "description": "Dainty gentle bell charm anklet sized safely and comfortably for children. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 480,
+    "priceQatar": 40,
     "category": "anklets",
     "tags": [
       "Anklets",
@@ -1882,6 +1958,7 @@ export const products: Product[] = [
     "shortDescription": "Classic twisted rope chain anklet. High-polish golden weave that rests comfortably on the ankle.",
     "description": "Classic twisted rope chain anklet. High-polish golden weave that rests comfortably on the ankle. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 480,
+    "priceQatar": 40,
     "category": "anklets",
     "tags": [
       "Anklets",
@@ -1906,6 +1983,7 @@ export const products: Product[] = [
     "shortDescription": "Whimsical fluttering butterfly charms suspended along a delicate dual-link anklet.",
     "description": "Whimsical fluttering butterfly charms suspended along a delicate dual-link anklet. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 500,
+    "priceQatar": 40,
     "category": "anklets",
     "tags": [
       "Anklets",
@@ -1931,6 +2009,7 @@ export const products: Product[] = [
     "shortDescription": "Multiple glittering bezel-set cubic zirconia diamonds creating radiant sparkle with each step.",
     "description": "Multiple glittering bezel-set cubic zirconia diamonds creating radiant sparkle with each step. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 620,
+    "priceQatar": 50,
     "category": "anklets",
     "tags": [
       "Anklets",
@@ -1956,6 +2035,7 @@ export const products: Product[] = [
     "shortDescription": "Richly embellished anklet featuring celestial stars, crescent moons, and mini droplets.",
     "description": "Richly embellished anklet featuring celestial stars, crescent moons, and mini droplets. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 640,
+    "priceQatar": 50,
     "category": "anklets",
     "tags": [
       "Anklets",
@@ -1980,6 +2060,7 @@ export const products: Product[] = [
     "shortDescription": "Cascading polished golden hearts that catch light along the entire ankle circumference.",
     "description": "Cascading polished golden hearts that catch light along the entire ankle circumference. Handcrafted with surgical-grade 316L stainless steel with thick 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 640,
+    "priceQatar": 50,
     "category": "anklets",
     "tags": [
       "Anklets",

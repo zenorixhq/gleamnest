@@ -114,25 +114,28 @@ export function Header() {
 
             {/* Right Action Icons */}
             <div className="flex items-center space-x-3 sm:space-x-5">
-              {/* Currency Selector */}
+              {/* Currency / Region Selector */}
               {storeConfig.features.enableCurrencySwitcher && (
                 <div className="relative group hidden sm:flex items-center">
-                  <div className="flex items-center gap-1 text-xs font-semibold px-2 py-1.5 rounded-md hover:bg-muted cursor-pointer text-muted-foreground hover:text-foreground">
-                    <Globe className="w-3.5 h-3.5" />
-                    <span>{selectedCurrency}</span>
-                    <ChevronDown className="w-3 h-3" />
+                  <div className="flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1.5 rounded-lg border border-border/70 hover:bg-muted cursor-pointer text-foreground transition-colors">
+                    <Globe className="w-3.5 h-3.5 text-primary" />
+                    <span>{selectedCurrency === "QAR" ? "🇶🇦 QAR" : "🇮🇳 INR"}</span>
+                    <ChevronDown className="w-3 h-3 text-muted-foreground" />
                   </div>
-                  <div className="absolute right-0 top-full mt-1 w-28 bg-card border border-border shadow-lg rounded-md py-1 hidden group-hover:block z-50">
+                  <div className="absolute right-0 top-full mt-1.5 w-36 bg-card border border-border shadow-xl rounded-xl py-1.5 hidden group-hover:block z-50 animate-in fade-in-0 zoom-in-95">
                     {storeConfig.commerce.supportedCurrencies.map((c) => (
                       <button
                         key={c.code}
                         onClick={() => setCurrency(c.code)}
-                        className={`w-full text-left px-3 py-1.5 text-xs flex justify-between items-center hover:bg-muted ${
-                          selectedCurrency === c.code ? "font-bold text-primary" : "text-foreground"
+                        className={`w-full text-left px-3 py-2 text-xs flex justify-between items-center hover:bg-muted transition-colors ${
+                          selectedCurrency === c.code ? "font-bold text-primary bg-primary/10" : "text-foreground"
                         }`}
                       >
-                        <span>{c.code}</span>
-                        <span className="text-muted-foreground">{c.symbol}</span>
+                        <span className="flex items-center gap-1.5">
+                          <span>{c.flag || (c.code === "QAR" ? "🇶🇦" : "🇮🇳")}</span>
+                          <span>{c.code}</span>
+                        </span>
+                        <span className="text-[11px] text-muted-foreground">{c.symbol}</span>
                       </button>
                     ))}
                   </div>
@@ -241,19 +244,20 @@ export function Header() {
             </nav>
 
             <div className="pt-4 border-t border-border space-y-3">
-              <p className="text-xs text-muted-foreground">Currency</p>
-              <div className="grid grid-cols-4 gap-2">
+              <p className="text-xs text-muted-foreground font-semibold">Destination Region & Currency</p>
+              <div className="grid grid-cols-2 gap-2">
                 {storeConfig.commerce.supportedCurrencies.map((c) => (
                   <button
                     key={c.code}
                     onClick={() => setCurrency(c.code)}
-                    className={`py-1.5 text-xs font-semibold rounded border text-center ${
+                    className={`py-2 px-3 text-xs font-bold rounded-lg border text-center flex items-center justify-center gap-1.5 transition-all ${
                       selectedCurrency === c.code
-                        ? "border-primary bg-primary/10 text-primary"
+                        ? "border-primary bg-primary/10 text-primary shadow-sm"
                         : "border-border text-foreground hover:bg-muted"
                     }`}
                   >
-                    {c.code}
+                    <span>{c.flag || (c.code === "QAR" ? "🇶🇦" : "🇮🇳")}</span>
+                    <span>{c.code}</span>
                   </button>
                 ))}
               </div>
@@ -325,7 +329,12 @@ export function Header() {
                             {product.category}
                           </p>
                           <p className="text-xs font-bold text-foreground mt-0.5">
-                            {formatPrice(product.salePrice || product.price, selectedCurrency)}
+                            {formatPrice(
+                              selectedCurrency === "QAR"
+                                ? product.salePriceQatar || product.priceQatar || Math.max(10, Math.round((product.salePrice || product.price) / 20))
+                                : product.salePrice || product.price,
+                              selectedCurrency
+                            )}
                           </p>
                         </div>
                       </Link>

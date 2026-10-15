@@ -40,9 +40,10 @@ export function CartDrawer() {
 
   if (!isCartOpen) return null;
 
+  const isQatar = selectedCurrency === "QAR";
   const freeShippingThreshold = storeConfig.commerce.freeShippingThreshold;
-  const progressPercent = Math.min(100, Math.round((subtotal / freeShippingThreshold) * 100));
-  const amountNeeded = Math.max(0, freeShippingThreshold - subtotal);
+  const progressPercent = isQatar ? 100 : Math.min(100, Math.round((subtotal / freeShippingThreshold) * 100));
+  const amountNeeded = isQatar ? 0 : Math.max(0, freeShippingThreshold - subtotal);
 
   const handleApplyCoupon = (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,7 +89,12 @@ export function CartDrawer() {
             <div className="flex items-center justify-between text-xs font-medium mb-1.5">
               <span className="flex items-center gap-1.5 text-foreground">
                 <Truck className="w-4 h-4 text-primary flex-shrink-0" />
-                {amountNeeded === 0 ? (
+                {isQatar ? (
+                  <span className="text-emerald-700 font-semibold flex items-center gap-1">
+                    <Sparkles className="w-3.5 h-3.5" />
+                    Free Delivery Across Qatar Included!
+                  </span>
+                ) : amountNeeded === 0 ? (
                   <span className="text-emerald-600 font-semibold flex items-center gap-1">
                     <Sparkles className="w-3.5 h-3.5" />
                     Complimentary Shipping Unlocked!
@@ -190,7 +196,14 @@ export function CartDrawer() {
                       </div>
 
                       <span className="text-sm font-bold text-foreground">
-                        {formatPrice(item.price * item.quantity, selectedCurrency)}
+                        {formatPrice(
+                          (isQatar
+                            ? item.priceQatar !== undefined && item.priceQatar !== null
+                              ? item.priceQatar
+                              : Math.max(10, Math.round(item.price / 20))
+                            : item.price) * item.quantity,
+                          selectedCurrency
+                        )}
                       </span>
                     </div>
                   </div>
@@ -262,7 +275,7 @@ export function CartDrawer() {
                 )}
                 <div className="flex justify-between text-muted-foreground">
                   <span>Estimated Shipping</span>
-                  <span>{shipping === 0 ? "FREE" : formatPrice(shipping, selectedCurrency)}</span>
+                  <span>{shipping === 0 ? (isQatar ? "FREE (Qatar Express)" : "FREE") : formatPrice(shipping, selectedCurrency)}</span>
                 </div>
                 <div className="flex justify-between text-base font-bold text-foreground pt-2 border-t border-border">
                   <span>Estimated Total</span>

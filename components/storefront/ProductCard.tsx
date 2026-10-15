@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Product } from "@/types/store";
 import { useCartStore } from "@/store/useCartStore";
-import { formatPrice, calculateDiscountPercent } from "@/lib/utils";
+import { formatPrice, calculateDiscountPercent, getProductPrices } from "@/lib/utils";
 import { Heart, Eye, ShoppingBag, Star, Check } from "lucide-react";
 
 interface ProductCardProps {
@@ -20,9 +20,10 @@ export function ProductCard({ product }: ProductCardProps) {
   const isInWishlist = useCartStore((s) => s.isInWishlist)(product.id);
   const openQuickView = useCartStore((s) => s.openQuickView);
 
-  const discountPercent = product.salePrice
-    ? calculateDiscountPercent(product.price, product.salePrice)
-    : 0;
+  const { regularPrice, salePrice, effectivePrice, discountPercent } = getProductPrices(
+    product,
+    selectedCurrency
+  );
 
   const handleQuickAdd = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -156,11 +157,11 @@ export function ProductCard({ product }: ProductCardProps) {
         <div className="pt-2 mt-1.5 border-t border-border/40 flex items-center justify-between">
           <div className="flex items-baseline gap-1.5">
             <span className="text-xs sm:text-sm font-bold text-foreground">
-              {formatPrice(price, selectedCurrency)}
+              {formatPrice(effectivePrice, selectedCurrency)}
             </span>
-            {product.salePrice && (
+            {salePrice && (
               <span className="text-[10px] text-muted-foreground line-through">
-                {formatPrice(product.price, selectedCurrency)}
+                {formatPrice(regularPrice, selectedCurrency)}
               </span>
             )}
           </div>

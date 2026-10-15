@@ -1,4 +1,4 @@
-export type CurrencyCode = "USD" | "EUR" | "GBP" | "INR" | "CAD" | "AUD";
+export type CurrencyCode = "INR" | "QAR" | "USD" | "EUR" | "GBP" | "CAD" | "AUD";
 
 export interface ProductVariant {
   id: string;
@@ -28,8 +28,10 @@ export interface Product {
   title: string;
   description: string;
   shortDescription: string;
-  price: number;
-  salePrice?: number;
+  price: number; // India price (₹ INR)
+  salePrice?: number; // India sale price (₹ INR)
+  priceQatar?: number; // Qatar price (QAR)
+  salePriceQatar?: number; // Qatar sale price (QAR)
   category: string;
   subcategory?: string;
   tags: string[];
@@ -64,7 +66,8 @@ export interface CartItem {
   productId: string;
   title: string;
   slug: string;
-  price: number;
+  price: number; // India price (₹ INR)
+  priceQatar?: number; // Qatar price (QAR)
   image: string;
   quantity: number;
   selectedVariant?: {
