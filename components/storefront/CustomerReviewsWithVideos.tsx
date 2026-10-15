@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Play, Volume2, ArrowLeft, ArrowRight, Sparkles, CheckCircle2, X } from "lucide-react";
 
@@ -25,77 +25,95 @@ interface VideoReel {
   productPrice: number;
 }
 
+const defaultReviews: Review[] = [
+  {
+    id: 1,
+    quote:
+      "Every piece feels like a whisper of the old couture houses. The 18K finish is beyond reproach, and zero tarnish after 2 months of daily wear.",
+    author: "Isabella M.",
+    location: "Kochi, Kerala",
+    piece: "Statement Ring & Clover Bangle",
+  },
+  {
+    id: 2,
+    quote:
+      "My solitaire arrived in a velvet box that already felt like an heirloom. The stone is extraordinary, and the WhatsApp ordering was so personal.",
+    author: "Camille R.",
+    location: "Kannur, Kerala",
+    piece: "White Stone Charm Chain",
+  },
+  {
+    id: 3,
+    quote:
+      "The atelier answered every question personally on WhatsApp. Rare, and quite lovely. Fast 2-day delivery across South India.",
+    author: "Sofia A.",
+    location: "Bengaluru, Karnataka",
+    piece: "Clover Bracelet - Gold",
+  },
+  {
+    id: 4,
+    quote:
+      "I was skeptical about waterproof claims at this price point, but I've showered and swum in this necklace for weeks without a hint of fading.",
+    author: "Meera K.",
+    location: "Mumbai, Maharashtra",
+    piece: "Simple Pearl Chain",
+  },
+];
+
+const defaultVideoReels: VideoReel[] = [
+  {
+    id: 1,
+    influencer: "Ananya Sanil",
+    handle: "@ananya.styling",
+    title: "100% Waterproof Shower Test 💧",
+    poster: "https://images.unsplash.com/photo-1611591475806-039775089201?auto=format&fit=crop&q=80&w=700",
+    videoUrl: "https://assets.mixkit.co/videos/preview/mixkit-woman-wearing-jewelry-in-front-of-a-mirror-42407-large.mp4",
+    views: "18.4K views",
+    productTitle: "Clover Bracelet - Gold",
+    productSlug: "clover-bracelet-gold",
+    productPrice: 150,
+  },
+  {
+    id: 2,
+    influencer: "Devika Menon",
+    handle: "@devika_curates",
+    title: "Unboxing & Daily Stack Review ✨",
+    poster: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&q=80&w=700",
+    videoUrl: "https://assets.mixkit.co/videos/preview/mixkit-close-up-of-a-woman-showing-a-gold-ring-42409-large.mp4",
+    views: "24.1K views",
+    productTitle: "Statement Ring",
+    productSlug: "statement-ring",
+    productPrice: 140,
+  },
+];
+
 export function CustomerReviewsWithVideos() {
-  const reviews: Review[] = [
-    {
-      id: 1,
-      quote:
-        "Every piece feels like a whisper of the old couture houses. The 18K finish is beyond reproach, and zero tarnish after 2 months of daily wear.",
-      author: "Isabella M.",
-      location: "Kochi, Kerala",
-      piece: "Statement Ring & Clover Bangle",
-    },
-    {
-      id: 2,
-      quote:
-        "My solitaire arrived in a velvet box that already felt like an heirloom. The stone is extraordinary, and the WhatsApp ordering was so personal.",
-      author: "Camille R.",
-      location: "Kannur, Kerala",
-      piece: "White Stone Charm Chain",
-    },
-    {
-      id: 3,
-      quote:
-        "The atelier answered every question personally on WhatsApp. Rare, and quite lovely. Fast 2-day delivery across South India.",
-      author: "Sofia A.",
-      location: "Bengaluru, Karnataka",
-      piece: "Clover Bracelet - Gold",
-    },
-    {
-      id: 4,
-      quote:
-        "I was skeptical about waterproof claims at this price point, but I've showered and swum in this necklace for weeks without a hint of fading.",
-      author: "Meera K.",
-      location: "Mumbai, Maharashtra",
-      piece: "Simple Pearl Chain",
-    },
-  ];
-
-  const videoReels: VideoReel[] = [
-    {
-      id: 1,
-      influencer: "Ananya Sanil",
-      handle: "@ananya.styling",
-      title: "100% Waterproof Shower Test 💧",
-      poster: "https://images.unsplash.com/photo-1611591475806-039775089201?auto=format&fit=crop&q=80&w=700",
-      videoUrl: "https://assets.mixkit.co/videos/preview/mixkit-woman-wearing-jewelry-in-front-of-a-mirror-42407-large.mp4",
-      views: "18.4K views",
-      productTitle: "Clover Bracelet - Gold",
-      productSlug: "clover-bracelet-gold",
-      productPrice: 150,
-    },
-    {
-      id: 2,
-      influencer: "Devika Menon",
-      handle: "@devika_curates",
-      title: "Unboxing & Daily Stack Review ✨",
-      poster: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&q=80&w=700",
-      videoUrl: "https://assets.mixkit.co/videos/preview/mixkit-close-up-of-a-woman-showing-a-gold-ring-42409-large.mp4",
-      views: "24.1K views",
-      productTitle: "Statement Ring",
-      productSlug: "statement-ring",
-      productPrice: 140,
-    },
-  ];
-
+  const [reviews, setReviews] = useState<Review[]>(defaultReviews);
+  const [videoReels, setVideoReels] = useState<VideoReel[]>(defaultVideoReels);
   const [activeReviewIdx, setActiveReviewIdx] = useState(0);
   const [selectedVideo, setSelectedVideo] = useState<VideoReel | null>(null);
 
+  useEffect(() => {
+    fetch("/api/reviews")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.reviews && data.reviews.length > 0) {
+          setReviews(data.reviews);
+        }
+        if (data.videoReels && data.videoReels.length > 0) {
+          setVideoReels(data.videoReels);
+        }
+      })
+      .catch((e) => console.error("Could not fetch reviews:", e));
+  }, []);
+
   const nextReview = () => {
+    if (reviews.length === 0) return;
     setActiveReviewIdx((prev) => (prev + 1) % reviews.length);
   };
 
   const prevReview = () => {
+    if (reviews.length === 0) return;
     setActiveReviewIdx((prev) => (prev - 1 + reviews.length) % reviews.length);
   };
 

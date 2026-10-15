@@ -96,9 +96,9 @@ export const storeConfig: StoreConfig = {
       hours: "Mon – Sat: 9:30 AM – 8:00 PM IST",
     },
     socials: {
-      instagram: "https://instagram.com/gleamnest.in",
+      instagram: "https://www.instagram.com/gleamnest.in?igsh=c3I4M2h1YmprdXI5",
       whatsapp: "https://wa.me/919633956222",
-      facebook: "https://facebook.com",
+      facebook: "https://www.facebook.com/share/1DXg9Puzkj/",
     },
   },
   commerce: {

@@ -25,6 +25,10 @@ import {
   Image as ImageIcon,
   Database,
   Upload,
+  MessageSquare,
+  Video,
+  Star,
+  Play,
 } from "lucide-react";
 
 export default function AdminDashboardPage() {
@@ -35,8 +39,34 @@ export default function AdminDashboardPage() {
   const updateProduct = useProductStore((s) => s.updateProduct);
   const deleteProduct = useProductStore((s) => s.deleteProduct);
 
-  const [activeTab, setActiveTab] = useState<"overview" | "orders" | "inventory" | "config">("inventory");
+  const [activeTab, setActiveTab] = useState<"overview" | "orders" | "inventory" | "config" | "reviews">("inventory");
   const [searchQuery, setSearchQuery] = useState("");
+
+  // Reviews & Video Reels State
+  const [reviewsList, setReviewsList] = useState<any[]>([]);
+  const [videosList, setVideosList] = useState<any[]>([]);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
+
+  const [reviewForm, setReviewForm] = useState({
+    author: "",
+    location: "Kerala, India",
+    piece: "",
+    rating: 5,
+    quote: "",
+  });
+
+  const [videoForm, setVideoForm] = useState({
+    influencer: "",
+    handle: "",
+    title: "",
+    videoUrl: "",
+    poster: "",
+    views: "18.4K views",
+    productTitle: "",
+    productSlug: "",
+    productPrice: 150,
+  });
 
   // Modal states for Product Add / Edit
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -60,8 +90,19 @@ export default function AdminDashboardPage() {
     isNewArrival: true,
   });
 
+  const fetchReviewsAndVideos = () => {
+    fetch("/api/reviews")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.reviews) setReviewsList(data.reviews);
+        if (data.videoReels) setVideosList(data.videoReels);
+      })
+      .catch((err) => console.error("Error fetching reviews:", err));
+  };
+
   useEffect(() => {
     fetchProducts();
+    fetchReviewsAndVideos();
 
     fetch("/api/orders")
       .then((res) => res.json())
@@ -72,15 +113,98 @@ export default function AdminDashboardPage() {
   }, [fetchProducts]);
 
   // Calculate high-level KPIs
-  const totalRevenue = orders.reduce((sum, o) => sum + o.grandTotal, 0);
+  const totalRevenue = orders.reduce((sum, o) => sum + (o?.grandTotal || 0), 0);
   const totalOrdersCount = orders.length;
   const aov = totalRevenue / (totalOrdersCount || 1);
   const totalStockUnits = products.reduce((sum, p) => sum + p.stockCount, 0);
 
-  const handleUpdateOrderStatus = (orderId: string, newStatus: OrderStatus) => {
+  const handleUpdateOrderStatus = async (orderId: string, newStatus: OrderStatus) => {
     setOrders((prev) =>
       prev.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o))
     );
+    try {
+      await fetch("/api/orders", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: orderId, status: newStatus }),
+      });
+    } catch (err) {
+      console.error("Failed to persist order status:", err);
+    }
+  };
+
+  const handleAddReview = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!reviewForm.author || !reviewForm.quote) {
+      alert("Please enter author name and review quote.");
+      return;
+    }
+    try {
+      const res = await fetch("/api/reviews", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...reviewForm, type: "review" }),
+      });
+      if (res.ok) {
+        setIsReviewModalOpen(false);
+        setReviewForm({ author: "", location: "Kerala, India", piece: "", rating: 5, quote: "" });
+        fetchReviewsAndVideos();
+      }
+    } catch (err) {
+      alert("Error adding review");
+    }
+  };
+
+  const handleDeleteReview = async (id: string | number) => {
+    if (!confirm("Are you sure you want to remove this client review?")) return;
+    try {
+      await fetch(`/api/reviews?type=review&id=${id}`, { method: "DELETE" });
+      fetchReviewsAndVideos();
+    } catch (err) {
+      alert("Error deleting review");
+    }
+  };
+
+  const handleAddVideo = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!videoForm.title || !videoForm.videoUrl) {
+      alert("Please enter video title and URL.");
+      return;
+    }
+    try {
+      const res = await fetch("/api/reviews", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...videoForm, type: "video" }),
+      });
+      if (res.ok) {
+        setIsVideoModalOpen(false);
+        setVideoForm({
+          influencer: "",
+          handle: "",
+          title: "",
+          videoUrl: "",
+          poster: "",
+          views: "18.4K views",
+          productTitle: "",
+          productSlug: "",
+          productPrice: 150,
+        });
+        fetchReviewsAndVideos();
+      }
+    } catch (err) {
+      alert("Error adding video reel");
+    }
+  };
+
+  const handleDeleteVideo = async (id: string | number) => {
+    if (!confirm("Are you sure you want to remove this video reel?")) return;
+    try {
+      await fetch(`/api/reviews?type=video&id=${id}`, { method: "DELETE" });
+      fetchReviewsAndVideos();
+    } catch (err) {
+      alert("Error deleting video reel");
+    }
   };
 
   const handleStockAdjust = async (productId: string, delta: number) => {
@@ -312,6 +436,18 @@ export default function AdminDashboardPage() {
             <Palette className="w-4 h-4" />
             <span>Branding & Razorpay Config</span>
           </button>
+
+          <button
+            onClick={() => setActiveTab("reviews")}
+            className={`flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-lg transition-all ${
+              activeTab === "reviews"
+                ? "bg-primary text-primary-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground hover:bg-muted"
+            }`}
+          >
+            <MessageSquare className="w-4 h-4" />
+            <span>Reviews & Videos ({reviewsList.length + videosList.length})</span>
+          </button>
         </div>
 
         {/* Tab: Product Catalog Management & Editing */}
@@ -491,58 +627,114 @@ export default function AdminDashboardPage() {
         {/* Tab: Order Fulfillment */}
         {activeTab === "orders" && (
           <div className="bg-card border border-border rounded-2xl p-6 shadow-sm space-y-4">
-            <h3 className="text-sm font-bold text-foreground uppercase tracking-wider">
-              Order Fulfillment Queue
-            </h3>
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-sm font-bold text-foreground uppercase tracking-wider">
+                  Order Fulfillment Queue
+                </h3>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Manage incoming customer orders, review deliveries, and update processing statuses.
+                </p>
+              </div>
+              <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-primary/10 text-primary">
+                {orders.length} Total Orders
+              </span>
+            </div>
 
             <div className="space-y-4">
-              {orders.map((order) => (
-                <div
-                  key={order.id}
-                  className="p-4 rounded-xl border border-border bg-muted/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
-                >
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-3">
-                      <span className="text-sm font-black text-foreground">{order.orderNumber}</span>
-                      <span className="text-xs text-muted-foreground">
-                        {new Date(order.createdAt).toLocaleDateString()}
-                      </span>
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded uppercase bg-primary/10 text-primary">
-                        {order.paymentMethod}
-                      </span>
-                    </div>
-                    <p className="text-xs text-foreground font-medium">
-                      {order.customer.fullName} • {order.customer.email}
-                    </p>
-                    <p className="text-[11px] text-muted-foreground">
-                      {order.customer.address.street}, {order.customer.address.city}
-                    </p>
-                  </div>
-
-                  <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                    <div className="text-right sm:text-right">
-                      <span className="text-xs text-muted-foreground">Total</span>
-                      <p className="text-sm font-bold text-foreground">
-                        {formatPrice(order.grandTotal)}
-                      </p>
-                    </div>
-
-                    <select
-                      value={order.status}
-                      onChange={(e) =>
-                        handleUpdateOrderStatus(order.id, e.target.value as OrderStatus)
-                      }
-                      className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-card border border-border focus:ring-1 focus:ring-primary cursor-pointer"
-                    >
-                      <option value="pending">Pending</option>
-                      <option value="processing">Processing</option>
-                      <option value="shipped">Shipped</option>
-                      <option value="delivered">Delivered</option>
-                      <option value="cancelled">Cancelled</option>
-                    </select>
-                  </div>
+              {orders.length === 0 ? (
+                <div className="text-center py-12 text-muted-foreground text-xs bg-muted/20 rounded-xl border border-border">
+                  No orders found in fulfillment queue yet.
                 </div>
-              ))}
+              ) : (
+                orders.map((order) => {
+                  const customerName =
+                    order.customer?.fullName ||
+                    (order.customer as any)?.name ||
+                    (order as any).customerName ||
+                    "Valued Customer";
+                  const customerEmail =
+                    order.customer?.email ||
+                    (order as any).customerEmail ||
+                    "Direct WhatsApp";
+                  const customerPhone =
+                    order.customer?.phone ||
+                    (order as any).customerPhone ||
+                    "";
+                  const streetAddress =
+                    order.customer?.address?.street ||
+                    (order.customer as any)?.shippingAddress?.line1 ||
+                    (order as any).shippingAddress ||
+                    "Direct delivery";
+                  const cityAddress =
+                    order.customer?.address?.city ||
+                    (order.customer as any)?.shippingAddress?.city ||
+                    "";
+
+                  return (
+                    <div
+                      key={order.id}
+                      className="p-4 rounded-xl border border-border bg-muted/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-primary/40 transition-colors"
+                    >
+                      <div className="space-y-1.5 flex-1">
+                        <div className="flex items-center gap-3 flex-wrap">
+                          <span className="text-sm font-black text-foreground">
+                            {order.orderNumber || order.id}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : "Recent"}
+                          </span>
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded uppercase bg-primary/10 text-primary">
+                            {order.paymentMethod || "WhatsApp Order"}
+                          </span>
+                        </div>
+                        <p className="text-xs text-foreground font-medium">
+                          {customerName} • {customerEmail} {customerPhone ? `• ${customerPhone}` : ""}
+                        </p>
+                        <p className="text-[11px] text-muted-foreground">
+                          {streetAddress}
+                          {cityAddress ? `, ${cityAddress}` : ""}
+                        </p>
+                        {order.items && order.items.length > 0 && (
+                          <div className="flex flex-wrap gap-1.5 pt-1">
+                            {order.items.map((item: any, i: number) => (
+                              <span
+                                key={i}
+                                className="text-[10px] bg-background border border-border px-2 py-0.5 rounded text-foreground font-medium"
+                              >
+                                {item.quantity || 1}x {item.title || item.name}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-4 shrink-0">
+                        <div className="text-right sm:text-right">
+                          <span className="text-[10px] uppercase font-bold text-muted-foreground">Total</span>
+                          <p className="text-sm font-black text-foreground">
+                            {formatPrice(order.grandTotal || 0)}
+                          </p>
+                        </div>
+
+                        <select
+                          value={order.status || "processing"}
+                          onChange={(e) =>
+                            handleUpdateOrderStatus(order.id, e.target.value as OrderStatus)
+                          }
+                          className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-card border border-border focus:ring-1 focus:ring-primary cursor-pointer"
+                        >
+                          <option value="pending">Pending</option>
+                          <option value="processing">Processing</option>
+                          <option value="shipped">Shipped</option>
+                          <option value="delivered">Delivered</option>
+                          <option value="cancelled">Cancelled</option>
+                        </select>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
             </div>
           </div>
         )}
@@ -579,6 +771,179 @@ export default function AdminDashboardPage() {
                   <p>Production: <strong className="text-foreground">PostgreSQL Ready via DATABASE_URL</strong></p>
                   <p>GUI Studio: <strong className="text-foreground font-mono">npx prisma studio</strong></p>
                 </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Tab: Reviews & Videos */}
+        {activeTab === "reviews" && (
+          <div className="space-y-8">
+            {/* Header banner */}
+            <div className="bg-card border border-border rounded-2xl p-6 sm:p-8 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <span className="text-xs font-bold text-primary uppercase tracking-wider">
+                  Social Proof & Media Management
+                </span>
+                <h3 className="text-xl font-black text-foreground mt-1">
+                  Customer Reviews & Styling Video Reels
+                </h3>
+                <p className="text-xs text-muted-foreground mt-1 max-w-xl">
+                  Manage genuine customer reviews, unboxing testimonials, and high-fashion styling video reels displayed directly on your homepage.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-3 flex-wrap">
+                <button
+                  onClick={() => setIsReviewModalOpen(true)}
+                  className="px-4 py-2.5 rounded-xl bg-primary text-primary-foreground text-xs font-bold flex items-center gap-2 hover:bg-primary/90 shadow-md transition-all"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Add Client Review</span>
+                </button>
+                <button
+                  onClick={() => setIsVideoModalOpen(true)}
+                  className="px-4 py-2.5 rounded-xl border border-border bg-card text-foreground hover:bg-muted text-xs font-semibold flex items-center gap-2 transition-all shadow-sm"
+                >
+                  <Video className="w-4 h-4 text-primary" />
+                  <span>Add Video Reel</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Client Reviews Section */}
+            <div className="bg-card border border-border rounded-2xl p-6 shadow-sm space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="text-sm font-bold text-foreground uppercase tracking-wider flex items-center gap-2">
+                    <Star className="w-4 h-4 fill-amber-500 text-amber-500" />
+                    <span>Customer Reviews ({reviewsList.length})</span>
+                  </h4>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Quotes displayed on the homepage customer words carousel.
+                  </p>
+                </div>
+                <button
+                  onClick={() => setIsReviewModalOpen(true)}
+                  className="text-xs font-bold text-primary hover:underline"
+                >
+                  + Add Review
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {reviewsList.map((rev) => (
+                  <div
+                    key={rev.id}
+                    className="p-5 rounded-xl border border-border bg-muted/20 flex flex-col justify-between space-y-4 relative group"
+                  >
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1 text-amber-500">
+                          {Array.from({ length: rev.rating || 5 }).map((_, i) => (
+                            <Star key={i} className="w-3.5 h-3.5 fill-current" />
+                          ))}
+                        </div>
+                        <button
+                          onClick={() => handleDeleteReview(rev.id)}
+                          className="opacity-0 group-hover:opacity-100 p-1.5 rounded-md hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-all"
+                          title="Delete Review"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+
+                      <p className="text-xs text-foreground italic font-light leading-relaxed">
+                        &ldquo;{rev.quote}&rdquo;
+                      </p>
+                    </div>
+
+                    <div className="pt-3 border-t border-border/60 flex items-center justify-between text-[11px]">
+                      <div>
+                        <span className="font-bold text-foreground">{rev.author}</span>
+                        <span className="text-muted-foreground"> • {rev.location}</span>
+                      </div>
+                      <span className="px-2 py-0.5 rounded bg-primary/10 text-primary font-medium text-[10px]">
+                        {rev.piece}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Video Reels Section */}
+            <div className="bg-card border border-border rounded-2xl p-6 shadow-sm space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="text-sm font-bold text-foreground uppercase tracking-wider flex items-center gap-2">
+                    <Video className="w-4 h-4 text-primary" />
+                    <span>Styling & Client Video Reels ({videosList.length})</span>
+                  </h4>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Vertical video tests and unboxings with tagged products.
+                  </p>
+                </div>
+                <button
+                  onClick={() => setIsVideoModalOpen(true)}
+                  className="text-xs font-bold text-primary hover:underline"
+                >
+                  + Add Video Reel
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {videosList.map((video) => (
+                  <div
+                    key={video.id}
+                    className="rounded-xl border border-border overflow-hidden bg-muted/20 flex flex-col justify-between group shadow-sm"
+                  >
+                    <div className="relative aspect-[9/14] bg-black overflow-hidden">
+                      <img
+                        src={video.poster}
+                        alt={video.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30 flex flex-col justify-between p-3 text-white">
+                        <span className="text-[10px] bg-black/60 px-2 py-0.5 rounded-full font-medium self-start">
+                          {video.views}
+                        </span>
+
+                        <a
+                          href={video.videoUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="self-center w-10 h-10 rounded-full bg-white/90 text-stone-900 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform"
+                        >
+                          <Play className="w-4 h-4 fill-current ml-0.5" />
+                        </a>
+
+                        <div>
+                          <p className="text-xs font-bold line-clamp-1 text-white">{video.title}</p>
+                          <p className="text-[10px] text-white/80">{video.handle}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="p-3 bg-card border-t border-border flex items-center justify-between">
+                      <div>
+                        <span className="text-[11px] font-bold text-foreground block line-clamp-1">
+                          {video.productTitle}
+                        </span>
+                        <span className="text-[10px] text-emerald-600 font-semibold">
+                          ₹{video.productPrice}
+                        </span>
+                      </div>
+                      <button
+                        onClick={() => handleDeleteVideo(video.id)}
+                        className="p-1.5 rounded-md hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+                        title="Delete Video Reel"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -864,6 +1229,264 @@ export default function AdminDashboardPage() {
                   className="px-6 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/90 shadow-md disabled:opacity-50"
                 >
                   {isSaving ? "Saving..." : editingProduct ? "Save Changes" : "Publish Product"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Client Review Add Modal */}
+      {isReviewModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+          <div
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={() => setIsReviewModalOpen(false)}
+          />
+
+          <div className="relative w-full max-w-lg bg-card border border-border rounded-2xl shadow-2xl overflow-hidden z-10 my-8 animate-in fade-in zoom-in-95">
+            <div className="px-6 py-4 border-b border-border flex items-center justify-between">
+              <div>
+                <h3 className="text-base font-bold text-foreground">Add Verified Client Review</h3>
+                <p className="text-xs text-muted-foreground">
+                  Publish customer feedback on the homepage testimonial reel
+                </p>
+              </div>
+              <button
+                onClick={() => setIsReviewModalOpen(false)}
+                className="p-1.5 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleAddReview} className="p-6 space-y-4">
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-foreground">Customer Name *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Pooja Hegde"
+                  value={reviewForm.author}
+                  onChange={(e) => setReviewForm({ ...reviewForm, author: e.target.value })}
+                  className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-foreground">City / Region</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Kochi, Kerala"
+                    value={reviewForm.location}
+                    onChange={(e) => setReviewForm({ ...reviewForm, location: e.target.value })}
+                    className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-foreground">Rating</label>
+                  <select
+                    value={reviewForm.rating}
+                    onChange={(e) => setReviewForm({ ...reviewForm, rating: Number(e.target.value) })}
+                    className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none"
+                  >
+                    <option value={5}>5 Stars ★★★★★</option>
+                    <option value={4}>4 Stars ★★★★☆</option>
+                    <option value={3}>3 Stars ★★★☆☆</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-foreground">Purchased Jewelry Piece</label>
+                <input
+                  type="text"
+                  placeholder="e.g. Statement Ring & Clover Bangle"
+                  value={reviewForm.piece}
+                  onChange={(e) => setReviewForm({ ...reviewForm, piece: e.target.value })}
+                  className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-foreground">Customer Quote / Review *</label>
+                <textarea
+                  rows={4}
+                  required
+                  placeholder="Write the customer's exact words..."
+                  value={reviewForm.quote}
+                  onChange={(e) => setReviewForm({ ...reviewForm, quote: e.target.value })}
+                  className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none resize-none"
+                />
+              </div>
+
+              <div className="pt-4 border-t border-border flex items-center justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsReviewModalOpen(false)}
+                  className="px-4 py-2 rounded-xl border border-border text-xs font-semibold hover:bg-muted"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-6 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/90 shadow-md"
+                >
+                  Save Review
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Video Reel Add Modal */}
+      {isVideoModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+          <div
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={() => setIsVideoModalOpen(false)}
+          />
+
+          <div className="relative w-full max-w-lg bg-card border border-border rounded-2xl shadow-2xl overflow-hidden z-10 my-8 animate-in fade-in zoom-in-95">
+            <div className="px-6 py-4 border-b border-border flex items-center justify-between">
+              <div>
+                <h3 className="text-base font-bold text-foreground">Add Styling Video Reel</h3>
+                <p className="text-xs text-muted-foreground">
+                  Publish a client unboxing or styling video test to the storefront
+                </p>
+              </div>
+              <button
+                onClick={() => setIsVideoModalOpen(false)}
+                className="p-1.5 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleAddVideo} className="p-6 space-y-4">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-foreground">Creator Name</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Ananya Sanil"
+                    value={videoForm.influencer}
+                    onChange={(e) => setVideoForm({ ...videoForm, influencer: e.target.value })}
+                    className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-foreground">Social Handle</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. @ananya.styling"
+                    value={videoForm.handle}
+                    onChange={(e) => setVideoForm({ ...videoForm, handle: e.target.value })}
+                    className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none font-mono"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-foreground">Video Title / Caption *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. 100% Waterproof Shower Test 💧"
+                  value={videoForm.title}
+                  onChange={(e) => setVideoForm({ ...videoForm, title: e.target.value })}
+                  className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-foreground">Video URL (MP4 / Web Video) *</label>
+                <input
+                  type="url"
+                  required
+                  placeholder="https://...mp4 or CDN video link"
+                  value={videoForm.videoUrl}
+                  onChange={(e) => setVideoForm({ ...videoForm, videoUrl: e.target.value })}
+                  className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none font-mono"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-foreground">Poster / Thumbnail Image URL</label>
+                <input
+                  type="url"
+                  placeholder="https://images.unsplash.com/... or public image URL"
+                  value={videoForm.poster}
+                  onChange={(e) => setVideoForm({ ...videoForm, poster: e.target.value })}
+                  className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none font-mono"
+                />
+              </div>
+
+              <div className="grid grid-cols-3 gap-3">
+                <div className="space-y-1 col-span-2">
+                  <label className="text-xs font-semibold text-foreground">Tagged Product Name</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Clover Bracelet - Gold"
+                    value={videoForm.productTitle}
+                    onChange={(e) => setVideoForm({ ...videoForm, productTitle: e.target.value })}
+                    className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-foreground">Price (₹)</label>
+                  <input
+                    type="number"
+                    placeholder="150"
+                    value={videoForm.productPrice}
+                    onChange={(e) => setVideoForm({ ...videoForm, productPrice: Number(e.target.value) })}
+                    className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-foreground">Product Slug</label>
+                  <input
+                    type="text"
+                    placeholder="clover-bracelet-gold"
+                    value={videoForm.productSlug}
+                    onChange={(e) => setVideoForm({ ...videoForm, productSlug: e.target.value })}
+                    className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none font-mono"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-foreground">Views Badge</label>
+                  <input
+                    type="text"
+                    placeholder="18.4K views"
+                    value={videoForm.views}
+                    onChange={(e) => setVideoForm({ ...videoForm, views: e.target.value })}
+                    className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="pt-4 border-t border-border flex items-center justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsVideoModalOpen(false)}
+                  className="px-4 py-2 rounded-xl border border-border text-xs font-semibold hover:bg-muted"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-6 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/90 shadow-md"
+                >
+                  Save Video Reel
                 </button>
               </div>
             </form>

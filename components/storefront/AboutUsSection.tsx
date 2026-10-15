@@ -6,7 +6,7 @@ export function AboutUsSection() {
   return (
     <section
       id="about-us"
-      className="relative w-full h-screen max-h-[100vh] lg:h-[100svh] min-h-[580px] flex flex-col justify-between py-4 sm:py-6 lg:py-8 bg-[#FAF6EF] text-[#1C1917] overflow-hidden border-b border-[#EADBBE]/80 select-none"
+      className="relative w-full min-h-screen py-8 sm:py-10 lg:py-12 flex flex-col justify-between bg-[#FAF6EF] text-[#1C1917] overflow-hidden border-b border-[#EADBBE]/80 select-none"
     >
       {/* Background Topographic Wave Contours (Matching Reference Image) */}
       <svg
@@ -51,10 +51,10 @@ export function AboutUsSection() {
               <span className="font-editorial text-xs sm:text-sm italic text-[#8F7842] block mb-1 tracking-wider">
                 03
               </span>
-              <div className="w-full aspect-[4/3] max-h-[26vh] sm:max-h-[28vh] lg:max-h-[30vh] rounded-sm overflow-hidden shadow-sm border border-[#E2D5BE] bg-[#F0E6D2]">
+              <div className="w-full aspect-[16/10] sm:aspect-[16/9] max-h-[26vh] sm:max-h-[28vh] lg:max-h-[30vh] rounded-sm overflow-hidden shadow-sm border border-[#E2D5BE] bg-[#F0E6D2]">
                 <img
-                  src="/images/about-necklace.jpg"
-                  alt="GleamNest 18K Gold Waterproof Necklace on Woman"
+                  src="/images/about-model-landscape.jpg"
+                  alt="GleamNest 18K Gold Waterproof Necklace & Ring Lifestyle Landscape"
                   className="w-full h-full object-cover object-center hover:scale-105 transition-transform duration-700"
                 />
               </div>
@@ -80,17 +80,19 @@ export function AboutUsSection() {
           {/* Spacer Column */}
           <div className="hidden md:block md:col-span-1" />
 
-          {/* Right Column: Number 04 + Tall Vertical Photo */}
-          <div className="md:col-span-6 flex flex-col justify-center h-full">
-            <span className="font-editorial text-xs sm:text-sm italic text-[#8F7842] block mb-1 tracking-wider">
-              04
-            </span>
-            <div className="w-full max-h-[50vh] sm:max-h-[54vh] lg:max-h-[58vh] aspect-[4/5] sm:aspect-[3/4] lg:aspect-[14/17] rounded-sm overflow-hidden shadow-md border border-[#E2D5BE] bg-[#F0E6D2]">
-              <img
-                src="/images/about-bracelet.jpg"
-                alt="GleamNest 18K Gold Bracelet and Necklaces Lifestyle"
-                className="w-full h-full object-cover object-center hover:scale-105 transition-transform duration-700"
-              />
+          {/* Right Column: Number 04 + Tall Vertical 9:16 Photo */}
+          <div className="md:col-span-6 flex flex-col justify-center items-center h-full">
+            <div className="w-full max-w-[320px] sm:max-w-[340px] lg:max-w-[360px] flex flex-col items-start">
+              <span className="font-editorial text-xs sm:text-sm italic text-[#8F7842] block mb-1 tracking-wider">
+                04
+              </span>
+              <div className="w-full aspect-[9/16] max-h-[50vh] sm:max-h-[54vh] lg:max-h-[58vh] rounded-sm overflow-hidden shadow-md border border-[#E2D5BE] bg-[#F0E6D2]">
+                <img
+                  src="/images/about-model-portrait.jpg"
+                  alt="GleamNest 18K Gold Fine Jewelry Portrait"
+                  className="w-full h-full object-cover object-top hover:scale-105 transition-transform duration-700"
+                />
+              </div>
             </div>
           </div>
         </div>

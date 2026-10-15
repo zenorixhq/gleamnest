@@ -96,7 +96,7 @@ export function Footer() {
 
             <div className="flex items-center gap-3 pt-2">
               <a
-                href="https://instagram.com"
+                href={storeConfig.brand.socials.instagram || "https://www.instagram.com/gleamnest.in?igsh=c3I4M2h1YmprdXI5"}
                 target="_blank"
                 rel="noreferrer"
                 className="w-8 h-8 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary transition-colors"
@@ -105,16 +105,7 @@ export function Footer() {
                 <Instagram className="w-4 h-4" />
               </a>
               <a
-                href="https://twitter.com"
-                target="_blank"
-                rel="noreferrer"
-                className="w-8 h-8 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary transition-colors"
-                aria-label="Twitter"
-              >
-                <Twitter className="w-4 h-4" />
-              </a>
-              <a
-                href="https://facebook.com"
+                href={storeConfig.brand.socials.facebook || "https://www.facebook.com/share/1DXg9Puzkj/"}
                 target="_blank"
                 rel="noreferrer"
                 className="w-8 h-8 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary transition-colors"

@@ -45,7 +45,7 @@ export function InstagramReelSection() {
         </span>
 
         <a
-          href="https://instagram.com/gleamnest.in"
+          href="https://www.instagram.com/gleamnest.in?igsh=c3I4M2h1YmprdXI5"
           target="_blank"
           rel="noopener noreferrer"
           className="inline-block font-editorial text-3xl sm:text-5xl md:text-6xl font-normal tracking-tight text-[#1C1917] hover:text-[#C5A059] transition-colors"
@@ -59,7 +59,7 @@ export function InstagramReelSection() {
         {instaPosts.map((post) => (
           <a
             key={post.id}
-            href="https://instagram.com/gleamnest"
+            href="https://www.instagram.com/gleamnest.in?igsh=c3I4M2h1YmprdXI5"
             target="_blank"
             rel="noopener noreferrer"
             className="group relative aspect-[3/4] sm:aspect-[2/3] overflow-hidden bg-stone-200 block"
