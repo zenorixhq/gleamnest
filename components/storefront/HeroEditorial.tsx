@@ -7,11 +7,11 @@ export function HeroEditorial() {
   return (
     <section className="relative w-full h-[calc(100svh-5.5rem)] sm:h-[calc(100vh-6.5rem)] min-h-[580px] max-h-[920px] bg-gradient-to-r from-[#F7EEDD] via-[#F5EAD6] to-[#E9D9C1] text-[#1C1917] overflow-hidden select-none flex flex-col justify-between">
       {/* 1. Left Editorial Model Image (From Uploaded Image 1 on Warm Studio Canvas) */}
-      <div className="absolute top-0 bottom-28 sm:bottom-16 lg:bottom-20 left-0 w-full lg:w-[54%] xl:w-[50%] pointer-events-none select-none z-0 overflow-hidden">
+      <div className="absolute inset-y-0 left-0 w-full lg:w-[54%] xl:w-[50%] pointer-events-none select-none z-0 overflow-hidden">
         <img
           src="/images/hero-model-light-bg.jpg"
           alt="GleamNest Fine Jewelry - Model wearing layered gold necklace and gemstone eternity rings"
-          className="w-full h-full object-cover object-[25%_bottom] sm:object-[32%_bottom] lg:object-[35%_bottom]"
+          className="w-full h-full object-cover object-[26%_bottom] sm:object-[30%_bottom] lg:object-[34%_bottom] scale-105 -translate-y-6 sm:-translate-y-8 lg:-translate-y-10"
         />
         {/* Soft edge blend into right studio backdrop on desktop */}
         <div className="hidden lg:block absolute inset-y-0 right-0 w-40 bg-gradient-to-r from-transparent to-[#F5EAD6]" />
@@ -19,7 +19,7 @@ export function HeroEditorial() {
         <div className="lg:hidden absolute inset-0 bg-[#F7EEDD]/20 backdrop-blur-[0.5px]" />
       </div>
 
-      {/* 2. Top-Right Brand Philosophy & Link */}
+      {/* 2. Top-Right Brand Philosophy */}
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 pt-5 sm:pt-7 flex justify-end">
         <div className="space-y-1 text-right max-w-xs sm:max-w-sm">
           <span className="text-[10px] sm:text-xs tracking-[0.25em] uppercase font-bold text-[#5C5349] block">
@@ -29,39 +29,16 @@ export function HeroEditorial() {
             Fine jewelry for the skin, not the vault. <br />
             18K gold finish. Worn every day.
           </p>
-          <div className="pt-0.5">
-            <Link
-              href={`https://wa.me/${storeConfig.brand.contact.whatsappNumber}?text=Hello%20GleamNest!%20I%20would%20like%20to%20book%20a%20private%20fitting%20and%20consultation.`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#1C1917] hover:text-black transition-colors group"
-            >
-              <span>Book a fitting</span>
-              <span className="group-hover:translate-x-1 transition-transform">→</span>
-            </Link>
-          </div>
         </div>
       </div>
 
-      {/* 3. Center Signature Editorial Headline (Strictly 2 Lines) */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 my-auto">
-        <div className="max-w-5xl">
-          {/* Line 1: NEVER SAVED FOR SOMEDAY (Strictly 1 line, nowrap) */}
-          <div className="flex items-baseline gap-2.5 sm:gap-4 md:gap-5 whitespace-nowrap">
-            <span className="font-editorial text-3xl sm:text-5xl md:text-6xl lg:text-[4.6vw] xl:text-[5.6rem] font-normal tracking-tight text-[#1C1917] uppercase leading-[0.92]">
-              NEVER SAVED
-            </span>
-            <span className="font-editorial text-3xl sm:text-5xl md:text-6xl lg:text-[4.6vw] xl:text-[5.6rem] font-light tracking-wide uppercase text-[#948D85]/60 font-outline-editorial leading-[0.92]">
-              FOR SOMEDAY
-            </span>
-          </div>
-
-          {/* Line 2: CRAFTED TO LIVE IN (Indented towards the center, strictly 1 line, nowrap) */}
-          <div className="pl-4 sm:pl-16 md:pl-28 lg:pl-36 xl:pl-44 mt-0.5 sm:mt-1 whitespace-nowrap">
-            <h1 className="font-editorial text-3xl sm:text-5xl md:text-6xl lg:text-[4.6vw] xl:text-[5.6rem] font-normal tracking-tight text-[#1C1917] uppercase leading-[0.92]">
-              CRAFTED TO LIVE IN
-            </h1>
-          </div>
+      {/* 3. Right-Aligned Hero Editorial Headline (Clear of Model's Face) */}
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 my-auto flex justify-end">
+        <div className="w-full lg:w-[48%] xl:w-[46%] text-right lg:text-left pl-0 lg:pl-6">
+          <h1 className="font-editorial text-4xl sm:text-5xl md:text-6xl lg:text-[3.8vw] xl:text-[4.5rem] font-normal tracking-tight text-[#1C1917] leading-[1.05]">
+            <span>Forever in style.</span> <br />
+            <span className="font-editorial italic font-light text-[#4A4036]">Just like you.</span>
+          </h1>
         </div>
       </div>
 
