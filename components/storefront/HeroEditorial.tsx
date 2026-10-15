@@ -7,14 +7,14 @@ export function HeroEditorial() {
   return (
     <section className="relative w-full h-[calc(100svh-5.5rem)] sm:h-[calc(100vh-6.5rem)] min-h-[580px] max-h-[920px] bg-gradient-to-r from-[#F7EEDD] via-[#F5EAD6] to-[#E9D9C1] text-[#1C1917] overflow-hidden select-none flex flex-col justify-between">
       {/* 1. Left Editorial Model Image (From Uploaded Image 1 on Warm Studio Canvas) */}
-      <div className="absolute top-0 bottom-32 sm:bottom-16 lg:bottom-20 left-0 w-full lg:w-[48%] xl:w-[46%] pointer-events-none select-none z-0 overflow-hidden">
+      <div className="absolute top-0 bottom-28 sm:bottom-16 lg:bottom-20 left-0 w-full lg:w-[54%] xl:w-[50%] pointer-events-none select-none z-0 overflow-hidden">
         <img
           src="/images/hero-model-light-bg.jpg"
           alt="GleamNest Fine Jewelry - Model wearing layered gold necklace and gemstone eternity rings"
-          className="w-full h-full object-cover object-[0%_bottom] sm:object-[15%_bottom]"
+          className="w-full h-full object-cover object-[25%_bottom] sm:object-[32%_bottom] lg:object-[35%_bottom]"
         />
         {/* Soft edge blend into right studio backdrop on desktop */}
-        <div className="hidden lg:block absolute inset-y-0 right-0 w-36 bg-gradient-to-r from-transparent to-[#F5EAD6]" />
+        <div className="hidden lg:block absolute inset-y-0 right-0 w-40 bg-gradient-to-r from-transparent to-[#F5EAD6]" />
         {/* Mobile soft contrast overlay */}
         <div className="lg:hidden absolute inset-0 bg-[#F7EEDD]/20 backdrop-blur-[0.5px]" />
       </div>
