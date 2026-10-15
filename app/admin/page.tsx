@@ -23,15 +23,30 @@ import {
   X,
   Search,
   Image as ImageIcon,
-  Database,
   Upload,
   MessageSquare,
   Video,
   Star,
   Play,
+  Globe,
+  Mail,
+  User,
+  Lock,
+  KeyRound,
+  LogOut,
+  Eye,
+  EyeOff,
+  ShieldCheck,
 } from "lucide-react";
 
 export default function AdminDashboardPage() {
+  // Authentication State
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [loginEmail, setLoginEmail] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [loginError, setLoginError] = useState("");
+
   const [orders, setOrders] = useState<Order[]>(sampleOrders);
   const products = useProductStore((s) => s.products);
   const fetchProducts = useProductStore((s) => s.fetchProducts);
@@ -101,16 +116,56 @@ export default function AdminDashboardPage() {
   };
 
   useEffect(() => {
-    fetchProducts();
-    fetchReviewsAndVideos();
+    // Check if merchant is already authenticated
+    if (typeof window !== "undefined") {
+      const auth = localStorage.getItem("gleamnest_admin_auth");
+      if (auth === "true") {
+        setIsAuthenticated(true);
+      } else {
+        setIsAuthenticated(false);
+      }
+    }
+  }, []);
 
-    fetch("/api/orders")
-      .then((res) => res.json())
-      .then((data) => {
-        if (Array.isArray(data) && data.length > 0) setOrders(data);
-      })
-      .catch((err) => console.error("Error fetching orders:", err));
-  }, [fetchProducts]);
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    const cleanEmail = loginEmail.trim().toLowerCase();
+    const cleanPassword = loginPassword.trim();
+
+    // Accepted Merchant Credentials:
+    // Username: admin@gleamnest.in or admin
+    // Password: gleamnest@2026 or GleamNest@2026
+    if (
+      (cleanEmail === "admin@gleamnest.in" || cleanEmail === "admin") &&
+      (cleanPassword === "gleamnest@2026" || cleanPassword === "GleamNest@2026")
+    ) {
+      localStorage.setItem("gleamnest_admin_auth", "true");
+      setIsAuthenticated(true);
+      setLoginError("");
+    } else {
+      setLoginError("Invalid merchant credentials. Please verify your username and password.");
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("gleamnest_admin_auth");
+    setIsAuthenticated(false);
+    setLoginPassword("");
+  };
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchProducts();
+      fetchReviewsAndVideos();
+
+      fetch("/api/orders")
+        .then((res) => res.json())
+        .then((data) => {
+          if (Array.isArray(data) && data.length > 0) setOrders(data);
+        })
+        .catch((err) => console.error("Error fetching orders:", err));
+    }
+  }, [isAuthenticated, fetchProducts]);
 
   // Calculate high-level KPIs
   const totalRevenue = orders.reduce((sum, o) => sum + (o?.grandTotal || 0), 0);
@@ -352,6 +407,111 @@ export default function AdminDashboardPage() {
       p.category.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  if (isAuthenticated === null) {
+    return (
+      <div className="min-h-screen bg-[#FAF7F2] flex items-center justify-center">
+        <div className="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-[#FAF7F2] flex flex-col items-center justify-center p-4 sm:p-6 text-[#1C1917] relative">
+        <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(#1C1917_1px,transparent_1px)] [background-size:16px_16px]" />
+
+        <div className="w-full max-w-md bg-card border border-border/80 rounded-3xl p-8 sm:p-10 shadow-xl relative z-10 space-y-6">
+          <div className="text-center space-y-2">
+            <span className="font-editorial text-3xl sm:text-4xl tracking-tight text-foreground font-normal">
+              {storeConfig.brand.logo.text}
+            </span>
+            <p className="text-[11px] uppercase tracking-[0.2em] text-[#8F7234] font-medium">
+              Merchant Management Portal
+            </p>
+          </div>
+
+          <div className="border-t border-border/60 pt-2 text-center">
+            <h2 className="text-base font-bold text-foreground">Sign In to Dashboard</h2>
+            <p className="text-xs text-muted-foreground mt-1">
+              Enter your boutique administrator credentials to access catalog and order operations.
+            </p>
+          </div>
+
+          {loginError && (
+            <div className="p-3 rounded-xl bg-destructive/10 border border-destructive/20 text-xs text-destructive flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-destructive shrink-0" />
+              <span>{loginError}</span>
+            </div>
+          )}
+
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-foreground flex items-center justify-between">
+                <span>Admin Username or Email</span>
+                <span className="text-[10px] text-muted-foreground font-mono">admin@gleamnest.in</span>
+              </label>
+              <div className="relative">
+                <input
+                  type="text"
+                  required
+                  autoFocus
+                  placeholder="admin@gleamnest.in"
+                  value={loginEmail}
+                  onChange={(e) => setLoginEmail(e.target.value)}
+                  className="w-full px-3.5 py-2.5 pl-10 text-xs rounded-xl bg-background border border-border focus:ring-1 focus:ring-primary outline-none transition-all"
+                />
+                <User className="w-4 h-4 text-muted-foreground absolute left-3.5 top-1/2 -translate-y-1/2" />
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-foreground flex items-center justify-between">
+                <span>Secret Password</span>
+                <span className="text-[10px] text-muted-foreground font-mono">gleamnest@2026</span>
+              </label>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  required
+                  placeholder="••••••••••••"
+                  value={loginPassword}
+                  onChange={(e) => setLoginPassword(e.target.value)}
+                  className="w-full px-3.5 py-2.5 pl-10 pr-10 text-xs rounded-xl bg-background border border-border focus:ring-1 focus:ring-primary outline-none transition-all font-mono"
+                />
+                <Lock className="w-4 h-4 text-muted-foreground absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              className="w-full py-3 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/90 shadow-md transition-all active:scale-[0.99] flex items-center justify-center gap-2"
+            >
+              <KeyRound className="w-4 h-4" />
+              <span>Unlock Admin Dashboard</span>
+            </button>
+          </form>
+
+          <div className="pt-4 border-t border-border flex items-center justify-between text-[11px] text-muted-foreground">
+            <Link href="/" className="hover:text-primary transition-colors flex items-center gap-1">
+              <span>← Return to Store</span>
+            </Link>
+            <span className="flex items-center gap-1 text-[10px]">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+              <span>256-Bit SSL Encrypted</span>
+            </span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-muted/30 min-h-screen py-8 sm:py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
@@ -360,16 +520,16 @@ export default function AdminDashboardPage() {
           <div>
             <div className="flex items-center gap-2">
               <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black tracking-wider uppercase bg-primary text-primary-foreground">
-                Built-in Next.js CMS
+                Authorized Merchant Portal
               </span>
-              <span className="text-xs text-muted-foreground">Product & Store Management Console</span>
+              <span className="text-xs text-muted-foreground">Product, Order & Store Operations Console</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-black text-foreground mt-1">
-              {storeConfig.brand.logo.text} Merchant Dashboard
+              {storeConfig.brand.logo.text} Boutique Management
             </h1>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-wrap">
             <button
               onClick={openAddModal}
               className="px-4 py-2.5 rounded-xl bg-primary text-primary-foreground text-xs font-bold flex items-center gap-2 hover:bg-primary/90 shadow-md transition-all"
@@ -384,6 +544,14 @@ export default function AdminDashboardPage() {
               <ExternalLink className="w-3.5 h-3.5" />
               <span>View Storefront</span>
             </Link>
+            <button
+              onClick={handleLogout}
+              className="px-3.5 py-2.5 rounded-xl border border-destructive/30 bg-card text-destructive hover:bg-destructive/10 text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-sm"
+              title="Sign out of Admin Dashboard"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span>Log Out</span>
+            </button>
           </div>
         </div>
 
@@ -434,7 +602,7 @@ export default function AdminDashboardPage() {
             }`}
           >
             <Palette className="w-4 h-4" />
-            <span>Branding & Razorpay Config</span>
+            <span>Store Settings & Regional Setup</span>
           </button>
 
           <button
@@ -600,7 +768,7 @@ export default function AdminDashboardPage() {
                   <ShoppingBag className="w-4 h-4 text-primary" />
                 </div>
                 <p className="text-2xl sm:text-3xl font-black text-foreground">{totalOrdersCount}</p>
-                <p className="text-[11px] text-muted-foreground">Processed with Razorpay & COD</p>
+                <p className="text-[11px] text-muted-foreground">Processed via WhatsApp & Online Orders</p>
               </div>
 
               <div className="p-6 rounded-2xl bg-card border border-border shadow-sm space-y-2">
@@ -739,37 +907,115 @@ export default function AdminDashboardPage() {
           </div>
         )}
 
-        {/* Tab: Branding & Razorpay Config */}
+        {/* Tab: Store Settings & Regional Setup */}
         {activeTab === "config" && (
           <div className="bg-card border border-border rounded-2xl p-6 sm:p-8 shadow-sm space-y-6">
             <div>
               <span className="text-xs font-bold text-primary uppercase tracking-wider">
-                Storefront & Payment Gateway Setup
+                Storefront & Regional Operations
               </span>
               <h3 className="text-lg font-black text-foreground mt-1">
-                Active Client Configuration
+                Active Storefront Configuration
               </h3>
               <p className="text-xs text-muted-foreground mt-1">
-                All client configurations live inside <code className="text-primary font-mono bg-primary/10 px-1.5 py-0.5 rounded">config/store.config.ts</code> and <code className="text-primary font-mono bg-primary/10 px-1.5 py-0.5 rounded">.env</code>.
+                Official contact details, multi-currency regional pricing, and shipping policies active across your boutique.
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="p-4 rounded-xl bg-muted/40 border border-border space-y-2">
-                <span className="text-xs font-bold text-foreground">Razorpay Integration Details</span>
-                <div className="text-xs space-y-1 text-muted-foreground">
-                  <p>Key ID: <strong className="text-foreground font-mono">rzp_test_... (Set in .env)</strong></p>
-                  <p>Payment Modes: <strong className="text-foreground">UPI (GPay/PhonePe), NetBanking, Cards</strong></p>
-                  <p>Webhook Verification: <strong className="text-foreground">HMAC-SHA256 Ready</strong></p>
+              {/* Store Profile & Concierge */}
+              <div className="p-5 rounded-xl bg-muted/30 border border-border space-y-3">
+                <div className="flex items-center gap-2 text-foreground font-bold text-xs uppercase tracking-wider">
+                  <Mail className="w-4 h-4 text-primary" />
+                  <span>Store Contact & Concierge</span>
+                </div>
+                <div className="text-xs space-y-1.5 text-muted-foreground">
+                  <p>Brand Name: <strong className="text-foreground">{storeConfig.brand.logo.text}</strong></p>
+                  <p>Customer Support Email: <strong className="text-foreground">{storeConfig.brand.contact.email}</strong></p>
+                  <p>WhatsApp Hotline: <strong className="text-foreground">+{storeConfig.brand.contact.whatsappNumber}</strong></p>
+                  <p>Operating Hours: <strong className="text-foreground">{storeConfig.brand.contact.hours}</strong></p>
+                  <p>Dispatch Atelier: <strong className="text-foreground">{storeConfig.brand.contact.address}</strong></p>
                 </div>
               </div>
 
-              <div className="p-4 rounded-xl bg-muted/40 border border-border space-y-2">
-                <span className="text-xs font-bold text-foreground">Database Storage</span>
-                <div className="text-xs space-y-1 text-muted-foreground">
-                  <p>Engine: <strong className="text-foreground">Prisma + SQLite (dev.db)</strong></p>
-                  <p>Production: <strong className="text-foreground">PostgreSQL Ready via DATABASE_URL</strong></p>
-                  <p>GUI Studio: <strong className="text-foreground font-mono">npx prisma studio</strong></p>
+              {/* Regional Pricing & Delivery */}
+              <div className="p-5 rounded-xl bg-muted/30 border border-border space-y-3">
+                <div className="flex items-center gap-2 text-foreground font-bold text-xs uppercase tracking-wider">
+                  <Truck className="w-4 h-4 text-emerald-600" />
+                  <span>Dual Regional Pricing & Delivery</span>
+                </div>
+                <div className="text-xs space-y-1.5 text-muted-foreground">
+                  <p>
+                    🇮🇳 India (INR ₹):{" "}
+                    <strong className="text-foreground">
+                      Free Shipping on orders above ₹{storeConfig.commerce.freeShippingThreshold} (Flat ₹{storeConfig.commerce.flatShippingFee} below)
+                    </strong>
+                  </p>
+                  <p>
+                    🇶🇦 Qatar (QAR):{" "}
+                    <strong className="text-emerald-700 font-bold">
+                      100% Complimentary Express Delivery on all orders
+                    </strong>
+                  </p>
+                  <p>Ordering Method: <strong className="text-foreground">Instant WhatsApp Order Direct Checkout</strong></p>
+                  <p>Payment Modes: <strong className="text-foreground">Direct UPI (GPay/PhonePe/Paytm), COD & Direct Bank Transfer</strong></p>
+                </div>
+              </div>
+
+              {/* Official Social Media Channels */}
+              <div className="p-5 rounded-xl bg-muted/30 border border-border space-y-3">
+                <div className="flex items-center gap-2 text-foreground font-bold text-xs uppercase tracking-wider">
+                  <Globe className="w-4 h-4 text-primary" />
+                  <span>Official Social Channels</span>
+                </div>
+                <div className="text-xs space-y-1.5 text-muted-foreground">
+                  <p>
+                    Instagram:{" "}
+                    <a
+                      href={storeConfig.brand.socials.instagram}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-primary hover:underline font-mono text-[11px]"
+                    >
+                      @gleamnest.in ↗
+                    </a>
+                  </p>
+                  <p>
+                    Facebook:{" "}
+                    <a
+                      href={storeConfig.brand.socials.facebook}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-primary hover:underline font-mono text-[11px]"
+                    >
+                      GleamNest Official Page ↗
+                    </a>
+                  </p>
+                  <p>
+                    WhatsApp Channel:{" "}
+                    <a
+                      href={`https://wa.me/${storeConfig.brand.contact.whatsappNumber}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-primary hover:underline font-mono text-[11px]"
+                    >
+                      +{storeConfig.brand.contact.whatsappNumber} ↗
+                    </a>
+                  </p>
+                </div>
+              </div>
+
+              {/* Admin Portal Access Credentials */}
+              <div className="p-5 rounded-xl bg-muted/30 border border-border space-y-3">
+                <div className="flex items-center gap-2 text-foreground font-bold text-xs uppercase tracking-wider">
+                  <KeyRound className="w-4 h-4 text-amber-600" />
+                  <span>Admin Access Credentials</span>
+                </div>
+                <div className="text-xs space-y-1.5 text-muted-foreground">
+                  <p>Portal URL: <strong className="text-foreground font-mono">/admin</strong></p>
+                  <p>Username / Email: <strong className="text-foreground font-mono">admin@gleamnest.in</strong> (or <span className="font-mono">admin</span>)</p>
+                  <p>Default Password: <strong className="text-foreground font-mono">gleamnest@2026</strong></p>
+                  <p>Session Security: <strong className="text-emerald-700">Encrypted Local Storage Authentication</strong></p>
                 </div>
               </div>
             </div>

@@ -219,7 +219,7 @@ export function Footer() {
           <div className="flex items-center gap-4">
             <span className="text-[11px] font-medium tracking-wide">SECURE 256-BIT ENCRYPTION</span>
             <span>•</span>
-            <span>STRIPE & PAYPAL COMPLIANT</span>
+            <span>100% SECURE DIRECT CHECKOUT</span>
           </div>
         </div>
       </div>
