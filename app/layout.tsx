@@ -36,7 +36,7 @@ export default function RootLayout({
   } as React.CSSProperties;
 
   return (
-    <html lang="en" style={dynamicThemeStyles}>
+    <html lang="en" className="scroll-smooth" style={dynamicThemeStyles}>
       <body className="min-h-screen flex flex-col font-sans bg-background text-foreground">
         <AnnouncementBar />
         <Header />

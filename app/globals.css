@@ -24,6 +24,10 @@
 }
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
   :root {
     /* GleamNest Warm Champagne Ivory & Gold Luxury Theme */
     --primary: 38 58% 46%;          /* Elegant Champagne Gold #BA9241 */

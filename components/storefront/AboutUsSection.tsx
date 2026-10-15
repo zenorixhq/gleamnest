@@ -6,7 +6,7 @@ export function AboutUsSection() {
   return (
     <section
       id="about-us"
-      className="relative w-full py-12 sm:py-16 lg:py-20 flex flex-col justify-between bg-[#FAF6EF] text-[#1C1917] overflow-hidden border-b border-[#EADBBE]/80 select-none"
+      className="relative w-full h-screen max-h-[100vh] lg:h-[100svh] min-h-[560px] flex flex-col justify-between py-2 sm:py-3 lg:py-4 bg-[#FAF6EF] text-[#1C1917] overflow-hidden border-b border-[#EADBBE]/80 select-none"
     >
       {/* Background Topographic Wave Contours (Matching Reference Image) */}
       <svg
@@ -28,30 +28,30 @@ export function AboutUsSection() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 w-full h-full flex flex-col justify-between relative z-10">
         
         {/* 1. Header: ABOUT US + Elegant Manifesto Paragraph */}
-        <div className="text-center shrink-0 pt-2 pb-2 sm:pb-3 max-w-2xl mx-auto space-y-1.5 sm:space-y-2">
+        <div className="text-center shrink-0 pt-1 pb-1 sm:pb-2 max-w-xl mx-auto space-y-1">
           <div className="relative inline-block">
             <span className="absolute -top-2.5 -left-5 text-[#C5A059] text-[10px] sm:text-xs">✦</span>
             <span className="absolute -bottom-1 -right-5 text-[#C5A059] text-[10px] sm:text-xs">✦</span>
-            <h2 className="font-editorial text-2xl sm:text-3xl md:text-4xl font-normal tracking-[0.25em] uppercase text-[#1C1917]">
+            <h2 className="font-editorial text-2xl sm:text-3xl lg:text-4xl font-normal tracking-[0.25em] uppercase text-[#1C1917]">
               ABOUT US
             </h2>
           </div>
 
-          <p className="text-xs sm:text-[13px] text-[#5C5346] leading-relaxed font-light max-w-xl mx-auto px-2">
-            GleamNest designs modern, everyday luxury jewellery pieces handcrafted from surgical-grade 316L stainless steel and 18K gold PVD. In an industry that&apos;s focused on trends, we believe in timelessness.
+          <p className="text-[11px] sm:text-xs text-[#5C5346] leading-relaxed font-light max-w-lg mx-auto px-2">
+            GleamNest designs modern, everyday luxury jewellery pieces handcrafted from surgical-grade 316L stainless steel and 18K gold finish. We believe in timeless daily elegance.
           </p>
         </div>
 
-        {/* 2. Main Two-Column Editorial Spread (Fills Remaining Screen Height Cleanly) */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 lg:gap-10 items-center flex-1 min-h-0 py-2 sm:py-3">
+        {/* 2. Main Two-Column Editorial Spread (Fills Remaining Screen Height Cleanly with ZERO Overflow) */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 lg:gap-8 items-center flex-1 min-h-0 py-1 sm:py-2">
           
           {/* Left Column: Number 03 + Landscape Photo + Story + Oval Pill Button */}
-          <div className="md:col-span-5 flex flex-col justify-center h-full space-y-4 sm:space-y-5">
+          <div className="md:col-span-5 flex flex-col justify-center h-full space-y-2 sm:space-y-3">
             <div>
-              <span className="font-editorial text-xs sm:text-sm italic text-[#8F7842] block mb-1.5 tracking-wider">
+              <span className="font-editorial text-xs italic text-[#8F7842] block mb-1 tracking-wider">
                 03
               </span>
-              <div className="w-full aspect-[16/9] rounded-sm overflow-hidden shadow-sm border border-[#E2D5BE] bg-[#F0E6D2]">
+              <div className="w-full max-w-[300px] sm:max-w-[330px] lg:max-w-[350px] aspect-[16/9] max-h-[22vh] rounded-sm overflow-hidden shadow-sm border border-[#E2D5BE] bg-[#F0E6D2]">
                 <img
                   src="/images/about-model-landscape.jpg"
                   alt="GleamNest 18K Gold Waterproof Necklace & Ring Lifestyle Landscape"
@@ -60,15 +60,15 @@ export function AboutUsSection() {
               </div>
             </div>
 
-            <div className="text-center space-y-2 sm:space-y-3 max-w-sm mx-auto pt-1">
-              <p className="text-xs sm:text-[13px] text-[#5C5346] leading-relaxed font-light">
+            <div className="space-y-1.5 sm:space-y-2 max-w-xs pt-0.5">
+              <p className="text-[11px] sm:text-xs text-[#5C5346] leading-relaxed font-light">
                 Our goal is to create products that are made for life. We encourage people to think about jewellery as part of their identity and legacy.
               </p>
 
               <div>
                 <Link
                   href="/products"
-                  className="inline-flex items-center gap-2 px-6 py-1.5 sm:py-2 rounded-full border border-[#1C1917] text-[#1C1917] hover:bg-[#1C1917] hover:text-white text-xs font-medium tracking-wide transition-all shadow-sm active:scale-95 group"
+                  className="inline-flex items-center gap-2 px-5 py-1.5 rounded-full border border-[#1C1917] text-[#1C1917] hover:bg-[#1C1917] hover:text-white text-xs font-medium tracking-wide transition-all shadow-sm active:scale-95 group"
                 >
                   <span>More Information</span>
                   <span className="group-hover:translate-x-1 transition-transform">→</span>
@@ -80,13 +80,13 @@ export function AboutUsSection() {
           {/* Spacer Column */}
           <div className="hidden md:block md:col-span-1" />
 
-          {/* Right Column: Number 04 + Tall Vertical Photo with Full Pendant Visibility */}
+          {/* Right Column: Number 04 + Portrait Photo (Strict 2:3 ratio, height constrained to viewport) */}
           <div className="md:col-span-6 flex flex-col justify-center items-center h-full">
-            <div className="w-full max-w-[420px] sm:max-w-[450px] lg:max-w-[480px] flex flex-col items-start">
-              <span className="font-editorial text-xs sm:text-sm italic text-[#8F7842] block mb-1.5 tracking-wider">
+            <div className="flex flex-col items-start max-h-[48vh] sm:max-h-[52vh] lg:max-h-[55vh] aspect-[2/3] w-auto">
+              <span className="font-editorial text-xs italic text-[#8F7842] block mb-1 tracking-wider">
                 04
               </span>
-              <div className="w-full aspect-[2/3] rounded-sm overflow-hidden shadow-md border border-[#E2D5BE] bg-[#F0E6D2]">
+              <div className="w-full flex-1 aspect-[2/3] rounded-sm overflow-hidden shadow-md border border-[#E2D5BE] bg-[#F0E6D2]">
                 <img
                   src="/images/about-model-portrait.jpg"
                   alt="GleamNest 18K Gold Fine Jewelry Portrait"
@@ -98,7 +98,7 @@ export function AboutUsSection() {
         </div>
 
         {/* 3. Bottom Subtle Accent Line */}
-        <div className="shrink-0 pb-1 pt-1 flex justify-center">
+        <div className="shrink-0 pb-1 pt-0.5 flex justify-center">
           <div className="w-12 h-[1px] bg-[#C5A059]/40" />
         </div>
       </div>
