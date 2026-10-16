@@ -56,23 +56,23 @@ export function HeroEditorial() {
         {/* Floating Cards (Bottom Right Quadrant) */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-3 sm:pb-4 flex justify-end">
           <div className="flex items-center gap-3 sm:gap-4 overflow-x-auto no-scrollbar max-w-full">
-            {/* Card 1: Bracelet · Line */}
+            {/* Card 1: Rings · Eternity Stack */}
             <Link
-              href="/products?category=bracelets"
+              href="/products?category=rings"
               className="relative w-36 sm:w-48 md:w-56 h-24 sm:h-28 md:h-32 rounded-xl overflow-hidden shadow-lg border border-white/40 group flex-shrink-0 transition-transform duration-300 hover:-translate-y-1"
             >
               <img
-                src="/images/hero-card-bracelet.png"
-                alt="Bracelet Line - GleamNest"
+                src="/images/hero-card-rings.jpg"
+                alt="18K Gold & Emerald Eternity Rings - GleamNest"
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-black/30 pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/30 pointer-events-none" />
               <div className="absolute inset-0 p-2.5 sm:p-3 flex flex-col justify-between text-white">
                 <span className="text-[10px] sm:text-xs font-serif tracking-wide text-white/95">
-                  Bracelet · Line
+                  Rings · Eternity Stack
                 </span>
                 <div className="flex items-center justify-between text-[9px] sm:text-[10px]">
-                  <span className="text-white/80 font-light italic">many, worn as one</span>
+                  <span className="text-white/80 font-light italic">emerald & gold bands</span>
                   <span className="text-white/95 font-medium group-hover:translate-x-0.5 transition-transform">
                     See more →
                   </span>
@@ -80,23 +80,23 @@ export function HeroEditorial() {
               </div>
             </Link>
 
-            {/* Card 2: Necklace · Rivière */}
+            {/* Card 2: Necklace · 18K Pendant */}
             <Link
               href="/products?category=necklaces"
               className="relative w-36 sm:w-48 md:w-56 h-24 sm:h-28 md:h-32 rounded-xl overflow-hidden shadow-lg border border-white/40 group flex-shrink-0 transition-transform duration-300 hover:-translate-y-1"
             >
               <img
-                src="/images/hero-card-necklace.png"
-                alt="Necklace Rivière - GleamNest"
+                src="/images/hero-card-necklace.jpg"
+                alt="18K Gold Bamboo Pendant Layered Necklace - GleamNest"
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-black/30 pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/30 pointer-events-none" />
               <div className="absolute inset-0 p-2.5 sm:p-3 flex flex-col justify-between text-white">
                 <span className="text-[10px] sm:text-xs font-serif tracking-wide text-white/95">
-                  Necklace · Rivière
+                  Necklace · 18K Pendant
                 </span>
                 <div className="flex items-center justify-between text-[9px] sm:text-[10px]">
-                  <span className="text-white/80 font-light italic">a single stone, close to the skin</span>
+                  <span className="text-white/80 font-light italic">layered, close to skin</span>
                   <span className="text-white/95 font-medium group-hover:translate-x-0.5 transition-transform">
                     See more →
                   </span>
