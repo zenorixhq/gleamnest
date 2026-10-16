@@ -67,14 +67,14 @@ export default function HomePage() {
             <Link
               key={cat.id}
               href={`/products?category=${cat.slug}`}
-              className="group relative aspect-[4/5] rounded-2xl overflow-hidden border border-[#EADBBE] shadow-sm bg-[#FFFDF9]"
+              className="group relative aspect-[4/5] rounded-2xl overflow-hidden border border-[#EADBBE] shadow-sm bg-[#FFFDF9] hover:-translate-y-1.5 hover:shadow-[0_16px_36px_rgba(197,160,89,0.18)] transition-all duration-500 ease-out"
             >
               <img
                 src={cat.image}
                 alt={cat.name}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent flex flex-col justify-end p-5 text-white">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent flex flex-col justify-end p-5 text-white transition-opacity duration-300">
                 <span className="text-[11px] text-[#EADBBE] font-medium tracking-wider uppercase">
                   {cat.productCount} Items
                 </span>
@@ -97,7 +97,7 @@ export default function HomePage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#EADBBE] pb-4">
           <div>
             <div className="flex items-center gap-1.5 text-xs font-bold text-[#C5A059] uppercase tracking-widest">
-              <Sparkles className="w-3.5 h-3.5" />
+              <Sparkles className="w-3.5 h-3.5 animate-float-gentle" />
               <span>Handpicked Catalog</span>
             </div>
             <h2 className="font-editorial text-3xl sm:text-4xl font-normal text-[#1C1917] mt-1 tracking-wide">
@@ -109,9 +109,9 @@ export default function HomePage() {
           <div className="flex gap-1.5 p-1 bg-[#F0E6D2] rounded-xl self-start sm:self-auto border border-[#EADBBE]">
             <button
               onClick={() => setActiveTab("bestsellers")}
-              className={`px-4 py-2 text-xs font-bold rounded-lg transition-all ${
+              className={`px-4 py-2 text-xs font-bold rounded-lg transition-all duration-300 ${
                 activeTab === "bestsellers"
-                  ? "bg-white text-[#1C1917] shadow-sm"
+                  ? "bg-white text-[#1C1917] shadow-sm scale-[1.02]"
                   : "text-[#6C6354] hover:text-[#1C1917]"
               }`}
             >
@@ -119,9 +119,9 @@ export default function HomePage() {
             </button>
             <button
               onClick={() => setActiveTab("new")}
-              className={`px-4 py-2 text-xs font-bold rounded-lg transition-all ${
+              className={`px-4 py-2 text-xs font-bold rounded-lg transition-all duration-300 ${
                 activeTab === "new"
-                  ? "bg-white text-[#1C1917] shadow-sm"
+                  ? "bg-white text-[#1C1917] shadow-sm scale-[1.02]"
                   : "text-[#6C6354] hover:text-[#1C1917]"
               }`}
             >
@@ -129,9 +129,9 @@ export default function HomePage() {
             </button>
             <button
               onClick={() => setActiveTab("featured")}
-              className={`px-4 py-2 text-xs font-bold rounded-lg transition-all ${
+              className={`px-4 py-2 text-xs font-bold rounded-lg transition-all duration-300 ${
                 activeTab === "featured"
-                  ? "bg-white text-[#1C1917] shadow-sm"
+                  ? "bg-white text-[#1C1917] shadow-sm scale-[1.02]"
                   : "text-[#6C6354] hover:text-[#1C1917]"
               }`}
             >
@@ -140,8 +140,8 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Product Cards Grid: 4 items in a row, 3 rows */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5">
+        {/* Product Cards Grid: 4 items in a row, 3 rows with smooth tab entrance */}
+        <div key={activeTab} className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 animate-fade-in">
           {filteredProducts.slice(0, 12).map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}

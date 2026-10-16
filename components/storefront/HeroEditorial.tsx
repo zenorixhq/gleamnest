@@ -29,7 +29,7 @@ export function HeroEditorial() {
       </div>
 
       {/* 3. Top-Right Brand Philosophy */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-5 sm:pt-7 flex justify-end">
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-5 sm:pt-7 flex justify-end animate-fade-in">
         <div className="space-y-1 text-right max-w-xs sm:max-w-sm">
           <span className="text-[10px] sm:text-xs tracking-[0.25em] uppercase font-bold text-white/95 lg:text-[#5C5349] block drop-shadow-sm">
             {storeConfig.meta.name || "GLEAMNEST"}
@@ -42,7 +42,7 @@ export function HeroEditorial() {
       </div>
 
       {/* 4. Right-Aligned Hero Editorial Headline (Clear of Model's Face, Crisp White on Mobile) */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 my-auto flex justify-end">
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 my-auto flex justify-end animate-slide-up">
         <div className="w-full lg:w-[48%] xl:w-[46%] text-right lg:text-left pl-0 lg:pl-6">
           <h1 className="font-editorial text-4xl sm:text-5xl md:text-6xl lg:text-[3.8vw] xl:text-[4.5rem] font-normal tracking-tight text-white lg:text-[#1C1917] leading-[1.05] drop-shadow-[0_2px_14px_rgba(0,0,0,0.7)] lg:drop-shadow-none">
             <span>Forever in style.</span> <br />
@@ -121,7 +121,7 @@ export function HeroEditorial() {
               href="#about-us"
               className="flex flex-col items-center justify-center text-[9px] sm:text-[10px] uppercase tracking-[0.25em] text-[#7A7269] hover:text-[#1C1917] transition-colors group cursor-pointer"
             >
-              <span className="text-xs group-hover:translate-y-0.5 transition-transform">↓</span>
+              <span className="text-xs group-hover:translate-y-0.5 transition-transform animate-float-gentle inline-block">↓</span>
               <span className="font-semibold tracking-[0.2em]">SCROLL</span>
             </a>
 

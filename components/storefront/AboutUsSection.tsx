@@ -10,7 +10,7 @@ export function AboutUsSection() {
     >
       {/* Background Topographic Wave Contours (Matching Reference Image) */}
       <svg
-        className="absolute inset-0 w-full h-full opacity-[0.045] pointer-events-none"
+        className="absolute inset-0 w-full h-full opacity-[0.045] pointer-events-none animate-pulse-soft"
         xmlns="http://www.w3.org/2000/svg"
         preserveAspectRatio="none"
         viewBox="0 0 1000 800"
@@ -30,8 +30,8 @@ export function AboutUsSection() {
         {/* 1. Header: ABOUT US + Elegant Manifesto Paragraph */}
         <div className="text-center shrink-0 pt-1 pb-1 sm:pb-2 max-w-xl mx-auto space-y-1">
           <div className="relative inline-block">
-            <span className="absolute -top-2.5 -left-5 text-[#C5A059] text-[10px] sm:text-xs">✦</span>
-            <span className="absolute -bottom-1 -right-5 text-[#C5A059] text-[10px] sm:text-xs">✦</span>
+            <span className="absolute -top-2.5 -left-5 text-[#C5A059] text-[10px] sm:text-xs animate-float-gentle">✦</span>
+            <span className="absolute -bottom-1 -right-5 text-[#C5A059] text-[10px] sm:text-xs animate-float-gentle">✦</span>
             <h2 className="font-editorial text-2xl sm:text-3xl lg:text-4xl font-normal tracking-[0.25em] uppercase text-[#1C1917]">
               ABOUT US
             </h2>

@@ -147,12 +147,12 @@ export function CustomerReviewsWithVideos() {
                 <div
                   key={reel.id}
                   onClick={() => setSelectedVideo(reel)}
-                  className="group relative aspect-[9/15] rounded-xl overflow-hidden bg-stone-900 shadow-md cursor-pointer border border-stone-300/80 hover:shadow-xl transition-all"
+                  className="group relative aspect-[9/15] rounded-xl overflow-hidden bg-stone-900 shadow-md cursor-pointer border border-stone-300/80 hover:shadow-xl hover:-translate-y-1 transition-all duration-500 ease-out"
                 >
                   <img
                     src={reel.poster}
                     alt={reel.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-black/30 flex flex-col justify-between p-3 text-white">
                     {/* Top Views Badge */}
@@ -164,7 +164,7 @@ export function CustomerReviewsWithVideos() {
                     </div>
 
                     {/* Center Animated Play Button */}
-                    <div className="self-center w-11 h-11 rounded-full bg-white/90 text-stone-900 flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:bg-white transition-all">
+                    <div className="self-center w-11 h-11 rounded-full bg-white/90 text-stone-900 flex items-center justify-center shadow-lg group-hover:scale-115 group-hover:bg-white transition-all duration-300">
                       <Play className="w-4 h-4 fill-current ml-0.5" />
                     </div>
 
