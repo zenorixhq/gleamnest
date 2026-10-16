@@ -38,7 +38,7 @@ export function BrandLogo({
             className="h-5 sm:h-6 md:h-6.5 w-auto object-contain object-left"
           />
           {showTagline && (
-            <span className="font-script text-[11px] sm:text-xs md:text-[13px] text-[#C5A059] tracking-normal mt-0.5 whitespace-nowrap">
+            <span className="font-script text-[9.5px] sm:text-xs md:text-[13px] text-[#C5A059] tracking-normal mt-0.5 truncate max-w-[210px] sm:max-w-none">
               The place where elegance and sparkle come together.
             </span>
           )}

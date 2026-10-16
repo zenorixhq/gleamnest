@@ -5,39 +5,48 @@ import { storeConfig } from "@/config/store.config";
 
 export function HeroEditorial() {
   return (
-    <section className="relative w-full h-[calc(100svh-5.5rem)] sm:h-[calc(100vh-6.5rem)] min-h-[580px] max-h-[920px] bg-gradient-to-r from-[#F7EEDD] via-[#F5EAD6] to-[#E9D9C1] text-[#1C1917] overflow-hidden select-none flex flex-col justify-between">
-      {/* 1. Left Editorial Model Image (From Uploaded Image 1 on Warm Studio Canvas) */}
-      <div className="absolute inset-y-0 left-0 w-full lg:w-[54%] xl:w-[50%] pointer-events-none select-none z-0 overflow-hidden">
+    <section className="relative w-full h-[calc(100svh-5.5rem)] sm:h-[calc(100vh-6.5rem)] min-h-[580px] max-h-[920px] bg-[#1C1917] lg:bg-gradient-to-r lg:from-[#F7EEDD] lg:via-[#F5EAD6] lg:to-[#E9D9C1] text-[#1C1917] overflow-hidden select-none flex flex-col justify-between">
+      {/* 1. Mobile 9:16 Editorial Model Background (Full Portrait, Jewelry and Face in Full View) */}
+      <div className="lg:hidden absolute inset-0 z-0 overflow-hidden pointer-events-none select-none">
+        <img
+          src="/images/hero-model-mobile.jpg"
+          alt="GleamNest Fine Jewelry Editorial - Model wearing layered gold necklace and eternity rings"
+          className="w-full h-full object-cover object-[center_top]"
+        />
+        {/* Subtle Luxury Gradient Overlay for Crisp White Typography Legibility */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/25 to-black/75" />
+      </div>
+
+      {/* 2. Desktop Editorial Model Image (From Uploaded Image 1 on Warm Studio Canvas) */}
+      <div className="hidden lg:block absolute inset-y-0 left-0 w-[54%] xl:w-[50%] pointer-events-none select-none z-0 overflow-hidden">
         <img
           src="/images/hero-model-light-bg.jpg"
           alt="GleamNest Fine Jewelry - Model wearing layered gold necklace and gemstone eternity rings"
-          className="w-full h-full object-cover object-[26%_bottom] sm:object-[30%_bottom] lg:object-[34%_bottom] scale-105 -translate-y-6 sm:-translate-y-8 lg:-translate-y-10"
+          className="w-full h-full object-cover object-[34%_bottom] scale-105 -translate-y-10"
         />
         {/* Soft edge blend into right studio backdrop on desktop */}
-        <div className="hidden lg:block absolute inset-y-0 right-0 w-40 bg-gradient-to-r from-transparent to-[#F5EAD6]" />
-        {/* Mobile soft contrast overlay */}
-        <div className="lg:hidden absolute inset-0 bg-[#F7EEDD]/20 backdrop-blur-[0.5px]" />
+        <div className="absolute inset-y-0 right-0 w-40 bg-gradient-to-r from-transparent to-[#F5EAD6]" />
       </div>
 
-      {/* 2. Top-Right Brand Philosophy */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 pt-5 sm:pt-7 flex justify-end">
+      {/* 3. Top-Right Brand Philosophy */}
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-5 sm:pt-7 flex justify-end">
         <div className="space-y-1 text-right max-w-xs sm:max-w-sm">
-          <span className="text-[10px] sm:text-xs tracking-[0.25em] uppercase font-bold text-[#5C5349] block">
+          <span className="text-[10px] sm:text-xs tracking-[0.25em] uppercase font-bold text-white/95 lg:text-[#5C5349] block drop-shadow-sm">
             {storeConfig.meta.name || "GLEAMNEST"}
           </span>
-          <p className="text-xs sm:text-sm text-[#383129] font-normal leading-snug">
+          <p className="text-xs sm:text-sm text-white/90 lg:text-[#383129] font-normal leading-snug drop-shadow-sm">
             Fine jewelry for the skin, not the vault. <br />
             18K gold finish. Worn every day.
           </p>
         </div>
       </div>
 
-      {/* 3. Right-Aligned Hero Editorial Headline (Clear of Model's Face) */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 my-auto flex justify-end">
+      {/* 4. Right-Aligned Hero Editorial Headline (Clear of Model's Face, Crisp White on Mobile) */}
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 my-auto flex justify-end">
         <div className="w-full lg:w-[48%] xl:w-[46%] text-right lg:text-left pl-0 lg:pl-6">
-          <h1 className="font-editorial text-4xl sm:text-5xl md:text-6xl lg:text-[3.8vw] xl:text-[4.5rem] font-normal tracking-tight text-[#1C1917] leading-[1.05]">
+          <h1 className="font-editorial text-4xl sm:text-5xl md:text-6xl lg:text-[3.8vw] xl:text-[4.5rem] font-normal tracking-tight text-white lg:text-[#1C1917] leading-[1.05] drop-shadow-[0_2px_14px_rgba(0,0,0,0.7)] lg:drop-shadow-none">
             <span>Forever in style.</span> <br />
-            <span className="font-editorial italic font-light text-[#4A4036]">Just like you.</span>
+            <span className="font-editorial italic font-light text-white/95 lg:text-[#4A4036]">Just like you.</span>
           </h1>
         </div>
       </div>
@@ -45,7 +54,7 @@ export function HeroEditorial() {
       {/* 4. Bottom Right Floating Product Cards & Bottom White Dock */}
       <div className="relative z-10 w-full">
         {/* Floating Cards (Bottom Right Quadrant) */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 pb-3 sm:pb-4 flex justify-end">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-3 sm:pb-4 flex justify-end">
           <div className="flex items-center gap-3 sm:gap-4 overflow-x-auto no-scrollbar max-w-full">
             {/* Card 1: Bracelet · Line */}
             <Link
@@ -99,7 +108,7 @@ export function HeroEditorial() {
 
         {/* 5. Bottom White Curved Dock / Floating Bar */}
         <div className="w-full bg-white rounded-t-[1.75rem] sm:rounded-t-[2.25rem] md:rounded-t-[2.75rem] shadow-[0_-8px_30px_rgba(0,0,0,0.03)] border-t border-[#E3D7C5]">
-          <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 py-3.5 sm:py-4 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-6">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 sm:py-4 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-6">
             {/* Left: 3-line lower-case motto */}
             <div className="text-[10px] sm:text-[11px] text-[#8C847B] font-normal lowercase leading-tight text-center sm:text-left">
               <div>waterproof & anti-tarnish.</div>

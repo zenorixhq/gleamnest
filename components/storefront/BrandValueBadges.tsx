@@ -81,44 +81,44 @@ export function BrandValueBadges() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Container with warm champagne luxury card styling */}
         <div className="rounded-3xl bg-[#FFFDF9] border border-[#EADBBE] shadow-[0_8px_30px_rgb(197,160,89,0.08)] p-6 sm:p-10 space-y-8">
-          {/* 1. Five Signature Brand Badges from Brand Card */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 sm:gap-8 items-start">
+          {/* 1. Five Signature Brand Badges - One Line on Mobile, Grid on Tablet/Desktop */}
+          <div className="flex overflow-x-auto no-scrollbar gap-4 sm:gap-6 lg:gap-8 pb-2 -mx-2 px-2 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-3 lg:grid-cols-5 items-start snap-x snap-mandatory">
             {badges.map((badge, idx) => (
-              <div key={idx} className="flex flex-col items-center text-center group">
+              <div key={idx} className="flex-shrink-0 w-[136px] sm:w-auto flex flex-col items-center text-center group snap-center">
                 {/* Circular Gold Icon Container */}
-                <div className="relative w-16 h-16 sm:w-18 sm:h-18 rounded-full border-[1.5px] border-[#C5A059] flex items-center justify-center p-3 mb-3.5 bg-gradient-to-br from-[#FFFDF9] to-[#F5EBDA] shadow-sm transition-all duration-300 group-hover:scale-110 group-hover:shadow-[0_4px_16px_rgba(197,160,89,0.25)]">
+                <div className="relative w-14 h-14 sm:w-16 sm:h-16 lg:w-18 lg:h-18 rounded-full border-[1.5px] border-[#C5A059] flex items-center justify-center p-2.5 sm:p-3 mb-2.5 sm:mb-3.5 bg-gradient-to-br from-[#FFFDF9] to-[#F5EBDA] shadow-sm transition-all duration-300 group-hover:scale-110 group-hover:shadow-[0_4px_16px_rgba(197,160,89,0.25)]">
                   {/* Inner Delicate Ring */}
                   <div className="absolute inset-[3px] rounded-full border border-[#DDC698]/50 pointer-events-none" />
                   {badge.icon}
                 </div>
 
                 {/* Title Matching Brand Card */}
-                <h4 className="font-editorial text-sm sm:text-base font-semibold tracking-wide text-[#1C1917] group-hover:text-[#8F7234] transition-colors">
+                <h4 className="font-editorial text-xs sm:text-sm lg:text-base font-semibold tracking-wide text-[#1C1917] group-hover:text-[#8F7234] transition-colors">
                   {badge.title}
                 </h4>
-                <p className="text-[11px] text-[#786E5E] leading-tight font-light mt-1 max-w-[150px]">
+                <p className="text-[10px] sm:text-[11px] text-[#786E5E] leading-tight font-light mt-1 max-w-[130px] sm:max-w-[150px]">
                   {badge.desc}
                 </p>
               </div>
             ))}
           </div>
 
-          {/* 2. Elegant Pill Banner Matching Bottom of Uploaded Brand Card */}
+          {/* 2. Elegant Pill Banner - One Line on Mobile & Desktop (No Stacking) */}
           <div className="pt-2 border-t border-[#EADBBE]/80">
             <Link
               href={`https://wa.me/${storeConfig.brand.contact.whatsappNumber}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="group flex flex-col sm:flex-row items-center justify-between gap-3 px-6 py-3.5 sm:py-4 rounded-2xl bg-[#FAF5EB] hover:bg-[#F3E8D3] border border-[#C5A059]/60 transition-all shadow-sm hover:shadow-md"
+              className="group flex flex-row items-center justify-between gap-2.5 sm:gap-4 px-3.5 sm:px-6 py-2.5 sm:py-3.5 rounded-2xl bg-[#FAF5EB] hover:bg-[#F3E8D3] border border-[#C5A059]/60 transition-all shadow-sm hover:shadow-md"
             >
-              <div className="flex items-center gap-2 text-xs sm:text-sm font-semibold tracking-widest uppercase text-[#806631]">
-                <span className="text-[#C5A059]">✦</span>
-                <span>CONTACT US FOR ORDERS & ENQUIRIES</span>
-                <span className="text-[#C5A059]">✦</span>
+              <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs md:text-sm font-semibold tracking-wide sm:tracking-widest uppercase text-[#806631] truncate">
+                <span className="text-[#C5A059] text-[10px] sm:text-xs shrink-0">✦</span>
+                <span className="truncate">CONTACT US FOR ORDERS & ENQUIRIES</span>
+                <span className="text-[#C5A059] text-[10px] sm:text-xs hidden md:inline shrink-0">✦</span>
               </div>
 
-              <div className="flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-[#1C1917] text-[#FAF5EB] group-hover:bg-[#000000] text-xs sm:text-sm font-bold tracking-wider transition-colors shadow-sm">
-                <MessageCircle className="w-4 h-4 text-[#25D366] fill-[#25D366]" />
+              <div className="flex items-center gap-1.5 sm:gap-2.5 px-3 sm:px-4 py-1.5 rounded-full bg-[#1C1917] text-[#FAF5EB] group-hover:bg-[#000000] text-[11px] sm:text-xs md:text-sm font-bold tracking-wider transition-colors shadow-sm shrink-0 whitespace-nowrap">
+                <MessageCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#25D366] fill-[#25D366]" />
                 <span>{storeConfig.brand.contact.phone}</span>
               </div>
             </Link>

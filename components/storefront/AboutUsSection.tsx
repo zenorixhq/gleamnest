@@ -6,7 +6,7 @@ export function AboutUsSection() {
   return (
     <section
       id="about-us"
-      className="relative w-full h-screen max-h-[100vh] lg:h-[100svh] min-h-[560px] flex flex-col justify-between py-2 sm:py-3 lg:py-4 bg-[#FAF6EF] text-[#1C1917] overflow-hidden border-b border-[#EADBBE]/80 select-none"
+      className="relative w-full min-h-[560px] md:h-screen md:max-h-[100vh] lg:h-[100svh] flex flex-col justify-between py-6 sm:py-8 md:py-2 lg:py-4 bg-[#FAF6EF] text-[#1C1917] overflow-hidden border-b border-[#EADBBE]/80 select-none"
     >
       {/* Background Topographic Wave Contours (Matching Reference Image) */}
       <svg
@@ -25,7 +25,7 @@ export function AboutUsSection() {
         <path d="M-100,680 Q300,540 600,740 T1200,600" fill="none" stroke="#1C1917" strokeWidth="1.5" />
       </svg>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 w-full h-full flex flex-col justify-between relative z-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full h-full flex flex-col justify-between relative z-10">
         
         {/* 1. Header: ABOUT US + Elegant Manifesto Paragraph */}
         <div className="text-center shrink-0 pt-1 pb-1 sm:pb-2 max-w-xl mx-auto space-y-1">
@@ -80,9 +80,9 @@ export function AboutUsSection() {
           {/* Spacer Column */}
           <div className="hidden md:block md:col-span-1" />
 
-          {/* Right Column: Number 04 + Portrait Photo (Strict 2:3 ratio, height constrained to viewport) */}
-          <div className="md:col-span-6 flex flex-col justify-center items-center h-full">
-            <div className="flex flex-col items-start max-h-[48vh] sm:max-h-[52vh] lg:max-h-[55vh] aspect-[2/3] w-auto">
+          {/* Right Column: Number 04 + Portrait Photo (Shifted to the right, strict 2:3 ratio, full pendant visibility) */}
+          <div className="md:col-span-6 flex flex-col justify-center items-end h-full">
+            <div className="flex flex-col items-start max-h-[48vh] sm:max-h-[52vh] lg:max-h-[55vh] aspect-[2/3] w-auto ml-auto mr-1 sm:mr-4 md:mr-8 lg:mr-12">
               <span className="font-editorial text-xs italic text-[#8F7842] block mb-1 tracking-wider">
                 04
               </span>
