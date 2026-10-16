@@ -5,7 +5,7 @@ import { storeConfig } from "@/config/store.config";
 
 export function HeroEditorial() {
   return (
-    <section className="relative w-full h-[calc(100svh-5.5rem)] sm:h-[calc(100vh-6.5rem)] min-h-[580px] max-h-[920px] bg-[#1C1917] lg:bg-gradient-to-r lg:from-[#F7EEDD] lg:via-[#F5EAD6] lg:to-[#E9D9C1] text-[#1C1917] overflow-hidden select-none flex flex-col justify-between">
+    <section className="relative w-full h-[calc(100svh-6.25rem)] sm:h-[calc(100vh-6.5rem)] min-h-0 sm:min-h-[540px] max-h-[920px] bg-[#1C1917] lg:bg-gradient-to-r lg:from-[#F7EEDD] lg:via-[#F5EAD6] lg:to-[#E9D9C1] text-[#1C1917] overflow-hidden select-none flex flex-col justify-between">
       {/* 1. Mobile 9:16 Editorial Model Background (Full Portrait, Jewelry and Face in Full View) */}
       <div className="lg:hidden absolute inset-0 z-0 overflow-hidden pointer-events-none select-none">
         <img
@@ -106,26 +106,20 @@ export function HeroEditorial() {
           </div>
         </div>
 
-        {/* 5. Bottom White Curved Dock / Floating Bar (Reduced size on mobile, 2-line motto) */}
-        <div className="w-full bg-white rounded-t-2xl sm:rounded-t-[2.25rem] md:rounded-t-[2.75rem] shadow-[0_-8px_30px_rgba(0,0,0,0.03)] border-t border-[#E3D7C5]">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 sm:py-3.5 md:py-4 flex flex-col sm:flex-row items-center justify-between gap-1.5 sm:gap-4 md:gap-6">
-            {/* Left: 2-line lower-case motto */}
-            <div className="text-[9.5px] sm:text-[11px] text-[#8C847B] font-normal lowercase leading-tight text-center sm:text-left">
-              <div>waterproof & anti-tarnish.</div>
-              <div>surgical-grade 316L steel. worn every day after.</div>
-            </div>
-
-            {/* Center: Scroll button */}
+        {/* 5. Bottom White Curved Dock / Floating Bar (Slim single-row with categories fully visible on screen) */}
+        <div className="w-full bg-white rounded-t-2xl sm:rounded-t-[2.25rem] md:rounded-t-[2.75rem] shadow-[0_-6px_24px_rgba(0,0,0,0.03)] border-t border-[#E3D7C5]">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 sm:py-3 md:py-3.5 flex flex-row items-center justify-between gap-3 sm:gap-6">
+            {/* Left: Scroll indicator button */}
             <a
               href="#about-us"
-              className="flex flex-col items-center justify-center text-[8.5px] sm:text-[10px] uppercase tracking-[0.25em] text-[#7A7269] hover:text-[#1C1917] transition-colors group cursor-pointer py-0.5 sm:py-0"
+              className="flex items-center gap-1.5 text-[9px] sm:text-[10px] uppercase tracking-[0.2em] text-[#7A7269] hover:text-[#1C1917] transition-colors group cursor-pointer"
             >
               <span className="text-xs group-hover:translate-y-0.5 transition-transform animate-float-gentle inline-block">↓</span>
-              <span className="font-semibold tracking-[0.2em]">SCROLL</span>
+              <span className="font-semibold tracking-[0.18em]">SCROLL</span>
             </a>
 
             {/* Right: Category navigation links */}
-            <div className="flex items-center gap-3.5 sm:gap-6 md:gap-8 text-[11px] sm:text-sm lowercase">
+            <div className="flex items-center gap-3 sm:gap-6 md:gap-8 text-xs sm:text-sm lowercase">
               <Link
                 href="/products?category=rings"
                 className="text-[#1C1917] font-semibold border-b-2 border-[#1C1917] pb-0.5 transition-colors"
