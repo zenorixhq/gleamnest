@@ -8,21 +8,21 @@ export function AboutUsSection() {
       id="about-us"
       className="relative w-full min-h-[560px] md:h-screen md:max-h-[100vh] lg:h-[100svh] flex flex-col justify-between py-6 sm:py-8 md:py-2 lg:py-4 bg-[#FAF6EF] text-[#1C1917] overflow-hidden border-b border-[#EADBBE]/80 select-none"
     >
-      {/* Background Topographic Wave Contours (Matching Reference Image) */}
+      {/* Background Topographic Wave Contours (Whisper-Light Ambient Motif, Non-Intrusive) */}
       <svg
-        className="absolute inset-0 w-full h-full opacity-[0.045] pointer-events-none animate-pulse-soft"
+        className="absolute inset-0 w-full h-full opacity-[0.016] pointer-events-none animate-pulse-soft"
         xmlns="http://www.w3.org/2000/svg"
         preserveAspectRatio="none"
         viewBox="0 0 1000 800"
       >
-        <path d="M-100,160 Q200,40 450,220 T900,80 T1200,260" fill="none" stroke="#1C1917" strokeWidth="1.5" />
-        <path d="M-100,200 Q200,80 450,260 T900,120 T1200,300" fill="none" stroke="#1C1917" strokeWidth="1.5" />
-        <path d="M-100,240 Q200,120 450,300 T900,160 T1200,340" fill="none" stroke="#1C1917" strokeWidth="1.5" />
-        <path d="M-100,280 Q200,160 450,340 T900,200 T1200,380" fill="none" stroke="#1C1917" strokeWidth="1.5" />
-        <path d="M-100,560 Q300,420 600,620 T1200,480" fill="none" stroke="#1C1917" strokeWidth="1.5" />
-        <path d="M-100,600 Q300,460 600,660 T1200,520" fill="none" stroke="#1C1917" strokeWidth="1.5" />
-        <path d="M-100,640 Q300,500 600,700 T1200,560" fill="none" stroke="#1C1917" strokeWidth="1.5" />
-        <path d="M-100,680 Q300,540 600,740 T1200,600" fill="none" stroke="#1C1917" strokeWidth="1.5" />
+        <path d="M-100,160 Q200,40 450,220 T900,80 T1200,260" fill="none" stroke="#C5A059" strokeWidth="1" />
+        <path d="M-100,200 Q200,80 450,260 T900,120 T1200,300" fill="none" stroke="#C5A059" strokeWidth="1" />
+        <path d="M-100,240 Q200,120 450,300 T900,160 T1200,340" fill="none" stroke="#C5A059" strokeWidth="1" />
+        <path d="M-100,280 Q200,160 450,340 T900,200 T1200,380" fill="none" stroke="#C5A059" strokeWidth="1" />
+        <path d="M-100,560 Q300,420 600,620 T1200,480" fill="none" stroke="#C5A059" strokeWidth="1" />
+        <path d="M-100,600 Q300,460 600,660 T1200,520" fill="none" stroke="#C5A059" strokeWidth="1" />
+        <path d="M-100,640 Q300,500 600,700 T1200,560" fill="none" stroke="#C5A059" strokeWidth="1" />
+        <path d="M-100,680 Q300,540 600,740 T1200,600" fill="none" stroke="#C5A059" strokeWidth="1" />
       </svg>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full h-full flex flex-col justify-between relative z-10">

@@ -41,10 +41,10 @@ export function HeroEditorial() {
         </div>
       </div>
 
-      {/* 4. Right-Aligned Hero Editorial Headline (Clear of Model's Face, Crisp White on Mobile) */}
+      {/* 4. Right-Aligned Hero Editorial Headline (Clear of Model's Face, Crisp White & Larger on Mobile) */}
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 my-auto flex justify-end animate-slide-up">
         <div className="w-full lg:w-[48%] xl:w-[46%] text-right lg:text-left pl-0 lg:pl-6">
-          <h1 className="font-editorial text-4xl sm:text-5xl md:text-6xl lg:text-[3.8vw] xl:text-[4.5rem] font-normal tracking-tight text-white lg:text-[#1C1917] leading-[1.05] drop-shadow-[0_2px_14px_rgba(0,0,0,0.7)] lg:drop-shadow-none">
+          <h1 className="font-editorial text-[3rem] xs:text-[3.35rem] sm:text-5xl md:text-6xl lg:text-[3.8vw] xl:text-[4.5rem] font-normal tracking-tight text-white lg:text-[#1C1917] leading-[1.02] sm:leading-[1.05] drop-shadow-[0_2px_14px_rgba(0,0,0,0.7)] lg:drop-shadow-none">
             <span>Forever in style.</span> <br />
             <span className="font-editorial italic font-light text-white/95 lg:text-[#4A4036]">Just like you.</span>
           </h1>
@@ -53,8 +53,8 @@ export function HeroEditorial() {
 
       {/* 4. Bottom Right Floating Product Cards & Bottom White Dock */}
       <div className="relative z-10 w-full">
-        {/* Floating Cards (Bottom Right Quadrant) */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-3 sm:pb-4 flex justify-end">
+        {/* Floating Cards (Desktop/Tablet only, hidden on mobile for clean full-portrait view) */}
+        <div className="hidden md:flex max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-3 sm:pb-4 justify-end">
           <div className="flex items-center gap-3 sm:gap-4 overflow-x-auto no-scrollbar max-w-full">
             {/* Card 1: Rings · Eternity Stack */}
             <Link
@@ -106,27 +106,26 @@ export function HeroEditorial() {
           </div>
         </div>
 
-        {/* 5. Bottom White Curved Dock / Floating Bar */}
-        <div className="w-full bg-white rounded-t-[1.75rem] sm:rounded-t-[2.25rem] md:rounded-t-[2.75rem] shadow-[0_-8px_30px_rgba(0,0,0,0.03)] border-t border-[#E3D7C5]">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 sm:py-4 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-6">
-            {/* Left: 3-line lower-case motto */}
-            <div className="text-[10px] sm:text-[11px] text-[#8C847B] font-normal lowercase leading-tight text-center sm:text-left">
+        {/* 5. Bottom White Curved Dock / Floating Bar (Reduced size on mobile, 2-line motto) */}
+        <div className="w-full bg-white rounded-t-2xl sm:rounded-t-[2.25rem] md:rounded-t-[2.75rem] shadow-[0_-8px_30px_rgba(0,0,0,0.03)] border-t border-[#E3D7C5]">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 sm:py-3.5 md:py-4 flex flex-col sm:flex-row items-center justify-between gap-1.5 sm:gap-4 md:gap-6">
+            {/* Left: 2-line lower-case motto */}
+            <div className="text-[9.5px] sm:text-[11px] text-[#8C847B] font-normal lowercase leading-tight text-center sm:text-left">
               <div>waterproof & anti-tarnish.</div>
-              <div>surgical-grade 316L steel.</div>
-              <div>worn every day after.</div>
+              <div>surgical-grade 316L steel. worn every day after.</div>
             </div>
 
             {/* Center: Scroll button */}
             <a
               href="#about-us"
-              className="flex flex-col items-center justify-center text-[9px] sm:text-[10px] uppercase tracking-[0.25em] text-[#7A7269] hover:text-[#1C1917] transition-colors group cursor-pointer"
+              className="flex flex-col items-center justify-center text-[8.5px] sm:text-[10px] uppercase tracking-[0.25em] text-[#7A7269] hover:text-[#1C1917] transition-colors group cursor-pointer py-0.5 sm:py-0"
             >
               <span className="text-xs group-hover:translate-y-0.5 transition-transform animate-float-gentle inline-block">↓</span>
               <span className="font-semibold tracking-[0.2em]">SCROLL</span>
             </a>
 
             {/* Right: Category navigation links */}
-            <div className="flex items-center gap-4 sm:gap-6 md:gap-8 text-xs sm:text-sm lowercase">
+            <div className="flex items-center gap-3.5 sm:gap-6 md:gap-8 text-[11px] sm:text-sm lowercase">
               <Link
                 href="/products?category=rings"
                 className="text-[#1C1917] font-semibold border-b-2 border-[#1C1917] pb-0.5 transition-colors"
