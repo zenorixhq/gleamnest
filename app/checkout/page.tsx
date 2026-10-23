@@ -583,7 +583,7 @@ ${greetingMessage}
                   Anti-Tarnish Guarantee
                 </span>
                 <span>•</span>
-                <span>Waterproof 18K Gold</span>
+                <span>Waterproof & 304/306 Steel</span>
               </div>
             </div>
           </div>

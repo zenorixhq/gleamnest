@@ -7,7 +7,7 @@ export function InstagramReelSection() {
     {
       id: 1,
       image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&q=80&w=700",
-      caption: "Floral notes & waterproof 18K gold hoops.",
+      caption: "Floral notes & waterproof gold hoops.",
     },
     {
       id: 2,
@@ -27,7 +27,7 @@ export function InstagramReelSection() {
     {
       id: 5,
       image: "https://images.unsplash.com/photo-1630019852942-f89202989a59?auto=format&fit=crop&q=80&w=700",
-      caption: "Contemporary cascade drop earrings in 18K PVD finish.",
+      caption: "Contemporary cascade drop earrings in anti-tarnish finish.",
     },
     {
       id: 6,

@@ -60,8 +60,42 @@ function ProductCatalogContent() {
     return products
       .filter((p) => {
         // Category filter
-        if (selectedCategory !== "all" && p.category !== selectedCategory) {
-          return false;
+        if (selectedCategory !== "all") {
+          if (selectedCategory === "new-arrivals") {
+            if (!p.isNewArrival && p.category !== "new-arrivals") return false;
+          } else if (selectedCategory === "necklaces-and-chains" || selectedCategory === "necklaces") {
+            const isMatch = p.category === "necklaces-and-chains" || p.category === "necklaces" || /necklace|chain|pendant/i.test(p.title);
+            if (!isMatch) return false;
+          } else if (selectedCategory === "bangles-kada") {
+            const isMatch = p.category === "bangles-kada" || p.category === "bangles" || /bangle|kada|cuff/i.test(p.title);
+            if (!isMatch) return false;
+          } else if (selectedCategory === "bracelets") {
+            const isMatch = (p.category === "bracelets" && !/bangle|kada|cuff/i.test(p.title)) || /bracelet/i.test(p.title);
+            if (!isMatch) return false;
+          } else if (selectedCategory === "watches") {
+            const isMatch = p.category === "watches" || /watch/i.test(p.title);
+            if (!isMatch) return false;
+          } else if (selectedCategory === "charms") {
+            const isMatch = p.category === "charms" || /charm/i.test(p.title);
+            if (!isMatch) return false;
+          } else if (selectedCategory === "hip-chains") {
+            const isMatch = p.category === "hip-chains" || /hip chain|waist/i.test(p.title);
+            if (!isMatch) return false;
+          } else if (selectedCategory === "kids-collection") {
+            const isMatch = p.category === "kids-collection" || p.category === "kids" || /kid|child/i.test(p.title);
+            if (!isMatch) return false;
+          } else if (selectedCategory === "anklets") {
+            const isMatch = p.category === "anklets" || /anklet/i.test(p.title);
+            if (!isMatch) return false;
+          } else if (selectedCategory === "rings") {
+            const isMatch = p.category === "rings" || /ring/i.test(p.title);
+            if (!isMatch) return false;
+          } else if (selectedCategory === "earrings") {
+            const isMatch = p.category === "earrings" || /earring|stud|hoop/i.test(p.title);
+            if (!isMatch) return false;
+          } else if (p.category !== selectedCategory) {
+            return false;
+          }
         }
 
         // Search filter
@@ -146,7 +180,7 @@ function ProductCatalogContent() {
         <div>
           <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/10 text-primary text-[11px] font-semibold mb-1">
             <Sparkles className="w-3 h-3" />
-            <span>Anti-Tarnish • 18K Gold PVD • Waterproof</span>
+            <span>Anti-Tarnish • 304 & 306 Steel • Waterproof</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-black text-foreground">
             {selectedCategory === "all"
@@ -179,7 +213,7 @@ function ProductCatalogContent() {
         </div>
       </div>
 
-      {/* 2. Horizontal Category Filter Pills (All + 5 Categories) */}
+      {/* 2. Horizontal Category Filter Pills (All + 11 Categories) */}
       <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none pt-1 -mx-4 px-4 sm:mx-0 sm:px-0">
         <button
           onClick={() => setSelectedCategory("all")}
@@ -193,20 +227,37 @@ function ProductCatalogContent() {
           <span className="text-[10px] opacity-80">({products.length})</span>
         </button>
 
-        {categories.map((cat) => (
-          <button
-            key={cat.id}
-            onClick={() => setSelectedCategory(cat.slug)}
-            className={`px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 ${
-              selectedCategory === cat.slug
-                ? "bg-primary text-primary-foreground shadow-sm"
-                : "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground"
-            }`}
-          >
-            <span>{cat.name}</span>
-            <span className="text-[10px] opacity-80">({cat.productCount})</span>
-          </button>
-        ))}
+        {categories.map((cat) => {
+          const count = products.filter((p) => {
+            if (cat.slug === "new-arrivals") return p.isNewArrival || p.category === "new-arrivals";
+            if (cat.slug === "necklaces-and-chains" || cat.slug === "necklaces") return p.category === "necklaces-and-chains" || p.category === "necklaces" || /necklace|chain|pendant/i.test(p.title);
+            if (cat.slug === "bangles-kada") return p.category === "bangles-kada" || p.category === "bangles" || /bangle|kada|cuff/i.test(p.title);
+            if (cat.slug === "bracelets") return (p.category === "bracelets" && !/bangle|kada|cuff/i.test(p.title)) || /bracelet/i.test(p.title);
+            if (cat.slug === "watches") return p.category === "watches" || /watch/i.test(p.title);
+            if (cat.slug === "charms") return p.category === "charms" || /charm/i.test(p.title);
+            if (cat.slug === "hip-chains") return p.category === "hip-chains" || /hip chain|waist/i.test(p.title);
+            if (cat.slug === "kids-collection") return p.category === "kids-collection" || p.category === "kids" || /kid|child/i.test(p.title);
+            if (cat.slug === "anklets") return p.category === "anklets" || /anklet/i.test(p.title);
+            if (cat.slug === "rings") return p.category === "rings" || /ring/i.test(p.title);
+            if (cat.slug === "earrings") return p.category === "earrings" || /earring|stud|hoop/i.test(p.title);
+            return p.category === cat.slug;
+          }).length;
+
+          return (
+            <button
+              key={cat.id}
+              onClick={() => setSelectedCategory(cat.slug)}
+              className={`px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 ${
+                selectedCategory === cat.slug
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground"
+              }`}
+            >
+              <span>{cat.name}</span>
+              <span className="text-[10px] opacity-80">({count})</span>
+            </button>
+          );
+        })}
       </div>
 
       {/* 3. Filter Controls & Sort Bar */}

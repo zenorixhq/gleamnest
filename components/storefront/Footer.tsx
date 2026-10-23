@@ -48,9 +48,9 @@ export function Footer() {
               <Mail className="w-6 h-6" />
             </div>
             <div>
-              <h4 className="text-sm font-bold text-foreground">Complimentary Global Shipping</h4>
+              <h4 className="text-sm font-bold text-foreground">Complimentary Express Shipping</h4>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Free standard delivery on orders exceeding ${storeConfig.commerce.freeShippingThreshold}.
+                Free delivery in Qatar & across India on orders above ₹{storeConfig.commerce.freeShippingThreshold} (Flat ₹{storeConfig.commerce.flatShippingFee} for smaller orders).
               </p>
             </div>
           </div>
@@ -128,28 +128,58 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/products?category=necklaces" className="hover:text-primary transition-colors">
-                  Necklaces & Pendants
+                <Link href="/products?category=new-arrivals" className="hover:text-primary transition-colors text-primary font-medium">
+                  ✦ New Arrivals
                 </Link>
               </li>
               <li>
-                <Link href="/products?category=earrings" className="hover:text-primary transition-colors">
-                  Hoops & Earrings
-                </Link>
-              </li>
-              <li>
-                <Link href="/products?category=bracelets" className="hover:text-primary transition-colors">
-                  Bangles & Bracelets
+                <Link href="/products?category=necklaces-and-chains" className="hover:text-primary transition-colors">
+                  Necklaces & Chains
                 </Link>
               </li>
               <li>
                 <Link href="/products?category=rings" className="hover:text-primary transition-colors">
-                  Anti-Tarnish Rings
+                  Rings
+                </Link>
+              </li>
+              <li>
+                <Link href="/products?category=earrings" className="hover:text-primary transition-colors">
+                  Earrings
+                </Link>
+              </li>
+              <li>
+                <Link href="/products?category=bracelets" className="hover:text-primary transition-colors">
+                  Bracelets
+                </Link>
+              </li>
+              <li>
+                <Link href="/products?category=bangles-kada" className="hover:text-primary transition-colors">
+                  Bangles & Kada
+                </Link>
+              </li>
+              <li>
+                <Link href="/products?category=watches" className="hover:text-primary transition-colors">
+                  Watches
+                </Link>
+              </li>
+              <li>
+                <Link href="/products?category=charms" className="hover:text-primary transition-colors">
+                  Charms
+                </Link>
+              </li>
+              <li>
+                <Link href="/products?category=hip-chains" className="hover:text-primary transition-colors">
+                  Hip Chains
                 </Link>
               </li>
               <li>
                 <Link href="/products?category=anklets" className="hover:text-primary transition-colors">
-                  Anklets & Charms
+                  Anklets
+                </Link>
+              </li>
+              <li>
+                <Link href="/products?category=kids-collection" className="hover:text-primary transition-colors">
+                  Kids Collection
                 </Link>
               </li>
             </ul>

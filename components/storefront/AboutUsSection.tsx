@@ -38,7 +38,7 @@ export function AboutUsSection() {
           </div>
 
           <p className="text-[11px] sm:text-xs text-[#5C5346] leading-relaxed font-light max-w-lg mx-auto px-2">
-            GleamNest designs modern, everyday luxury jewellery pieces handcrafted from surgical-grade 316L stainless steel and 18K gold finish. We believe in timeless daily elegance.
+            GleamNest designs modern, everyday luxury jewellery pieces handcrafted from premium 304 & 306 grade stainless steel. We believe in timeless daily elegance.
           </p>
         </div>
 
@@ -54,7 +54,7 @@ export function AboutUsSection() {
               <div className="w-full max-w-[300px] sm:max-w-[330px] lg:max-w-[350px] aspect-[16/9] max-h-[22vh] rounded-sm overflow-hidden shadow-sm border border-[#E2D5BE] bg-[#F0E6D2]">
                 <img
                   src="/images/about-model-landscape.jpg"
-                  alt="GleamNest 18K Gold Waterproof Necklace & Ring Lifestyle Landscape"
+                  alt="GleamNest Waterproof Necklace & Ring Lifestyle Landscape"
                   className="w-full h-full object-cover object-bottom hover:scale-105 transition-transform duration-700"
                 />
               </div>
@@ -89,7 +89,7 @@ export function AboutUsSection() {
               <div className="w-full flex-1 aspect-[2/3] rounded-sm overflow-hidden shadow-md border border-[#E2D5BE] bg-[#F0E6D2]">
                 <img
                   src="/images/about-model-portrait.jpg"
-                  alt="GleamNest 18K Gold Fine Jewelry Portrait"
+                  alt="GleamNest Fine Jewelry Portrait"
                   className="w-full h-full object-cover object-bottom hover:scale-105 transition-transform duration-700"
                 />
               </div>

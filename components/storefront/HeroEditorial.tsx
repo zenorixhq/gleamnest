@@ -36,7 +36,7 @@ export function HeroEditorial() {
           </span>
           <p className="text-xs sm:text-sm text-white/90 lg:text-[#383129] font-normal leading-snug drop-shadow-sm">
             Fine jewelry for the skin, not the vault. <br />
-            18K gold finish. Worn every day.
+            Waterproof & anti-tarnish. Worn every day.
           </p>
         </div>
       </div>
@@ -63,7 +63,7 @@ export function HeroEditorial() {
             >
               <img
                 src="/images/hero-card-rings.jpg"
-                alt="18K Gold & Emerald Eternity Rings - GleamNest"
+                alt="Emerald Eternity Rings - GleamNest"
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/30 pointer-events-none" />
@@ -80,20 +80,20 @@ export function HeroEditorial() {
               </div>
             </Link>
 
-            {/* Card 2: Necklace · 18K Pendant */}
+            {/* Card 2: Necklace · Pendant */}
             <Link
-              href="/products?category=necklaces"
+              href="/products?category=necklaces-and-chains"
               className="relative w-36 sm:w-48 md:w-56 h-24 sm:h-28 md:h-32 rounded-xl overflow-hidden shadow-lg border border-white/40 group flex-shrink-0 transition-transform duration-300 hover:-translate-y-1"
             >
               <img
                 src="/images/hero-card-necklace.jpg"
-                alt="18K Gold Bamboo Pendant Layered Necklace - GleamNest"
+                alt="Bamboo Pendant Layered Necklace - GleamNest"
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/30 pointer-events-none" />
               <div className="absolute inset-0 p-2.5 sm:p-3 flex flex-col justify-between text-white">
                 <span className="text-[10px] sm:text-xs font-serif tracking-wide text-white/95">
-                  Necklace · 18K Pendant
+                  Necklace · Pendant
                 </span>
                 <div className="flex items-center justify-between text-[9px] sm:text-[10px]">
                   <span className="text-white/80 font-light italic">layered, close to skin</span>
@@ -119,30 +119,48 @@ export function HeroEditorial() {
             </a>
 
             {/* Right: Category navigation links */}
-            <div className="flex items-center gap-3 sm:gap-6 md:gap-8 text-xs sm:text-sm lowercase">
+            <div className="flex items-center gap-3 sm:gap-6 md:gap-8 text-xs sm:text-sm lowercase overflow-x-auto no-scrollbar py-0.5 whitespace-nowrap">
               <Link
                 href="/products?category=rings"
-                className="text-[#1C1917] font-semibold border-b-2 border-[#1C1917] pb-0.5 transition-colors"
+                className="text-[#1C1917] font-semibold border-b-2 border-[#1C1917] pb-0.5 transition-colors shrink-0"
               >
                 rings
               </Link>
               <Link
                 href="/products?category=earrings"
-                className="text-[#7A7269] hover:text-[#1C1917] hover:border-b-2 hover:border-[#7A7269] pb-0.5 transition-all"
+                className="text-[#7A7269] hover:text-[#1C1917] hover:border-b-2 hover:border-[#7A7269] pb-0.5 transition-all shrink-0"
               >
                 earrings
               </Link>
               <Link
-                href="/products?category=necklaces"
-                className="text-[#7A7269] hover:text-[#1C1917] hover:border-b-2 hover:border-[#7A7269] pb-0.5 transition-all"
+                href="/products?category=necklaces-and-chains"
+                className="text-[#7A7269] hover:text-[#1C1917] hover:border-b-2 hover:border-[#7A7269] pb-0.5 transition-all shrink-0"
               >
-                necklaces
+                necklaces & chains
               </Link>
               <Link
                 href="/products?category=bracelets"
-                className="text-[#7A7269] hover:text-[#1C1917] hover:border-b-2 hover:border-[#7A7269] pb-0.5 transition-all"
+                className="text-[#7A7269] hover:text-[#1C1917] hover:border-b-2 hover:border-[#7A7269] pb-0.5 transition-all shrink-0"
               >
                 bracelets
+              </Link>
+              <Link
+                href="/products?category=bangles-kada"
+                className="text-[#7A7269] hover:text-[#1C1917] hover:border-b-2 hover:border-[#7A7269] pb-0.5 transition-all shrink-0"
+              >
+                bangles kada
+              </Link>
+              <Link
+                href="/products?category=anklets"
+                className="text-[#7A7269] hover:text-[#1C1917] hover:border-b-2 hover:border-[#7A7269] pb-0.5 transition-all shrink-0"
+              >
+                anklets
+              </Link>
+              <Link
+                href="/products?category=new-arrivals"
+                className="text-[#8F7234] font-medium hover:text-[#1C1917] hover:border-b-2 hover:border-[#8F7234] pb-0.5 transition-all shrink-0"
+              >
+                new arrivals
               </Link>
             </div>
           </div>

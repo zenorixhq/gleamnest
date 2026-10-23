@@ -62,7 +62,7 @@ export default function HomePage() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-5">
           {categories.map((cat) => (
             <Link
               key={cat.id}
@@ -74,16 +74,13 @@ export default function HomePage() {
                 alt={cat.name}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent flex flex-col justify-end p-5 text-white transition-opacity duration-300">
-                <span className="text-[11px] text-[#EADBBE] font-medium tracking-wider uppercase">
-                  {cat.productCount} Items
+              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent flex flex-col justify-end p-3.5 sm:p-4 text-white transition-opacity duration-300">
+                <span className="text-[10px] text-[#EADBBE] font-medium tracking-wider uppercase">
+                  Collection
                 </span>
-                <h3 className="font-editorial text-lg font-semibold tracking-wide text-white group-hover:text-[#F3DFB0] transition-colors">
+                <h3 className="font-editorial text-sm sm:text-base font-semibold tracking-wide text-white group-hover:text-[#F3DFB0] transition-colors leading-snug">
                   {cat.name}
                 </h3>
-                <p className="text-[11px] text-white/70 line-clamp-1 mt-0.5 font-light">
-                  {cat.description}
-                </p>
               </div>
             </Link>
           ))}

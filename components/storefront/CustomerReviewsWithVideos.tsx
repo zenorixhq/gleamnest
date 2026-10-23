@@ -29,7 +29,7 @@ const defaultReviews: Review[] = [
   {
     id: 1,
     quote:
-      "Every piece feels like a whisper of the old couture houses. The 18K finish is beyond reproach, and zero tarnish after 2 months of daily wear.",
+      "Every piece feels like a whisper of the old couture houses. The gold finish is beyond reproach, and zero tarnish after 2 months of daily wear.",
     author: "Isabella M.",
     location: "Kochi, Kerala",
     piece: "Statement Ring & Clover Bangle",

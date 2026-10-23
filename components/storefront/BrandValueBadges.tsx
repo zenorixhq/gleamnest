@@ -20,8 +20,8 @@ export function BrandValueBadges() {
       ),
     },
     {
-      title: "Stainless Steel Jewellery",
-      desc: "Surgical-grade 316L indestructible core",
+      title: "304 & 306 Grade Steel",
+      desc: "Premium stainless steel indestructible core",
       icon: (
         <svg viewBox="0 0 48 48" className="w-7 h-7 text-[#C5A059]" fill="none" stroke="currentColor" strokeWidth="2">
           {/* Steel Ingots / Pillars */}
@@ -60,8 +60,8 @@ export function BrandValueBadges() {
       ),
     },
     {
-      title: "18K Gold Plated",
-      desc: "Thick PVD vacuum coating for enduring luster",
+      title: "PVD Gold Coating",
+      desc: "Thick vacuum coating for enduring luster",
       icon: (
         <svg viewBox="0 0 48 48" className="w-7 h-7 text-[#C5A059]" fill="none" stroke="currentColor" strokeWidth="2">
           {/* Diamond Jewel */}

@@ -91,7 +91,7 @@ export default function AdminDashboardPage() {
   // Form fields
   const [formState, setFormState] = useState({
     title: "",
-    category: "necklaces",
+    category: "necklaces-and-chains",
     price: "",
     salePrice: "",
     priceQatar: "",
@@ -275,7 +275,7 @@ export default function AdminDashboardPage() {
     setEditingProduct(null);
     setFormState({
       title: "",
-      category: "necklaces",
+      category: "necklaces-and-chains",
       price: "",
       salePrice: "",
       priceQatar: "",
@@ -1229,7 +1229,7 @@ export default function AdminDashboardPage() {
                 <input
                   type="text"
                   required
-                  placeholder="e.g. 18K Gold Four-Leaf Clover Pearl Necklace"
+                  placeholder="e.g. Four-Leaf Clover Pearl Necklace"
                   value={formState.title}
                   onChange={(e) => setFormState({ ...formState, title: e.target.value })}
                   className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none"
@@ -1245,11 +1245,17 @@ export default function AdminDashboardPage() {
                     onChange={(e) => setFormState({ ...formState, category: e.target.value })}
                     className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none"
                   >
-                    <option value="necklaces">Necklaces</option>
+                    <option value="necklaces-and-chains">Necklaces and Chains</option>
+                    <option value="rings">Rings</option>
                     <option value="earrings">Earrings</option>
                     <option value="bracelets">Bracelets</option>
-                    <option value="rings">Rings</option>
+                    <option value="bangles-kada">Bangles Kada</option>
+                    <option value="watches">Watches</option>
+                    <option value="charms">Charms</option>
+                    <option value="hip-chains">Hip Chains</option>
                     <option value="anklets">Anklets</option>
+                    <option value="kids-collection">Kids Collection</option>
+                    <option value="new-arrivals">New Arrivals</option>
                   </select>
                 </div>
 
@@ -1420,7 +1426,7 @@ export default function AdminDashboardPage() {
                 <label className="text-xs font-semibold text-foreground">Short Summary</label>
                 <input
                   type="text"
-                  placeholder="e.g. 18K Gold Plated • Waterproof • Hypoallergenic"
+                  placeholder="e.g. 304 & 306 Grade Steel • Waterproof • Hypoallergenic"
                   value={formState.shortDescription}
                   onChange={(e) => setFormState({ ...formState, shortDescription: e.target.value })}
                   className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none"
@@ -1431,7 +1437,7 @@ export default function AdminDashboardPage() {
                 <label className="text-xs font-semibold text-foreground">Full Description & Story</label>
                 <textarea
                   rows={3}
-                  placeholder="Crafted with 316L medical-grade stainless steel with 18K gold PVD plating. 100% waterproof, sweatproof, and hypoallergenic."
+                  placeholder="Crafted with premium 304 & 306 grade stainless steel with high-grade PVD plating. 100% waterproof, sweatproof, and hypoallergenic."
                   value={formState.description}
                   onChange={(e) => setFormState({ ...formState, description: e.target.value })}
                   className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none"

@@ -58,13 +58,37 @@ export function Header() {
         .slice(0, 4)
     : [];
 
-  const navLinks = [
+  const primaryNavLinks = [
     { label: "Shop All", href: "/products" },
-    { label: "Necklaces", href: "/products?category=necklaces" },
-    { label: "Bracelets", href: "/products?category=bracelets" },
-    { label: "Earrings", href: "/products?category=earrings" },
+    { label: "✦ New Arrivals", href: "/products?category=new-arrivals", highlight: true },
+    { label: "Necklaces & Chains", href: "/products?category=necklaces-and-chains" },
     { label: "Rings", href: "/products?category=rings" },
+    { label: "Earrings", href: "/products?category=earrings" },
+    { label: "Bangles & Kada", href: "/products?category=bangles-kada" },
+  ];
+
+  const moreCategoryLinks = [
+    { label: "Bracelets", href: "/products?category=bracelets" },
+    { label: "Watches", href: "/products?category=watches" },
+    { label: "Charms", href: "/products?category=charms" },
+    { label: "Hip Chains", href: "/products?category=hip-chains" },
     { label: "Anklets", href: "/products?category=anklets" },
+    { label: "Kids Collection", href: "/products?category=kids-collection" },
+  ];
+
+  const allNavLinks = [
+    { label: "Shop All", href: "/products" },
+    { label: "✦ New Arrivals", href: "/products?category=new-arrivals" },
+    { label: "Necklaces & Chains", href: "/products?category=necklaces-and-chains" },
+    { label: "Rings", href: "/products?category=rings" },
+    { label: "Earrings", href: "/products?category=earrings" },
+    { label: "Bangles & Kada", href: "/products?category=bangles-kada" },
+    { label: "Bracelets", href: "/products?category=bracelets" },
+    { label: "Watches", href: "/products?category=watches" },
+    { label: "Charms", href: "/products?category=charms" },
+    { label: "Hip Chains", href: "/products?category=hip-chains" },
+    { label: "Anklets", href: "/products?category=anklets" },
+    { label: "Kids Collection", href: "/products?category=kids-collection" },
   ];
 
   return (
@@ -95,21 +119,52 @@ export function Header() {
             </div>
 
             {/* Desktop Navigation Links */}
-            <nav className="hidden lg:flex items-center space-x-8">
-              {navLinks.map((link) => {
+            <nav className="hidden lg:flex items-center space-x-6">
+              {primaryNavLinks.map((link) => {
                 const isActive = pathname === link.href;
                 return (
                   <Link
                     key={link.href}
                     href={link.href}
                     className={`text-sm font-medium tracking-wide transition-colors hover:text-primary ${
-                      isActive ? "text-primary font-semibold" : "text-foreground/80"
+                      link.highlight
+                        ? "text-[#8F7234] font-semibold"
+                        : isActive
+                        ? "text-primary font-semibold"
+                        : "text-foreground/80"
                     }`}
                   >
                     {link.label}
                   </Link>
                 );
               })}
+
+              {/* More Collections Dropdown */}
+              <div className="relative group">
+                <button
+                  type="button"
+                  className="flex items-center gap-1 text-sm font-medium text-foreground/80 hover:text-primary transition-colors py-2 cursor-pointer"
+                >
+                  <span>More</span>
+                  <ChevronDown className="w-3.5 h-3.5 group-hover:rotate-180 transition-transform duration-200 text-muted-foreground" />
+                </button>
+
+                <div className="absolute left-0 top-full pt-1 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-200 z-50">
+                  <div className="w-48 bg-[#FFFDF9] border border-[#EADBBE] rounded-xl shadow-xl py-2 px-1 divide-y divide-[#EADBBE]/40">
+                    <div className="py-1">
+                      {moreCategoryLinks.map((item) => (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          className="block px-3 py-2 text-xs font-medium text-foreground/80 hover:text-primary hover:bg-[#FAF7F2] rounded-lg transition-colors"
+                        >
+                          {item.label}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
             </nav>
 
             {/* Right Action Icons */}
@@ -213,13 +268,13 @@ export function Header() {
               </button>
             </div>
 
-            <nav className="flex-1 py-6 space-y-4">
-              {navLinks.map((link) => (
+            <nav className="flex-1 py-4 space-y-1.5 overflow-y-auto no-scrollbar">
+              {allNavLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="block text-lg font-medium text-foreground hover:text-primary transition-colors py-1"
+                  className="block text-base font-medium text-foreground hover:text-primary transition-colors py-1 px-2 rounded-lg hover:bg-muted/40"
                 >
                   {link.label}
                 </Link>

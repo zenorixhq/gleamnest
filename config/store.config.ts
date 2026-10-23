@@ -67,7 +67,7 @@ export const storeConfig: StoreConfig = {
   meta: {
     name: "GleamNest",
     tagline: "The place where elegance and sparkle come together.",
-    description: "Waterproof & Anti-Tarnish Everyday Luxury Jewellery crafted in 18K Gold Plated 316L Stainless Steel. Wear it daily, anywhere.",
+    description: "Waterproof & Anti-Tarnish Everyday Luxury Jewellery crafted in Premium 304 & 306 Grade Stainless Steel. Wear it daily, anywhere.",
     url: "https://gleamnest.in",
     favicon: "/favicon.ico",
   },
@@ -108,7 +108,7 @@ export const storeConfig: StoreConfig = {
       { code: "QAR", symbol: "QAR", name: "Qatar (QAR)", flag: "🇶🇦", rate: 1.0 },
     ],
     freeShippingThreshold: 799,
-    flatShippingFee: 60,
+    flatShippingFee: 40,
     taxRatePercent: 0, // Direct chat pricing with inclusive pricing
     taxInclusive: true,
     checkoutMode: "whatsapp",
@@ -122,7 +122,7 @@ export const storeConfig: StoreConfig = {
       {
         code: "FREESHIP",
         discountType: "fixed",
-        amount: 60,
+        amount: 40,
         minSpend: 500,
         description: "Complimentary Pan-India shipping",
       },
@@ -134,7 +134,7 @@ export const storeConfig: StoreConfig = {
     enableQuickView: true,
     enableStockBadges: true,
     enableAnnouncementBar: true,
-    announcementText: "✨ 100% Anti-Tarnish & Waterproof Jewelry • Free Delivery in Qatar & Pan-India on Orders Above ₹799 • Order on WhatsApp",
+    announcementText: "✨ 100% Anti-Tarnish & Waterproof Jewelry • Premium 304 & 306 Grade Stainless Steel • Free Delivery in Qatar & Pan-India on Orders Above ₹799 • Shipping ₹40 • Order on WhatsApp",
     enableWhatsAppFloat: true,
     enableCurrencySwitcher: true,
   },

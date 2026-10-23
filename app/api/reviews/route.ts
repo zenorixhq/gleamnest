@@ -13,7 +13,7 @@ function getInitialData() {
         location: "Kochi, Kerala",
         piece: "Statement Ring & Clover Bangle",
         rating: 5,
-        quote: "Every piece feels like a whisper of the old couture houses. The 18K finish is beyond reproach, and zero tarnish after 2 months of daily wear."
+        quote: "Every piece feels like a whisper of the old couture houses. The gold finish is beyond reproach, and zero tarnish after 2 months of daily wear."
       },
       {
         id: "rev-2",
@@ -124,7 +124,7 @@ export async function POST(req: Request) {
         id: `rev-${Date.now()}`,
         author: body.author || "Verified Customer",
         location: body.location || "Kerala, India",
-        piece: body.piece || "18K Gold Fine Jewelry",
+        piece: body.piece || "Anti-Tarnish Fine Jewelry",
         rating: Number(body.rating) || 5,
         quote: body.quote || "",
       };
