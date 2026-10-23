@@ -86,7 +86,7 @@ export function BrandValueBadges() {
             {badges.map((badge, idx) => (
               <div key={idx} className="flex-shrink-0 w-[136px] sm:w-auto flex flex-col items-center text-center group snap-center">
                 {/* Circular Gold Icon Container */}
-                <div className="relative w-14 h-14 sm:w-16 sm:h-16 lg:w-18 lg:h-18 rounded-full border-[1.5px] border-[#C5A059] flex items-center justify-center p-2.5 sm:p-3 mb-2.5 sm:mb-3.5 bg-gradient-to-br from-[#FFFDF9] to-[#F5EBDA] shadow-sm transition-all duration-500 group-hover:scale-110 group-hover:-translate-y-1 group-hover:shadow-[0_8px_24px_rgba(197,160,89,0.25)]">
+                <div className="relative w-14 h-14 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-full border-[1.5px] border-[#C5A059] flex items-center justify-center p-2.5 sm:p-3 mb-2.5 sm:mb-3.5 bg-gradient-to-br from-[#FFFDF9] to-[#F5EBDA] shadow-sm transition-all duration-500 group-hover:scale-110 group-hover:-translate-y-1 group-hover:shadow-[0_8px_24px_rgba(197,160,89,0.25)]">
                   {/* Inner Delicate Ring */}
                   <div className="absolute inset-[3px] rounded-full border border-[#DDC698]/50 pointer-events-none" />
                   {badge.icon}

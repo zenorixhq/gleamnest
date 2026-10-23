@@ -126,12 +126,12 @@ export default function CartPage() {
           </div>
 
           {items.map((item) => (
-            <div key={item.id} className="py-6 first:pt-4 flex flex-col sm:flex-row gap-6">
-              <div className="w-20 h-20 sm:w-24 sm:h-24 bg-[#FAF8F5] dark:bg-stone-900/40 rounded-xl border border-border p-1 flex items-center justify-center flex-shrink-0">
+            <div key={item.id} className="py-4 sm:py-6 first:pt-4 flex flex-row items-center gap-4 sm:gap-6">
+              <div className="w-16 h-16 sm:w-24 sm:h-24 bg-[#FAF8F5] dark:bg-stone-900/40 rounded-xl border border-border p-1 flex items-center justify-center shrink-0 aspect-square overflow-hidden">
                 <img
                   src={item.image}
                   alt={item.title}
-                  className="w-full h-full object-contain"
+                  className="w-full h-full object-contain rounded-lg max-w-full max-h-full"
                 />
               </div>
 

@@ -137,15 +137,15 @@ export function CartDrawer() {
               </div>
             ) : (
               items.map((item) => (
-                <div key={item.id} className="pt-4 first:pt-0 flex gap-3 sm:gap-4">
-                  <div className="w-18 h-18 sm:w-20 sm:h-20 bg-[#FAF8F5] dark:bg-stone-900/40 rounded-xl border border-border p-1 flex items-center justify-center flex-shrink-0">
+                <div key={item.id} className="pt-3.5 sm:pt-4 first:pt-0 flex gap-3 sm:gap-4 items-center">
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 shrink-0 aspect-square rounded-xl border border-border/80 bg-[#FAF8F5] dark:bg-stone-900/40 p-1 flex items-center justify-center overflow-hidden">
                     <img
                       src={item.image}
                       alt={item.title}
-                      className="w-full h-full object-contain"
+                      className="w-full h-full object-contain rounded-lg max-w-full max-h-full"
                     />
                   </div>
-                  <div className="flex-1 min-w-0 flex flex-col justify-between">
+                  <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
                     <div>
                       <div className="flex items-start justify-between gap-2">
                         <Link

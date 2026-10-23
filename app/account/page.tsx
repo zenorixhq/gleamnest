@@ -147,7 +147,7 @@ function AccountPageContent() {
                     <img
                       src={item.image}
                       alt={item.title}
-                      className="w-16 h-18 object-cover rounded-lg border border-border flex-shrink-0"
+                      className="w-16 h-16 object-cover rounded-lg border border-border shrink-0 aspect-square"
                     />
                     <div className="flex-1 min-w-0">
                       <h4 className="text-xs font-bold text-foreground truncate">{item.title}</h4>
