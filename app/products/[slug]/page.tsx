@@ -21,8 +21,12 @@ import {
   CheckCircle2,
   MessageCircle,
   Sparkles,
+  Ruler,
+  AlertCircle,
+  Video,
 } from "lucide-react";
 import { storeConfig } from "@/config/store.config";
+import { PolicyModal, PolicyTab } from "@/components/storefront/PolicyModal";
 
 export default function ProductDetailPage({
   params,
@@ -30,6 +34,7 @@ export default function ProductDetailPage({
   params: { slug: string };
 }) {
   const router = useRouter();
+  const [policyModalTab, setPolicyModalTab] = useState<PolicyTab | null>(null);
   const products = useProductStore((s) => s.products);
   const fetchProducts = useProductStore((s) => s.fetchProducts);
   const [hasAttemptedFetch, setHasAttemptedFetch] = useState(false);
@@ -276,10 +281,18 @@ ${greetingMessage}
           {/* Variant Selectors */}
           {product.variantAttributes?.map((attr) => (
             <div key={attr.name} className="space-y-2">
-              <div className="flex justify-between text-xs">
+              <div className="flex justify-between items-center text-xs">
                 <span className="font-bold text-foreground">
                   Select {attr.name}: <span className="font-normal text-muted-foreground">{currentOptions[attr.name]}</span>
                 </span>
+                <button
+                  type="button"
+                  onClick={() => setPolicyModalTab("size-guide")}
+                  className="text-primary hover:underline font-semibold flex items-center gap-1"
+                >
+                  <Ruler className="w-3.5 h-3.5" />
+                  <span>Size Guide</span>
+                </button>
               </div>
               <div className="flex flex-wrap gap-2">
                 {attr.options.map((opt) => (
@@ -379,24 +392,64 @@ ${greetingMessage}
             </button>
           </div>
 
-          {/* Jewelry Trust Value Badges */}
-          <div className="grid grid-cols-3 gap-3 pt-6 border-t border-border text-center text-[11px] text-muted-foreground">
-            <div className="space-y-1">
-              <ShieldCheck className="w-4 h-4 mx-auto text-primary" />
-              <p className="font-semibold text-foreground">Anti-Tarnish</p>
-              <p>Lifetime Gold Shine</p>
+          {/* Jewelry Trust Value Badges with Direct Guide Triggers */}
+          <div className="space-y-3 pt-6 border-t border-border">
+            <div className="grid grid-cols-3 gap-2 sm:gap-3 text-center text-[11px] text-muted-foreground">
+              <button
+                type="button"
+                onClick={() => setPolicyModalTab("care-guide")}
+                className="p-2.5 rounded-xl bg-card border border-border/80 hover:border-primary/50 transition-all text-center space-y-1 group"
+              >
+                <ShieldCheck className="w-4 h-4 mx-auto text-primary group-hover:scale-110 transition-transform" />
+                <p className="font-bold text-foreground">Anti-Tarnish</p>
+                <p className="text-[10px]">304 & 306 Steel</p>
+              </button>
+              <button
+                type="button"
+                onClick={() => setPolicyModalTab("care-guide")}
+                className="p-2.5 rounded-xl bg-card border border-border/80 hover:border-primary/50 transition-all text-center space-y-1 group"
+              >
+                <Sparkles className="w-4 h-4 mx-auto text-primary group-hover:scale-110 transition-transform" />
+                <p className="font-bold text-foreground">100% Waterproof</p>
+                <p className="text-[10px]">Shower & Gym Safe</p>
+              </button>
+              <button
+                type="button"
+                onClick={() => setPolicyModalTab("shipping")}
+                className="p-2.5 rounded-xl bg-card border border-border/80 hover:border-primary/50 transition-all text-center space-y-1 group"
+              >
+                <Truck className="w-4 h-4 mx-auto text-primary group-hover:scale-110 transition-transform" />
+                <p className="font-bold text-foreground">DTDC & India Post</p>
+                <p className="text-[10px]">{isQatar ? "Qatar Free Delivery" : "Pan-India ₹40 / Free ₹799+"}</p>
+              </button>
             </div>
-            <div className="space-y-1">
-              <Sparkles className="w-4 h-4 mx-auto text-primary" />
-              <p className="font-semibold text-foreground">100% Waterproof</p>
-              <p>Shower & Gym Safe</p>
-            </div>
-            <div className="space-y-1">
-              <Truck className="w-4 h-4 mx-auto text-primary" />
-              <p className="font-semibold text-foreground">
-                {isQatar ? "Qatar Delivery" : "Pan-India Courier"}
-              </p>
-              <p>{isQatar ? "100% Free Shipping" : "Free on ₹799+"}</p>
+
+            {/* Quick Policies Navigation Links */}
+            <div className="flex flex-wrap items-center justify-between gap-2 pt-1 text-xs">
+              <button
+                type="button"
+                onClick={() => setPolicyModalTab("size-guide")}
+                className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 font-medium"
+              >
+                <Ruler className="w-3.5 h-3.5 text-primary" />
+                <span>Size Guide</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setPolicyModalTab("return-refund")}
+                className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 font-medium"
+              >
+                <RotateCcw className="w-3.5 h-3.5 text-primary" />
+                <span>360° Unboxing Policy</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setPolicyModalTab("ordering-instructions")}
+                className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 font-medium"
+              >
+                <AlertCircle className="w-3.5 h-3.5 text-primary" />
+                <span>Order Instructions</span>
+              </button>
             </div>
           </div>
         </div>
@@ -495,6 +548,13 @@ ${greetingMessage}
           <span>WhatsApp</span>
         </button>
       </div>
+
+      {/* Interactive Policy & Size Guide Modal */}
+      <PolicyModal
+        isOpen={!!policyModalTab}
+        onClose={() => setPolicyModalTab(null)}
+        initialTab={policyModalTab || "size-guide"}
+      />
     </div>
   );
 }

@@ -279,7 +279,41 @@ export function Header() {
                   {link.label}
                 </Link>
               ))}
-              <div className="pt-4 border-t border-border">
+              <div className="pt-3 border-t border-border space-y-0.5">
+                <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider px-2 py-1">
+                  Guides & Policies
+                </p>
+                <Link
+                  href="/policies?tab=size-guide"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block text-xs font-medium text-muted-foreground hover:text-primary py-1.5 px-2 rounded-lg hover:bg-muted/40"
+                >
+                  📐 Bangle & Ring Size Guide
+                </Link>
+                <Link
+                  href="/policies?tab=care-guide"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block text-xs font-medium text-muted-foreground hover:text-primary py-1.5 px-2 rounded-lg hover:bg-muted/40"
+                >
+                  ✨ Jewelry Care (304 & 306 Steel)
+                </Link>
+                <Link
+                  href="/policies?tab=shipping"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block text-xs font-medium text-muted-foreground hover:text-primary py-1.5 px-2 rounded-lg hover:bg-muted/40"
+                >
+                  🚚 Shipping via DTDC & India Post
+                </Link>
+                <Link
+                  href="/policies?tab=return-refund"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block text-xs font-medium text-muted-foreground hover:text-primary py-1.5 px-2 rounded-lg hover:bg-muted/40"
+                >
+                  🔄 360° Unboxing & Return Policy
+                </Link>
+              </div>
+
+              <div className="pt-3 border-t border-border">
                 <Link
                   href="/admin"
                   onClick={() => setMobileMenuOpen(false)}

@@ -12,12 +12,20 @@ import {
   Instagram,
   Twitter,
   Facebook,
+  Ruler,
+  Sparkles,
+  Truck,
+  RotateCcw,
+  AlertCircle,
 } from "lucide-react";
 import { BrandLogo } from "@/components/storefront/BrandLogo";
+import { ProductFeatureSlider } from "@/components/storefront/ProductFeatureSlider";
+import { PolicyModal, PolicyTab } from "@/components/storefront/PolicyModal";
 
 export function Footer() {
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
+  const [policyModalTab, setPolicyModalTab] = useState<PolicyTab | null>(null);
 
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,45 +36,9 @@ export function Footer() {
 
   return (
     <footer className="bg-card border-t border-border mt-20">
-      {/* Top Value Propositions */}
-      <div className="border-b border-border/60 py-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
-          <div className="flex flex-col md:flex-row items-center gap-4">
-            <div className="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center flex-shrink-0">
-              <ShieldCheck className="w-6 h-6" />
-            </div>
-            <div>
-              <h4 className="text-sm font-bold text-foreground">Guaranteed Authenticity</h4>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                Every material sustainably sourced & certified for enduring quality.
-              </p>
-            </div>
-          </div>
-
-          <div className="flex flex-col md:flex-row items-center gap-4">
-            <div className="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center flex-shrink-0">
-              <Mail className="w-6 h-6" />
-            </div>
-            <div>
-              <h4 className="text-sm font-bold text-foreground">Complimentary Express Shipping</h4>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                Free delivery in Qatar & across India on orders above ₹{storeConfig.commerce.freeShippingThreshold} (Flat ₹{storeConfig.commerce.flatShippingFee} for smaller orders).
-              </p>
-            </div>
-          </div>
-
-          <div className="flex flex-col md:flex-row items-center gap-4">
-            <div className="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center flex-shrink-0">
-              <CheckCircle2 className="w-6 h-6" />
-            </div>
-            <div>
-              <h4 className="text-sm font-bold text-foreground">30-Day Hassle-Free Returns</h4>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                Pre-printed prepaid return labels enclosed in every order package.
-              </p>
-            </div>
-          </div>
-        </div>
+      {/* Interactive Auto-Scrolling Feature Slider */}
+      <div className="border-b border-border/60 py-8 sm:py-10 bg-muted/10">
+        <ProductFeatureSlider onOpenPolicy={(tab) => setPolicyModalTab(tab)} />
       </div>
 
       {/* Main Footer Links */}
@@ -192,6 +164,51 @@ export function Footer() {
             </h5>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
+                <button
+                  onClick={() => setPolicyModalTab("size-guide")}
+                  className="hover:text-primary transition-colors text-left flex items-center gap-1.5"
+                >
+                  <Ruler className="w-3.5 h-3.5 text-primary" />
+                  <span>Bangle & Ring Size Guide</span>
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => setPolicyModalTab("care-guide")}
+                  className="hover:text-primary transition-colors text-left flex items-center gap-1.5"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-primary" />
+                  <span>Jewelry Care (304 & 306 Steel)</span>
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => setPolicyModalTab("shipping")}
+                  className="hover:text-primary transition-colors text-left flex items-center gap-1.5"
+                >
+                  <Truck className="w-3.5 h-3.5 text-primary" />
+                  <span>Shipping via DTDC & India Post</span>
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => setPolicyModalTab("return-refund")}
+                  className="hover:text-primary transition-colors text-left flex items-center gap-1.5"
+                >
+                  <RotateCcw className="w-3.5 h-3.5 text-primary" />
+                  <span>Return & Replacement Policy</span>
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => setPolicyModalTab("ordering-instructions")}
+                  className="hover:text-primary transition-colors text-left flex items-center gap-1.5"
+                >
+                  <AlertCircle className="w-3.5 h-3.5 text-primary" />
+                  <span>Important Instructions</span>
+                </button>
+              </li>
+              <li className="pt-1 border-t border-border/50">
                 <Link href="/account" className="hover:text-primary transition-colors">
                   Order Status & Tracking
                 </Link>
@@ -253,6 +270,13 @@ export function Footer() {
           </div>
         </div>
       </div>
+
+      {/* Interactive Policy & Size Guide Modal */}
+      <PolicyModal
+        isOpen={!!policyModalTab}
+        onClose={() => setPolicyModalTab(null)}
+        initialTab={policyModalTab || "size-guide"}
+      />
     </footer>
   );
 }
