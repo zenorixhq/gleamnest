@@ -38,6 +38,7 @@ export function PolicyModal({
   initialTab = "size-guide",
 }: PolicyModalProps) {
   const [activeTab, setActiveTab] = useState<PolicyTab>(initialTab);
+  const [sizeSubTab, setSizeSubTab] = useState<"ring" | "bangle">("ring");
   const [zoomedImage, setZoomedImage] = useState<string | null>(null);
 
   useEffect(() => {
@@ -154,147 +155,300 @@ export function PolicyModal({
           {/* ======================================================== */}
           {/* TAB 1: SIZE GUIDE                                        */}
           {/* ======================================================== */}
+          {/* ======================================================== */}
+          {/* TAB 1: SIZE GUIDE                                        */}
+          {/* ======================================================== */}
           {activeTab === "size-guide" && (
             <div className="space-y-6 animate-in fade-in-50">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-border pb-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border pb-4">
                 <div>
                   <h4 className="text-xl font-bold text-foreground">
-                    How to Determine Your Bangle & Ring Size
+                    Ring & Bangle Size Guide
                   </h4>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    Follow our 5-step hand measurement method to find your exact GleamNest fit.
+                    Official GleamNest size charts and easy measurement instructions.
                   </p>
                 </div>
-                <span className="self-start sm:self-auto text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-primary/10 text-primary border border-primary/20">
-                  Standard Indian Sizing
-                </span>
-              </div>
 
-              {/* Graphic Banner & Diagram */}
-              <div className="relative group rounded-xl overflow-hidden border border-border bg-muted/20">
-                <img
-                  src="/images/bangle-size-guide.jpg"
-                  alt="GleamNest Official Bangle Size Guide & Hand Measurement Steps"
-                  className="w-full h-auto max-h-[380px] object-contain mx-auto"
-                />
-                <button
-                  onClick={() => setZoomedImage("/images/bangle-size-guide.jpg")}
-                  className="absolute bottom-3 right-3 px-3 py-1.5 rounded-lg bg-background/90 backdrop-blur border border-border shadow text-xs font-semibold flex items-center gap-1.5 text-foreground hover:bg-background"
-                >
-                  <Maximize2 className="w-3.5 h-3.5" />
-                  <span>Click to Enlarge Diagram</span>
-                </button>
-              </div>
-
-              {/* Step-by-Step Instructions */}
-              <div className="space-y-3">
-                <h5 className="text-sm font-bold uppercase tracking-wider text-primary">
-                  5 Steps to Measure Your Bangle Size
-                </h5>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                  <div className="p-3.5 rounded-xl bg-card border border-border/80 space-y-1">
-                    <span className="font-bold text-primary">Step 1: Fold Hand</span>
-                    <p className="text-muted-foreground">
-                      Fold your thumb and little finger together towards the center of your palm, as if you are slipping on a bangle.
-                    </p>
-                  </div>
-
-                  <div className="p-3.5 rounded-xl bg-card border border-border/80 space-y-1">
-                    <span className="font-bold text-primary">Step 2: Wrap Tape or Paper</span>
-                    <p className="text-muted-foreground">
-                      Use a flexible measuring tape or a strip of paper. Wrap it around the widest part of your hand across the knuckles and base of thumb.
-                    </p>
-                  </div>
-
-                  <div className="p-3.5 rounded-xl bg-card border border-border/80 space-y-1">
-                    <span className="font-bold text-primary">Step 3: Mark & Measure</span>
-                    <p className="text-muted-foreground">
-                      Mark where the tape or paper overlaps with a pen. Lay it flat against a ruler and measure the length in inches or millimeters.
-                    </p>
-                  </div>
-
-                  <div className="p-3.5 rounded-xl bg-card border border-border/80 space-y-1">
-                    <span className="font-bold text-primary">Step 4: Compare with Chart</span>
-                    <p className="text-muted-foreground">
-                      Match your measurement to our official Bangle Size Chart below to identify your size (2-2 to 2-10).
-                    </p>
-                  </div>
-                </div>
-
-                <div className="p-3.5 rounded-xl bg-primary/5 border border-primary/20 text-xs text-foreground flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-primary flex-shrink-0" />
-                  <span>
-                    <strong>Pro Fit Tip (Step 5):</strong> If you prefer a loose, playful fit, choose one size up. For a snug, sleek everyday fit, select the exact diameter.
-                  </span>
+                {/* Sub-toggle: Ring vs Bangle */}
+                <div className="flex items-center gap-1.5 p-1 bg-muted rounded-xl border border-border">
+                  <button
+                    type="button"
+                    onClick={() => setSizeSubTab("ring")}
+                    className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                      sizeSubTab === "ring"
+                        ? "bg-primary text-primary-foreground shadow-sm"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    Ring Size Guide
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSizeSubTab("bangle")}
+                    className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                      sizeSubTab === "bangle"
+                        ? "bg-primary text-primary-foreground shadow-sm"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    Bangle Size Guide
+                  </button>
                 </div>
               </div>
 
-              {/* Official Bangle Size Chart Table */}
-              <div className="space-y-3">
-                <h5 className="text-sm font-bold uppercase tracking-wider text-foreground">
-                  Official Bangle Size Chart
-                </h5>
-                <div className="overflow-x-auto rounded-xl border border-border">
-                  <table className="w-full text-xs text-left">
-                    <thead className="bg-muted/60 text-foreground font-bold border-b border-border">
-                      <tr>
-                        <th className="p-3">Bangle Size</th>
-                        <th className="p-3">Inside Diameter (Inches)</th>
-                        <th className="p-3">Inside Diameter (mm)</th>
-                        <th className="p-3">Fit Description</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-border">
-                      <tr className="hover:bg-muted/20">
-                        <td className="p-3 font-bold text-primary">Size 2-2</td>
-                        <td className="p-3">2.125 in (2 1/8&quot;)</td>
-                        <td className="p-3 font-mono">54.0 mm</td>
-                        <td className="p-3 text-muted-foreground">Petite / Extra Small wrist</td>
-                      </tr>
-                      <tr className="hover:bg-muted/20">
-                        <td className="p-3 font-bold text-primary">Size 2-4</td>
-                        <td className="p-3">2.250 in (2 1/4&quot;)</td>
-                        <td className="p-3 font-mono">57.2 mm</td>
-                        <td className="p-3 text-muted-foreground">Small wrist fit</td>
-                      </tr>
-                      <tr className="bg-primary/5 hover:bg-primary/10">
-                        <td className="p-3 font-bold text-primary flex items-center gap-1.5">
-                          <span>Size 2-6</span>
-                          <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-primary text-primary-foreground">
-                            Most Popular
-                          </span>
-                        </td>
-                        <td className="p-3 font-semibold">2.375 in (2 3/8&quot;)</td>
-                        <td className="p-3 font-mono font-semibold">60.3 mm</td>
-                        <td className="p-3 font-semibold text-foreground">Standard Medium wrist fit</td>
-                      </tr>
-                      <tr className="hover:bg-muted/20">
-                        <td className="p-3 font-bold text-primary">Size 2-8</td>
-                        <td className="p-3">2.500 in (2 1/2&quot;)</td>
-                        <td className="p-3 font-mono">63.5 mm</td>
-                        <td className="p-3 text-muted-foreground">Large wrist fit</td>
-                      </tr>
-                      <tr className="hover:bg-muted/20">
-                        <td className="p-3 font-bold text-primary">Size 2-10</td>
-                        <td className="p-3">2.625 in (2 5/8&quot;)</td>
-                        <td className="p-3 font-mono">66.7 mm</td>
-                        <td className="p-3 text-muted-foreground">Extra Large wrist fit</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+              {/* ================= RING SIZE GUIDE ================= */}
+              {sizeSubTab === "ring" && (
+                <div className="space-y-6 animate-in fade-in-50">
+                  {/* 1. SIZE CHART FIRST */}
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h5 className="text-sm font-bold uppercase tracking-wider text-primary flex items-center gap-2">
+                        <Ruler className="w-4 h-4" />
+                        <span>Official Ring Size Chart</span>
+                      </h5>
+                      <span className="text-[11px] font-semibold text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                        Adjustable bands fit sizes 5–9
+                      </span>
+                    </div>
 
-              {/* Ring Size Quick Guide */}
-              <div className="p-4 rounded-xl bg-card border border-border space-y-2">
-                <h5 className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-2">
-                  <Ruler className="w-4 h-4 text-primary" />
-                  <span>Ring Sizing Guide</span>
-                </h5>
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  Most GleamNest rings are designed with adjustable open bands for flexible comfort on any finger. For closed rings: wrap a piece of string or paper snugly around the base of your finger, mark the point of overlap, and measure the length in millimeters to find your inner circumference.
-                </p>
-              </div>
+                    <div className="overflow-x-auto rounded-xl border border-border">
+                      <table className="w-full text-xs text-left">
+                        <thead className="bg-muted/60 text-foreground font-bold border-b border-border">
+                          <tr>
+                            <th className="p-3">Indian Size</th>
+                            <th className="p-3">US / Standard Size</th>
+                            <th className="p-3">Inside Diameter (mm)</th>
+                            <th className="p-3">Inside Circumference (mm)</th>
+                            <th className="p-3">Suggested Finger / Fit</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-border">
+                          <tr className="hover:bg-muted/20">
+                            <td className="p-3 font-bold text-primary">Size 7 – 8</td>
+                            <td className="p-3 font-semibold">US 4 – 4.5</td>
+                            <td className="p-3 font-mono">14.9 – 15.3 mm</td>
+                            <td className="p-3 font-mono">46.8 – 48.0 mm</td>
+                            <td className="p-3 text-muted-foreground">Pinky / Midi Ring</td>
+                          </tr>
+                          <tr className="hover:bg-muted/20">
+                            <td className="p-3 font-bold text-primary">Size 9 – 10</td>
+                            <td className="p-3 font-semibold">US 5 – 5.5</td>
+                            <td className="p-3 font-mono">15.7 – 16.1 mm</td>
+                            <td className="p-3 font-mono">49.3 – 50.6 mm</td>
+                            <td className="p-3 text-muted-foreground">Petite Ring Finger</td>
+                          </tr>
+                          <tr className="bg-primary/5 hover:bg-primary/10">
+                            <td className="p-3 font-bold text-primary flex items-center gap-1.5">
+                              <span>Size 11 – 12</span>
+                              <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-primary text-primary-foreground">
+                                Most Popular
+                              </span>
+                            </td>
+                            <td className="p-3 font-bold text-foreground">US 6 – 6.5</td>
+                            <td className="p-3 font-mono font-bold">16.5 – 16.9 mm</td>
+                            <td className="p-3 font-mono font-bold">51.9 – 53.1 mm</td>
+                            <td className="p-3 font-semibold text-foreground">Standard Ring Finger</td>
+                          </tr>
+                          <tr className="hover:bg-muted/20">
+                            <td className="p-3 font-bold text-primary">Size 13 – 14</td>
+                            <td className="p-3 font-semibold">US 7 – 7.5</td>
+                            <td className="p-3 font-mono">17.3 – 17.7 mm</td>
+                            <td className="p-3 font-mono">54.4 – 55.7 mm</td>
+                            <td className="p-3 text-muted-foreground">Middle / Index Finger</td>
+                          </tr>
+                          <tr className="hover:bg-muted/20">
+                            <td className="p-3 font-bold text-primary">Size 15 – 16</td>
+                            <td className="p-3 font-semibold">US 8 – 8.5</td>
+                            <td className="p-3 font-mono">18.1 – 18.5 mm</td>
+                            <td className="p-3 font-mono">57.0 – 58.3 mm</td>
+                            <td className="p-3 text-muted-foreground">Index / Larger Fit</td>
+                          </tr>
+                          <tr className="hover:bg-muted/20">
+                            <td className="p-3 font-bold text-primary">Size 17 – 18</td>
+                            <td className="p-3 font-semibold">US 9 – 9.5</td>
+                            <td className="p-3 font-mono">18.9 – 19.4 mm</td>
+                            <td className="p-3 font-mono">59.5 – 60.8 mm</td>
+                            <td className="p-3 text-muted-foreground">Statement / Thumb Ring</td>
+                          </tr>
+                          <tr className="hover:bg-muted/20">
+                            <td className="p-3 font-bold text-primary">Size 19 – 22</td>
+                            <td className="p-3 font-semibold">US 10 – 11</td>
+                            <td className="p-3 font-mono">19.8 – 20.6 mm</td>
+                            <td className="p-3 font-mono">62.1 – 64.6 mm</td>
+                            <td className="p-3 text-muted-foreground">Men&apos;s / Thumb Ring</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <div className="p-3.5 rounded-xl bg-primary/5 border border-primary/20 text-xs text-foreground flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-primary flex-shrink-0" />
+                      <span>
+                        <strong>Adjustable Rings:</strong> Most GleamNest statement and band rings feature an open-ended adjustable comfort band that fits sizes 5 through 9 seamlessly without needing tools.
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* 2. HOW TO MEASURE SECOND */}
+                  <div className="space-y-3 pt-2">
+                    <h5 className="text-sm font-bold uppercase tracking-wider text-foreground">
+                      How to Measure Your Ring Size
+                    </h5>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                      <div className="p-3.5 rounded-xl bg-card border border-border/80 space-y-1">
+                        <span className="font-bold text-primary">Step 1: Wrap Paper or String</span>
+                        <p className="text-muted-foreground">
+                          Cut a thin strip of paper or non-stretchy string. Wrap it snugly around the base of the finger you plan to wear your ring on.
+                        </p>
+                      </div>
+
+                      <div className="p-3.5 rounded-xl bg-card border border-border/80 space-y-1">
+                        <span className="font-bold text-primary">Step 2: Mark the Overlap</span>
+                        <p className="text-muted-foreground">
+                          Use a pen to mark exactly where the paper overlaps to form a complete circle around your finger.
+                        </p>
+                      </div>
+
+                      <div className="p-3.5 rounded-xl bg-card border border-border/80 space-y-1">
+                        <span className="font-bold text-primary">Step 3: Measure with Ruler</span>
+                        <p className="text-muted-foreground">
+                          Lay the paper strip flat against a ruler and measure the length in millimeters (mm). This is your finger&apos;s Inside Circumference.
+                        </p>
+                      </div>
+
+                      <div className="p-3.5 rounded-xl bg-card border border-border/80 space-y-1">
+                        <span className="font-bold text-primary">Step 4: Check Knuckle Clearance</span>
+                        <p className="text-muted-foreground">
+                          If your knuckle is noticeably larger than your finger base, measure your knuckle too and choose a size halfway between the two measurements.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* ================= BANGLE SIZE GUIDE ================= */}
+              {sizeSubTab === "bangle" && (
+                <div className="space-y-6 animate-in fade-in-50">
+                  {/* 1. SIZE CHART FIRST */}
+                  <div className="space-y-3">
+                    <h5 className="text-sm font-bold uppercase tracking-wider text-primary flex items-center gap-2">
+                      <Ruler className="w-4 h-4" />
+                      <span>Official Bangle Size Chart</span>
+                    </h5>
+                    <div className="overflow-x-auto rounded-xl border border-border">
+                      <table className="w-full text-xs text-left">
+                        <thead className="bg-muted/60 text-foreground font-bold border-b border-border">
+                          <tr>
+                            <th className="p-3">Bangle Size</th>
+                            <th className="p-3">Inside Diameter (Inches)</th>
+                            <th className="p-3">Inside Diameter (mm)</th>
+                            <th className="p-3">Fit Description</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-border">
+                          <tr className="hover:bg-muted/20">
+                            <td className="p-3 font-bold text-primary">Size 2-2</td>
+                            <td className="p-3">2.125 in (2 1/8&quot;)</td>
+                            <td className="p-3 font-mono">54.0 mm</td>
+                            <td className="p-3 text-muted-foreground">Petite / Extra Small wrist</td>
+                          </tr>
+                          <tr className="hover:bg-muted/20">
+                            <td className="p-3 font-bold text-primary">Size 2-4</td>
+                            <td className="p-3">2.250 in (2 1/4&quot;)</td>
+                            <td className="p-3 font-mono">57.2 mm</td>
+                            <td className="p-3 text-muted-foreground">Small wrist fit</td>
+                          </tr>
+                          <tr className="bg-primary/5 hover:bg-primary/10">
+                            <td className="p-3 font-bold text-primary flex items-center gap-1.5">
+                              <span>Size 2-6</span>
+                              <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-primary text-primary-foreground">
+                                Most Popular
+                              </span>
+                            </td>
+                            <td className="p-3 font-semibold">2.375 in (2 3/8&quot;)</td>
+                            <td className="p-3 font-mono font-semibold">60.3 mm</td>
+                            <td className="p-3 font-semibold text-foreground">Standard Medium wrist fit</td>
+                          </tr>
+                          <tr className="hover:bg-muted/20">
+                            <td className="p-3 font-bold text-primary">Size 2-8</td>
+                            <td className="p-3">2.500 in (2 1/2&quot;)</td>
+                            <td className="p-3 font-mono">63.5 mm</td>
+                            <td className="p-3 text-muted-foreground">Large wrist fit</td>
+                          </tr>
+                          <tr className="hover:bg-muted/20">
+                            <td className="p-3 font-bold text-primary">Size 2-10</td>
+                            <td className="p-3">2.625 in (2 5/8&quot;)</td>
+                            <td className="p-3 font-mono">66.7 mm</td>
+                            <td className="p-3 text-muted-foreground">Extra Large wrist fit</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  {/* 2. HOW TO MEASURE SECOND */}
+                  <div className="space-y-4 pt-2">
+                    <h5 className="text-sm font-bold uppercase tracking-wider text-foreground">
+                      How to Measure Your Bangle Size (5 Easy Steps)
+                    </h5>
+
+                    {/* Graphic Banner & Diagram */}
+                    <div className="relative group rounded-xl overflow-hidden border border-border bg-muted/20">
+                      <img
+                        src="/images/bangle-size-guide.jpg"
+                        alt="GleamNest Official Bangle Size Guide & Hand Measurement Steps"
+                        className="w-full h-auto max-h-[360px] object-contain mx-auto"
+                      />
+                      <button
+                        onClick={() => setZoomedImage("/images/bangle-size-guide.jpg")}
+                        className="absolute bottom-3 right-3 px-3 py-1.5 rounded-lg bg-background/90 backdrop-blur border border-border shadow text-xs font-semibold flex items-center gap-1.5 text-foreground hover:bg-background"
+                      >
+                        <Maximize2 className="w-3.5 h-3.5" />
+                        <span>Click to Enlarge Diagram</span>
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                      <div className="p-3.5 rounded-xl bg-card border border-border/80 space-y-1">
+                        <span className="font-bold text-primary">Step 1: Fold Hand</span>
+                        <p className="text-muted-foreground">
+                          Fold your thumb and little finger together towards the center of your palm, as if you are slipping on a bangle.
+                        </p>
+                      </div>
+
+                      <div className="p-3.5 rounded-xl bg-card border border-border/80 space-y-1">
+                        <span className="font-bold text-primary">Step 2: Wrap Tape or Paper</span>
+                        <p className="text-muted-foreground">
+                          Use a flexible measuring tape or strip of paper. Wrap it around the widest part of your hand across knuckles and thumb base.
+                        </p>
+                      </div>
+
+                      <div className="p-3.5 rounded-xl bg-card border border-border/80 space-y-1">
+                        <span className="font-bold text-primary">Step 3: Mark & Measure</span>
+                        <p className="text-muted-foreground">
+                          Mark where the tape or paper overlaps with a pen. Lay it flat against a ruler and measure the length in inches or mm.
+                        </p>
+                      </div>
+
+                      <div className="p-3.5 rounded-xl bg-card border border-border/80 space-y-1">
+                        <span className="font-bold text-primary">Step 4: Compare with Chart</span>
+                        <p className="text-muted-foreground">
+                          Match your measurement to our official Bangle Size Chart above to identify your size (2-2 to 2-10).
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="p-3.5 rounded-xl bg-primary/5 border border-primary/20 text-xs text-foreground flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-primary flex-shrink-0" />
+                      <span>
+                        <strong>Pro Fit Tip (Step 5):</strong> If you prefer a loose, playful fit, choose one size up. For a snug, sleek everyday fit, select the exact diameter.
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
@@ -444,21 +598,6 @@ export function PolicyModal({
                 </span>
               </div>
 
-              {/* Graphic Banner */}
-              <div className="relative group rounded-xl overflow-hidden border border-border bg-muted/20">
-                <img
-                  src="/images/order-instructions.jpg"
-                  alt="GleamNest Important Instructions Before Ordering"
-                  className="w-full h-auto max-h-[380px] object-contain mx-auto"
-                />
-                <button
-                  onClick={() => setZoomedImage("/images/order-instructions.jpg")}
-                  className="absolute bottom-3 right-3 px-3 py-1.5 rounded-lg bg-background/90 backdrop-blur border border-border shadow text-xs font-semibold flex items-center gap-1.5 text-foreground hover:bg-background"
-                >
-                  <Maximize2 className="w-3.5 h-3.5" />
-                  <span>Click to Enlarge Instructions</span>
-                </button>
-              </div>
 
               {/* Instructions Grid */}
               <div className="space-y-3">

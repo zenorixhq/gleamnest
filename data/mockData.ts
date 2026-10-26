@@ -2,6 +2,14 @@ import { Product, Category, Order } from "@/types/store";
 
 export const categories: Category[] = [
   {
+    id: "cat-new-arrivals",
+    slug: "new-arrivals",
+    name: "✦ New Arrivals",
+    description: "Our latest seasonal drops in 304 & 306 grade stainless steel waterproof jewelry.",
+    image: "https://images.unsplash.com/photo-1573408301185-9146fe634ad0?auto=format&fit=crop&q=80&w=800",
+    productCount: 31,
+  },
+  {
     id: "cat-necklaces-and-chains",
     slug: "necklaces-and-chains",
     name: "Necklaces and Chains",
@@ -80,14 +88,6 @@ export const categories: Category[] = [
     description: "Gentle bell charms, mini studs, and lightweight hypoallergenic pieces safe for sensitive skin.",
     image: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&q=80&w=800",
     productCount: 4,
-  },
-  {
-    id: "cat-new-arrivals",
-    slug: "new-arrivals",
-    name: "New Arrivals",
-    description: "Our latest seasonal drops in 304 & 306 grade stainless steel waterproof jewelry.",
-    image: "https://images.unsplash.com/photo-1573408301185-9146fe634ad0?auto=format&fit=crop&q=80&w=800",
-    productCount: 31,
   },
 ];
 

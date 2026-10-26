@@ -37,6 +37,8 @@ import {
   Eye,
   EyeOff,
   ShieldCheck,
+  Instagram,
+  Camera,
 } from "lucide-react";
 
 export default function AdminDashboardPage() {
@@ -57,11 +59,15 @@ export default function AdminDashboardPage() {
   const [activeTab, setActiveTab] = useState<"overview" | "orders" | "inventory" | "config" | "reviews">("inventory");
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Reviews & Video Reels State
+  // Reviews, Video Reels, Screenshots & Instagram Videos State
   const [reviewsList, setReviewsList] = useState<any[]>([]);
   const [videosList, setVideosList] = useState<any[]>([]);
+  const [feedbackScreenshotsList, setFeedbackScreenshotsList] = useState<any[]>([]);
+  const [instagramVideosList, setInstagramVideosList] = useState<any[]>([]);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
+  const [isScreenshotModalOpen, setIsScreenshotModalOpen] = useState(false);
+  const [isInstaVideoModalOpen, setIsInstaVideoModalOpen] = useState(false);
 
   const [reviewForm, setReviewForm] = useState({
     author: "",
@@ -69,6 +75,26 @@ export default function AdminDashboardPage() {
     piece: "",
     rating: 5,
     quote: "",
+  });
+
+  const [screenshotForm, setScreenshotForm] = useState({
+    title: "WhatsApp / DM Customer Review",
+    customerName: "",
+    location: "Kerala, India",
+    piece: "",
+    imageUrl: "",
+    caption: "",
+    date: "Verified Recent Buyer",
+  });
+
+  const [instaVideoForm, setInstaVideoForm] = useState({
+    title: "Jewelry Styling Reel",
+    handle: "@gleamnest.in",
+    caption: "",
+    videoUrl: "",
+    poster: "",
+    views: "15.4K views",
+    instagramLink: "",
   });
 
   const [videoForm, setVideoForm] = useState({
@@ -111,6 +137,8 @@ export default function AdminDashboardPage() {
       .then((data) => {
         if (data.reviews) setReviewsList(data.reviews);
         if (data.videoReels) setVideosList(data.videoReels);
+        if (data.feedbackScreenshots) setFeedbackScreenshotsList(data.feedbackScreenshots);
+        if (data.instagramVideos) setInstagramVideosList(data.instagramVideos);
       })
       .catch((err) => console.error("Error fetching reviews:", err));
   };
@@ -259,6 +287,105 @@ export default function AdminDashboardPage() {
       fetchReviewsAndVideos();
     } catch (err) {
       alert("Error deleting video reel");
+    }
+  };
+
+  // Feedback Screenshot Handlers
+  const handleScreenshotFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 8 * 1024 * 1024) {
+      alert("Image is larger than 8MB. Please choose a smaller image.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const base64 = event.target?.result as string;
+      setScreenshotForm((prev) => ({ ...prev, imageUrl: base64 }));
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleAddScreenshot = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!screenshotForm.imageUrl) {
+      alert("Please upload a screenshot from your device or paste an image URL.");
+      return;
+    }
+    try {
+      const res = await fetch("/api/reviews", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...screenshotForm, type: "screenshot" }),
+      });
+      if (res.ok) {
+        setIsScreenshotModalOpen(false);
+        setScreenshotForm({
+          title: "WhatsApp / DM Customer Review",
+          customerName: "",
+          location: "Kerala, India",
+          piece: "",
+          imageUrl: "",
+          caption: "",
+          date: "Verified Recent Buyer",
+        });
+        fetchReviewsAndVideos();
+      }
+    } catch (err) {
+      alert("Error saving client feedback screenshot");
+    }
+  };
+
+  const handleDeleteScreenshot = async (id: string | number) => {
+    if (!confirm("Are you sure you want to remove this client feedback screenshot?")) return;
+    try {
+      await fetch(`/api/reviews?type=screenshot&id=${id}`, { method: "DELETE" });
+      fetchReviewsAndVideos();
+    } catch (err) {
+      alert("Error deleting feedback screenshot");
+    }
+  };
+
+  // Instagram Video ("Follow The House") Handlers
+  const handleAddInstaVideo = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!instaVideoForm.videoUrl) {
+      alert("Please provide the Instagram Reel URL or video link.");
+      return;
+    }
+    try {
+      const res = await fetch("/api/reviews", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...instaVideoForm, type: "instagramVideo" }),
+      });
+      if (res.ok) {
+        setIsInstaVideoModalOpen(false);
+        setInstaVideoForm({
+          title: "Jewelry Styling Reel",
+          handle: "@gleamnest.in",
+          caption: "",
+          videoUrl: "",
+          poster: "",
+          views: "15.4K views",
+          instagramLink: "",
+        });
+        fetchReviewsAndVideos();
+      }
+    } catch (err) {
+      alert("Error adding Instagram video");
+    }
+  };
+
+  const handleDeleteInstaVideo = async (id: string | number) => {
+    if (!confirm("Are you sure you want to remove this Instagram video?")) return;
+    try {
+      await fetch(`/api/reviews?type=instagramVideo&id=${id}`, { method: "DELETE" });
+      fetchReviewsAndVideos();
+    } catch (err) {
+      alert("Error deleting Instagram video");
     }
   };
 
@@ -1032,41 +1159,253 @@ export default function AdminDashboardPage() {
                   Social Proof & Media Management
                 </span>
                 <h3 className="text-xl font-black text-foreground mt-1">
-                  Customer Reviews & Styling Video Reels
+                  Client Proof, Instagram Reels & Customer Reviews
                 </h3>
                 <p className="text-xs text-muted-foreground mt-1 max-w-xl">
-                  Manage genuine customer reviews, unboxing testimonials, and high-fashion styling video reels displayed directly on your homepage.
+                  Manage WhatsApp / DM customer feedback screenshots, Instagram &ldquo;Follow The House&rdquo; video reels, customer review quotes, and product styling videos.
                 </p>
               </div>
 
-              <div className="flex items-center gap-3 flex-wrap">
+              <div className="flex items-center gap-2.5 flex-wrap">
                 <button
-                  onClick={() => setIsReviewModalOpen(true)}
+                  onClick={() => setIsScreenshotModalOpen(true)}
                   className="px-4 py-2.5 rounded-xl bg-primary text-primary-foreground text-xs font-bold flex items-center gap-2 hover:bg-primary/90 shadow-md transition-all"
                 >
-                  <Plus className="w-4 h-4" />
-                  <span>Add Client Review</span>
+                  <Camera className="w-4 h-4" />
+                  <span>+ Upload Screenshot</span>
+                </button>
+                <button
+                  onClick={() => setIsInstaVideoModalOpen(true)}
+                  className="px-4 py-2.5 rounded-xl border border-border bg-card text-foreground hover:bg-muted text-xs font-semibold flex items-center gap-2 transition-all shadow-sm"
+                >
+                  <Instagram className="w-4 h-4 text-pink-600" />
+                  <span>+ Add Instagram Video</span>
+                </button>
+                <button
+                  onClick={() => setIsReviewModalOpen(true)}
+                  className="px-3.5 py-2.5 rounded-xl border border-border bg-card text-foreground hover:bg-muted text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Add Quote</span>
                 </button>
                 <button
                   onClick={() => setIsVideoModalOpen(true)}
-                  className="px-4 py-2.5 rounded-xl border border-border bg-card text-foreground hover:bg-muted text-xs font-semibold flex items-center gap-2 transition-all shadow-sm"
+                  className="px-3.5 py-2.5 rounded-xl border border-border bg-card text-foreground hover:bg-muted text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm"
                 >
-                  <Video className="w-4 h-4 text-primary" />
-                  <span>Add Video Reel</span>
+                  <Video className="w-3.5 h-3.5 text-primary" />
+                  <span>Add Reel</span>
                 </button>
               </div>
             </div>
 
-            {/* Client Reviews Section */}
+            {/* SECTION 1: Client Feedback Screenshots (WhatsApp / DM Proof) */}
+            <div className="bg-card border border-border rounded-2xl p-6 shadow-sm space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="text-sm font-bold text-foreground uppercase tracking-wider flex items-center gap-2">
+                    <Camera className="w-4 h-4 text-primary" />
+                    <span>Client Feedback Screenshots ({feedbackScreenshotsList.length})</span>
+                  </h4>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    WhatsApp & DM customer chat screenshots displayed in the storefront feedback proof gallery.
+                  </p>
+                </div>
+                <button
+                  onClick={() => setIsScreenshotModalOpen(true)}
+                  className="text-xs font-bold text-primary hover:underline flex items-center gap-1"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Upload Screenshot</span>
+                </button>
+              </div>
+
+              {feedbackScreenshotsList.length === 0 ? (
+                <div className="p-8 rounded-xl border border-dashed border-border text-center space-y-3">
+                  <div className="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center mx-auto">
+                    <Camera className="w-6 h-6" />
+                  </div>
+                  <p className="text-xs font-semibold text-foreground">No feedback screenshots uploaded yet</p>
+                  <p className="text-xs text-muted-foreground max-w-sm mx-auto">
+                    Upload real WhatsApp messages, order unpacking confirmations, or Instagram DM reviews from your smartphone or PC.
+                  </p>
+                  <button
+                    onClick={() => setIsScreenshotModalOpen(true)}
+                    className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/90"
+                  >
+                    Upload First Screenshot
+                  </button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {feedbackScreenshotsList.map((item) => (
+                    <div
+                      key={item.id}
+                      className="rounded-xl border border-border overflow-hidden bg-muted/20 flex flex-col justify-between group shadow-sm hover:shadow-md transition-all"
+                    >
+                      <div className="relative aspect-[3/4] bg-stone-900 overflow-hidden">
+                        <img
+                          src={item.imageUrl}
+                          alt={item.customerName || item.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                        <div className="absolute top-2 right-2 flex items-center gap-1">
+                          <span className="text-[10px] bg-black/70 backdrop-blur px-2 py-0.5 rounded-full font-semibold text-white">
+                            {item.date || "Verified"}
+                          </span>
+                        </div>
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-transparent flex flex-col justify-end p-3 text-white">
+                          <p className="text-xs font-bold text-white line-clamp-1">{item.customerName}</p>
+                          <p className="text-[10px] text-white/80 line-clamp-1">{item.location}</p>
+                        </div>
+                      </div>
+
+                      <div className="p-3 bg-card border-t border-border flex flex-col justify-between flex-1 gap-2">
+                        <div className="space-y-1">
+                          {item.piece && (
+                            <span className="inline-block px-2 py-0.5 rounded bg-primary/10 text-primary font-medium text-[10px] line-clamp-1">
+                              {item.piece}
+                            </span>
+                          )}
+                          {item.caption && (
+                            <p className="text-[11px] text-muted-foreground italic line-clamp-2">
+                              {item.caption}
+                            </p>
+                          )}
+                        </div>
+
+                        <div className="pt-2 border-t border-border/60 flex items-center justify-between">
+                          <span className="text-[10px] text-emerald-600 font-semibold flex items-center gap-1">
+                            <CheckCircle2 className="w-3 h-3" />
+                            <span>Verified Buyer</span>
+                          </span>
+                          <button
+                            onClick={() => handleDeleteScreenshot(item.id)}
+                            className="p-1.5 rounded-md hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+                            title="Delete Screenshot"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* SECTION 2: Follow The House (Instagram Video Reels) */}
+            <div className="bg-card border border-border rounded-2xl p-6 shadow-sm space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="text-sm font-bold text-foreground uppercase tracking-wider flex items-center gap-2">
+                    <Instagram className="w-4 h-4 text-pink-600" />
+                    <span>Follow The House — Instagram Videos ({instagramVideosList.length})</span>
+                  </h4>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Reels & video links displayed in the homepage &ldquo;Follow The House&rdquo; section with playable in-site modal.
+                  </p>
+                </div>
+                <button
+                  onClick={() => setIsInstaVideoModalOpen(true)}
+                  className="text-xs font-bold text-primary hover:underline flex items-center gap-1"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Add Instagram Video</span>
+                </button>
+              </div>
+
+              {instagramVideosList.length === 0 ? (
+                <div className="p-8 rounded-xl border border-dashed border-border text-center space-y-3">
+                  <div className="w-12 h-12 rounded-full bg-pink-500/10 text-pink-600 flex items-center justify-center mx-auto">
+                    <Instagram className="w-6 h-6" />
+                  </div>
+                  <p className="text-xs font-semibold text-foreground">No Instagram videos added yet</p>
+                  <p className="text-xs text-muted-foreground max-w-sm mx-auto">
+                    Paste links to your Instagram reels or styling videos to feature them on the storefront.
+                  </p>
+                  <button
+                    onClick={() => setIsInstaVideoModalOpen(true)}
+                    className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/90"
+                  >
+                    Add First Instagram Video
+                  </button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {instagramVideosList.map((video) => (
+                    <div
+                      key={video.id}
+                      className="rounded-xl border border-border overflow-hidden bg-muted/20 flex flex-col justify-between group shadow-sm hover:shadow-md transition-all"
+                    >
+                      <div className="relative aspect-[9/14] bg-stone-900 overflow-hidden">
+                        <img
+                          src={video.poster || "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&q=80&w=700"}
+                          alt={video.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-black/30 flex flex-col justify-between p-3 text-white">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10px] bg-black/60 px-2 py-0.5 rounded-full font-medium">
+                              {video.views || "15K views"}
+                            </span>
+                            <span className="text-[10px] bg-pink-600/80 px-2 py-0.5 rounded-full font-medium">
+                              Reel
+                            </span>
+                          </div>
+
+                          <div className="self-center w-11 h-11 rounded-full bg-white/90 text-stone-900 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                            <Play className="w-5 h-5 fill-current ml-0.5" />
+                          </div>
+
+                          <div>
+                            <p className="text-xs font-bold line-clamp-1 text-white">{video.title}</p>
+                            <p className="text-[10px] text-white/80">{video.handle || "@gleamnest.in"}</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="p-3 bg-card border-t border-border flex flex-col justify-between flex-1 gap-2">
+                        {video.caption && (
+                          <p className="text-[11px] text-muted-foreground line-clamp-2">
+                            {video.caption}
+                          </p>
+                        )}
+
+                        <div className="pt-2 border-t border-border/60 flex items-center justify-between">
+                          <a
+                            href={video.instagramLink || video.videoUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-[11px] font-semibold text-primary hover:underline flex items-center gap-1"
+                          >
+                            <span>Open in Instagram</span>
+                            <ExternalLink className="w-3 h-3" />
+                          </a>
+                          <button
+                            onClick={() => handleDeleteInstaVideo(video.id)}
+                            className="p-1.5 rounded-md hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+                            title="Delete Video"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* SECTION 3: Client Reviews (Quotes) Section */}
             <div className="bg-card border border-border rounded-2xl p-6 shadow-sm space-y-4">
               <div className="flex items-center justify-between">
                 <div>
                   <h4 className="text-sm font-bold text-foreground uppercase tracking-wider flex items-center gap-2">
                     <Star className="w-4 h-4 fill-amber-500 text-amber-500" />
-                    <span>Customer Reviews ({reviewsList.length})</span>
+                    <span>Customer Review Quotes ({reviewsList.length})</span>
                   </h4>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    Quotes displayed on the homepage customer words carousel.
+                    Written quotes displayed on the storefront testimonial carousel.
                   </p>
                 </div>
                 <button
@@ -1118,16 +1457,16 @@ export default function AdminDashboardPage() {
               </div>
             </div>
 
-            {/* Video Reels Section */}
+            {/* SECTION 4: Styling Video Reels */}
             <div className="bg-card border border-border rounded-2xl p-6 shadow-sm space-y-4">
               <div className="flex items-center justify-between">
                 <div>
                   <h4 className="text-sm font-bold text-foreground uppercase tracking-wider flex items-center gap-2">
                     <Video className="w-4 h-4 text-primary" />
-                    <span>Styling & Client Video Reels ({videosList.length})</span>
+                    <span>Tagged Styling Video Reels ({videosList.length})</span>
                   </h4>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    Vertical video tests and unboxings with tagged products.
+                    Vertical video tests with tagged catalog pieces.
                   </p>
                 </div>
                 <button
@@ -1739,6 +2078,292 @@ export default function AdminDashboardPage() {
                   className="px-6 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/90 shadow-md"
                 >
                   Save Video Reel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Client Feedback Screenshot Upload Modal */}
+      {isScreenshotModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+          <div
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={() => setIsScreenshotModalOpen(false)}
+          />
+
+          <div className="relative w-full max-w-lg bg-card border border-border rounded-2xl shadow-2xl overflow-hidden z-10 my-8 animate-in fade-in zoom-in-95">
+            <div className="px-6 py-4 border-b border-border flex items-center justify-between">
+              <div>
+                <h3 className="text-base font-bold text-foreground">Upload Feedback Screenshot</h3>
+                <p className="text-xs text-muted-foreground">
+                  Upload WhatsApp message, Instagram DM proof, or unpacking photo
+                </p>
+              </div>
+              <button
+                onClick={() => setIsScreenshotModalOpen(false)}
+                className="p-1.5 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleAddScreenshot} className="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+              {/* File upload from Device or URL */}
+              <div className="space-y-2 border border-border p-3.5 rounded-xl bg-muted/20">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                    <Camera className="w-3.5 h-3.5 text-primary" />
+                    <span>Screenshot Image *</span>
+                  </label>
+                  <span className="text-[11px] text-muted-foreground">Device photo or URL</span>
+                </div>
+
+                {/* File picker */}
+                <div>
+                  <label
+                    htmlFor="feedback-screenshot-upload"
+                    className="w-full px-3 py-2.5 rounded-lg border border-dashed border-border hover:border-primary bg-background hover:bg-muted/40 cursor-pointer flex items-center justify-center gap-2 text-xs font-medium text-foreground transition-colors"
+                  >
+                    <Upload className="w-4 h-4 text-primary" />
+                    <span>Choose Screenshot from Device / Phone</span>
+                  </label>
+                  <input
+                    id="feedback-screenshot-upload"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleScreenshotFileUpload}
+                    className="hidden"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[11px] text-muted-foreground">Or paste public Image URL:</label>
+                  <input
+                    type="url"
+                    placeholder="https://... or image link"
+                    value={screenshotForm.imageUrl.startsWith("data:") ? "" : screenshotForm.imageUrl}
+                    onChange={(e) => setScreenshotForm({ ...screenshotForm, imageUrl: e.target.value })}
+                    className="w-full px-3 py-1.5 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none font-mono"
+                  />
+                </div>
+
+                {/* Preview Thumbnail */}
+                {screenshotForm.imageUrl && (
+                  <div className="flex items-center gap-3 pt-2">
+                    <div className="w-16 h-20 rounded-md overflow-hidden border border-border bg-card">
+                      <img src={screenshotForm.imageUrl} alt="Preview" className="w-full h-full object-cover" />
+                    </div>
+                    <div className="text-xs space-y-1">
+                      <p className="font-medium text-emerald-600">
+                        {screenshotForm.imageUrl.startsWith("data:") ? "Screenshot Loaded from Device ✓" : "Image URL Linked ✓"}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => setScreenshotForm({ ...screenshotForm, imageUrl: "" })}
+                        className="text-[11px] text-red-600 hover:underline"
+                      >
+                        Remove Photo
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-foreground">Customer Name *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Sneha Thomas"
+                    value={screenshotForm.customerName}
+                    onChange={(e) => setScreenshotForm({ ...screenshotForm, customerName: e.target.value })}
+                    className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-foreground">City / Region</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Calicut, Kerala"
+                    value={screenshotForm.location}
+                    onChange={(e) => setScreenshotForm({ ...screenshotForm, location: e.target.value })}
+                    className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-foreground">Jewelry Piece Purchased</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Clover Bangle (Size 2-6)"
+                    value={screenshotForm.piece}
+                    onChange={(e) => setScreenshotForm({ ...screenshotForm, piece: e.target.value })}
+                    className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-foreground">Verification Tag</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Verified 2 days ago"
+                    value={screenshotForm.date}
+                    onChange={(e) => setScreenshotForm({ ...screenshotForm, date: e.target.value })}
+                    className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-foreground">Customer Message / Note</label>
+                <textarea
+                  rows={3}
+                  placeholder="e.g. Arrived in 2 days via DTDC. The 304 steel mirror finish is so luxurious!"
+                  value={screenshotForm.caption}
+                  onChange={(e) => setScreenshotForm({ ...screenshotForm, caption: e.target.value })}
+                  className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none resize-none"
+                />
+              </div>
+
+              <div className="pt-4 border-t border-border flex items-center justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsScreenshotModalOpen(false)}
+                  className="px-4 py-2 rounded-xl border border-border text-xs font-semibold hover:bg-muted"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-6 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/90 shadow-md"
+                >
+                  Publish Screenshot
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Instagram Video ("Follow The House") Modal */}
+      {isInstaVideoModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+          <div
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={() => setIsInstaVideoModalOpen(false)}
+          />
+
+          <div className="relative w-full max-w-lg bg-card border border-border rounded-2xl shadow-2xl overflow-hidden z-10 my-8 animate-in fade-in zoom-in-95">
+            <div className="px-6 py-4 border-b border-border flex items-center justify-between">
+              <div>
+                <h3 className="text-base font-bold text-foreground">Add Instagram Video</h3>
+                <p className="text-xs text-muted-foreground">
+                  Feature an Instagram reel or styling video in &ldquo;Follow The House&rdquo;
+                </p>
+              </div>
+              <button
+                onClick={() => setIsInstaVideoModalOpen(false)}
+                className="p-1.5 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleAddInstaVideo} className="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-foreground">Instagram Reel URL or Video Link *</label>
+                <input
+                  type="url"
+                  required
+                  placeholder="https://www.instagram.com/reel/... or https://...mp4"
+                  value={instaVideoForm.videoUrl}
+                  onChange={(e) => setInstaVideoForm({ ...instaVideoForm, videoUrl: e.target.value })}
+                  className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none font-mono"
+                />
+                <p className="text-[10px] text-muted-foreground">
+                  Paste any Instagram reel link or public MP4 video link.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-foreground">Reel Title *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Daily Jewelry Stack & Styling Glow"
+                    value={instaVideoForm.title}
+                    onChange={(e) => setInstaVideoForm({ ...instaVideoForm, title: e.target.value })}
+                    className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-foreground">Instagram Handle</label>
+                  <input
+                    type="text"
+                    placeholder="@gleamnest.in"
+                    value={instaVideoForm.handle}
+                    onChange={(e) => setInstaVideoForm({ ...instaVideoForm, handle: e.target.value })}
+                    className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none font-mono"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-foreground">Poster Thumbnail URL (Optional)</label>
+                  <input
+                    type="url"
+                    placeholder="https://images.unsplash.com/..."
+                    value={instaVideoForm.poster}
+                    onChange={(e) => setInstaVideoForm({ ...instaVideoForm, poster: e.target.value })}
+                    className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none font-mono"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-foreground">Views Badge</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. 28.4K"
+                    value={instaVideoForm.views}
+                    onChange={(e) => setInstaVideoForm({ ...instaVideoForm, views: e.target.value })}
+                    className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-foreground">Caption / Description</label>
+                <textarea
+                  rows={2}
+                  placeholder="Waterproof & anti-tarnish everyday luxury crafted in 304 & 306 steel ✨"
+                  value={instaVideoForm.caption}
+                  onChange={(e) => setInstaVideoForm({ ...instaVideoForm, caption: e.target.value })}
+                  className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none resize-none"
+                />
+              </div>
+
+              <div className="pt-4 border-t border-border flex items-center justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsInstaVideoModalOpen(false)}
+                  className="px-4 py-2 rounded-xl border border-border text-xs font-semibold hover:bg-muted"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-6 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/90 shadow-md"
+                >
+                  Save Instagram Video
                 </button>
               </div>
             </form>

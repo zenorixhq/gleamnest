@@ -1,84 +1,289 @@
 "use client";
 
-import { Instagram } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import {
+  Instagram,
+  Play,
+  Volume2,
+  VolumeX,
+  X,
+  ExternalLink,
+  Sparkles,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
+
+export interface InstagramVideoItem {
+  id: string | number;
+  title: string;
+  handle?: string;
+  caption?: string;
+  videoUrl: string;
+  embedUrl?: string;
+  poster?: string;
+  views?: string;
+  instagramLink?: string;
+}
+
+const defaultInstagramVideos: InstagramVideoItem[] = [
+  {
+    id: "insta-1",
+    title: "Daily Jewelry Stack & Styling Glow",
+    handle: "@gleamnest.in",
+    caption: "Waterproof & anti-tarnish everyday luxury crafted in 304 & 306 steel ✨",
+    videoUrl: "https://assets.mixkit.co/videos/preview/mixkit-woman-wearing-jewelry-in-front-of-a-mirror-42407-large.mp4",
+    poster: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&q=80&w=700",
+    views: "28.4K",
+    instagramLink: "https://www.instagram.com/gleamnest.in?igsh=c3I4M2h1YmprdXI5",
+  },
+  {
+    id: "insta-2",
+    title: "Anti-Tarnish Water & Perfume Test",
+    handle: "@gleamnest.in",
+    caption: "Shower safe, sweatproof, and designed to never turn green 💧",
+    videoUrl: "https://assets.mixkit.co/videos/preview/mixkit-close-up-of-a-woman-showing-a-gold-ring-42409-large.mp4",
+    poster: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&q=80&w=700",
+    views: "34.1K",
+    instagramLink: "https://www.instagram.com/gleamnest.in?igsh=c3I4M2h1YmprdXI5",
+  },
+  {
+    id: "insta-3",
+    title: "Unboxing the GleamNest Velvet Pouch",
+    handle: "@gleamnest.in",
+    caption: "Every order packed with real care. Pan-India delivery via DTDC & India Post 📦",
+    videoUrl: "https://assets.mixkit.co/videos/preview/mixkit-holding-a-gold-ring-in-hand-42410-large.mp4",
+    poster: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&q=80&w=700",
+    views: "19.8K",
+    instagramLink: "https://www.instagram.com/gleamnest.in?igsh=c3I4M2h1YmprdXI5",
+  },
+  {
+    id: "insta-4",
+    title: "Earrings & Hoops Real Mirror Finish",
+    handle: "@gleamnest.in",
+    caption: "Lightweight, hypoallergenic, and crafted for all-day sensitive ear wear ✨",
+    videoUrl: "https://assets.mixkit.co/videos/preview/mixkit-woman-wearing-jewelry-in-front-of-a-mirror-42407-large.mp4",
+    poster: "https://images.unsplash.com/photo-1630019852942-f89202989a59?auto=format&fit=crop&q=80&w=700",
+    views: "22.5K",
+    instagramLink: "https://www.instagram.com/gleamnest.in?igsh=c3I4M2h1YmprdXI5",
+  },
+];
 
 export function InstagramReelSection() {
-  const instaPosts = [
-    {
-      id: 1,
-      image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&q=80&w=700",
-      caption: "Floral notes & waterproof gold hoops.",
-    },
-    {
-      id: 2,
-      image: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&q=80&w=700",
-      caption: "Our signature oval pendant on pure linen.",
-    },
-    {
-      id: 3,
-      image: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&q=80&w=700",
-      caption: "Statement rings crafted for effortless daily styling.",
-    },
-    {
-      id: 4,
-      image: "https://images.unsplash.com/photo-1603561591411-07134e71a2a9?auto=format&fit=crop&q=80&w=700",
-      caption: "Golden hour glow with the classic eternity band.",
-    },
-    {
-      id: 5,
-      image: "https://images.unsplash.com/photo-1630019852942-f89202989a59?auto=format&fit=crop&q=80&w=700",
-      caption: "Contemporary cascade drop earrings in anti-tarnish finish.",
-    },
-    {
-      id: 6,
-      image: "https://images.unsplash.com/photo-1611591475806-039775089201?auto=format&fit=crop&q=80&w=700",
-      caption: "Double layered chain stack. Shower & workout safe.",
-    },
-  ];
+  const [videos, setVideos] = useState<InstagramVideoItem[]>(defaultInstagramVideos);
+  const [activeVideo, setActiveVideo] = useState<InstagramVideoItem | null>(null);
+  const [isMuted, setIsMuted] = useState(false);
+  const videoPlayerRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    fetch("/api/reviews")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.instagramVideos && data.instagramVideos.length > 0) {
+          setVideos(data.instagramVideos);
+        }
+      })
+      .catch((e) => console.error("Error fetching Instagram videos:", e));
+  }, []);
+
+  // Lock body scroll when playing video modal
+  useEffect(() => {
+    if (activeVideo) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [activeVideo]);
+
+  // Handle escape key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && activeVideo) {
+        setActiveVideo(null);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [activeVideo]);
 
   return (
-    <section className="w-full bg-[#FAF7F2] pt-14 pb-4 overflow-hidden border-t border-[#EADBBE]/80">
-      {/* 1. Header: FOLLOW THE HOUSE & Large Serif Handle */}
-      <div className="text-center space-y-2 mb-10 px-4">
-        <span className="text-[10px] sm:text-xs uppercase tracking-[0.25em] text-[#8F7234] font-medium block">
-          FOLLOW THE HOUSE
-        </span>
+    <section className="w-full bg-[#FAF7F2] py-16 sm:py-20 border-t border-[#EADBBE]/80 overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+        {/* Header: FOLLOW THE HOUSE & Large Editorial Handle */}
+        <div className="text-center space-y-2">
+          <div className="flex items-center justify-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-[#C5A059] animate-pulse" />
+            <span className="text-[10px] sm:text-xs uppercase tracking-[0.25em] text-[#8F7234] font-medium block">
+              FOLLOW THE HOUSE
+            </span>
+          </div>
 
-        <a
-          href="https://www.instagram.com/gleamnest.in?igsh=c3I4M2h1YmprdXI5"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-block font-editorial text-3xl sm:text-5xl md:text-6xl font-normal tracking-tight text-[#1C1917] hover:text-[#C5A059] transition-colors"
-        >
-          @gleamnest.in
-        </a>
-      </div>
-
-      {/* 2. Full-Width Seamless 6-Photo Ribbon (Matching Image 3) */}
-      <div className="w-full grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-1 sm:gap-2 px-1 sm:px-2">
-        {instaPosts.map((post) => (
           <a
-            key={post.id}
             href="https://www.instagram.com/gleamnest.in?igsh=c3I4M2h1YmprdXI5"
             target="_blank"
             rel="noopener noreferrer"
-            className="group relative aspect-[3/4] sm:aspect-[2/3] overflow-hidden bg-stone-200 block"
+            className="inline-flex items-center gap-2 font-editorial text-3xl sm:text-5xl md:text-6xl font-normal tracking-tight text-[#1C1917] hover:text-[#C5A059] transition-colors"
           >
-            <img
-              src={post.image}
-              alt={post.caption}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-            />
-            {/* Instagram Hover Overlay */}
-            <div className="absolute inset-0 bg-stone-950/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-between p-4 text-white">
-              <Instagram className="w-5 h-5 ml-auto text-white/90" />
-              <p className="text-[11px] font-light line-clamp-2 leading-relaxed text-white/95">
-                {post.caption}
-              </p>
-            </div>
+            <span>@gleamnest.in</span>
+            <Instagram className="w-6 h-6 sm:w-8 sm:h-8 text-[#C5A059]" />
           </a>
-        ))}
+          <p className="text-xs sm:text-sm text-stone-600 font-light max-w-md mx-auto">
+            Watch our latest Instagram styling reels, water tests, and styling inspiration directly on site.
+          </p>
+        </div>
+
+        {/* Video Reels Grid (Shown directly in the site) */}
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+          {videos.map((vid) => (
+            <div
+              key={vid.id}
+              onClick={() => setActiveVideo(vid)}
+              className="group relative aspect-[9/15] rounded-2xl overflow-hidden bg-stone-900 shadow-md hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-500 ease-out cursor-pointer border border-[#EADBBE]"
+            >
+              {/* Poster Image / Background */}
+              <img
+                src={vid.poster || "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&q=80&w=700"}
+                alt={vid.title}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+              />
+
+              {/* Gradient Dark Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-black/30 flex flex-col justify-between p-3.5 sm:p-4 text-white">
+                {/* Top Badge: Views & Instagram Logo */}
+                <div className="flex items-center justify-between text-xs">
+                  <span className="bg-black/60 backdrop-blur-md px-2.5 py-0.5 rounded-full text-[10px] font-semibold tracking-wide">
+                    {vid.views ? `${vid.views} views` : "Instagram Reel"}
+                  </span>
+                  <div className="w-7 h-7 rounded-full bg-white/20 backdrop-blur flex items-center justify-center group-hover:bg-[#E1306C] transition-colors">
+                    <Instagram className="w-3.5 h-3.5 text-white" />
+                  </div>
+                </div>
+
+                {/* Center Animated Play Button */}
+                <div className="self-center w-12 h-12 rounded-full bg-white/95 text-stone-900 flex items-center justify-center shadow-xl group-hover:scale-115 group-hover:bg-white transition-all duration-300">
+                  <Play className="w-5 h-5 fill-current ml-0.5 text-[#1C1917]" />
+                </div>
+
+                {/* Bottom Video Details */}
+                <div className="space-y-1">
+                  <p className="text-xs sm:text-sm font-semibold text-white line-clamp-1 leading-snug">
+                    {vid.title}
+                  </p>
+                  <p className="text-[11px] text-white/80 line-clamp-1 font-light">
+                    {vid.caption}
+                  </p>
+                  <span className="inline-block text-[10px] text-[#F3DFB0] font-mono tracking-wider">
+                    {vid.handle || "@gleamnest.in"}
+                  </span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Bottom CTA to Instagram Profile */}
+        <div className="text-center pt-2">
+          <a
+            href="https://www.instagram.com/gleamnest.in?igsh=c3I4M2h1YmprdXI5"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full border border-[#1C1917] text-[#1C1917] hover:bg-[#1C1917] hover:text-white font-semibold text-xs tracking-wider uppercase transition-all shadow-sm"
+          >
+            <Instagram className="w-4 h-4" />
+            <span>Follow @gleamnest.in on Instagram</span>
+            <ExternalLink className="w-3.5 h-3.5" />
+          </a>
+        </div>
       </div>
+
+      {/* Video Modal Player (Plays video right inside the site!) */}
+      {activeVideo && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200"
+          onClick={() => setActiveVideo(null)}
+        >
+          <div
+            className="relative w-full max-w-sm sm:max-w-md bg-stone-950 rounded-2xl overflow-hidden shadow-2xl border border-stone-800 animate-in zoom-in-95 duration-200 flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="px-4 py-3 bg-stone-900 border-b border-stone-800 flex items-center justify-between text-white">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-amber-500 to-rose-500 flex items-center justify-center">
+                  <Instagram className="w-4 h-4 text-white" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-bold truncate max-w-[200px]">{activeVideo.title}</h4>
+                  <p className="text-[10px] text-stone-400">{activeVideo.handle || "@gleamnest.in"}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setIsMuted(!isMuted)}
+                  className="p-1.5 rounded-full hover:bg-stone-800 text-stone-300"
+                  title={isMuted ? "Unmute" : "Mute"}
+                >
+                  {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+                </button>
+                <button
+                  onClick={() => setActiveVideo(null)}
+                  className="p-1.5 rounded-full hover:bg-stone-800 text-stone-300"
+                  aria-label="Close video player"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Video Player Display */}
+            <div className="relative aspect-[9/15] max-h-[68vh] bg-black flex items-center justify-center overflow-hidden">
+              {activeVideo.embedUrl ? (
+                <iframe
+                  src={activeVideo.embedUrl}
+                  className="w-full h-full border-0"
+                  allow="autoplay; encrypted-media"
+                  allowFullScreen
+                />
+              ) : (
+                <video
+                  ref={videoPlayerRef}
+                  src={activeVideo.videoUrl}
+                  poster={activeVideo.poster}
+                  autoPlay
+                  loop
+                  playsInline
+                  muted={isMuted}
+                  controls
+                  className="w-full h-full object-cover"
+                />
+              )}
+            </div>
+
+            {/* Video Footer & Instagram Link */}
+            <div className="p-4 bg-stone-900 space-y-2 text-white">
+              <p className="text-xs text-stone-300 font-light leading-relaxed line-clamp-2">
+                {activeVideo.caption}
+              </p>
+              <div className="pt-2 flex items-center justify-between border-t border-stone-800 text-xs">
+                <span className="text-stone-400 text-[11px] font-mono">
+                  {activeVideo.views ? `${activeVideo.views} views` : "GleamNest Reel"}
+                </span>
+                <a
+                  href={activeVideo.instagramLink || "https://www.instagram.com/gleamnest.in?igsh=c3I4M2h1YmprdXI5"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3 py-1.5 rounded-lg bg-[#E1306C] hover:bg-[#c9245c] text-white text-[11px] font-bold flex items-center gap-1.5 transition-colors shadow-sm"
+                >
+                  <Instagram className="w-3.5 h-3.5" />
+                  <span>Open in Instagram</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
