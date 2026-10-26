@@ -1,11 +1,17 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { MessageCircle } from "lucide-react";
+import { MessageCircle, ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
 import { storeConfig } from "@/config/store.config";
 
 export function BrandValueBadges() {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+
+  const touchStartX = useRef<number | null>(null);
+  const touchEndX = useRef<number | null>(null);
+
   const badges = [
     {
       title: "Anti-Tarnish",
@@ -76,32 +82,149 @@ export function BrandValueBadges() {
     },
   ];
 
+  // Auto-scroll every 3 seconds unless paused by touch or hover
+  useEffect(() => {
+    if (isPaused) return;
+    const interval = setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % badges.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [isPaused, badges.length]);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.targetTouches[0].clientX;
+    setIsPaused(true);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    touchEndX.current = e.targetTouches[0].clientX;
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStartX.current || !touchEndX.current) {
+      setIsPaused(false);
+      return;
+    }
+    const delta = touchStartX.current - touchEndX.current;
+    if (delta > 40) {
+      // Swiped Left -> Next
+      setActiveIndex((prev) => (prev + 1) % badges.length);
+    } else if (delta < -40) {
+      // Swiped Right -> Prev
+      setActiveIndex((prev) => (prev - 1 + badges.length) % badges.length);
+    }
+    touchStartX.current = null;
+    touchEndX.current = null;
+    setIsPaused(false);
+  };
+
   return (
     <section id="brand-values" className="w-full py-12 sm:py-16 lg:py-20 bg-[#FAF7F2] border-b border-[#EADBBE]/80">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Container with warm champagne luxury card styling */}
-        <div className="rounded-3xl bg-[#FFFDF9] border border-[#EADBBE] shadow-[0_8px_30px_rgb(197,160,89,0.08)] p-6 sm:p-10 space-y-8">
-          {/* 1. Five Signature Brand Badges - Clean Non-Scrollable Responsive Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6 lg:gap-8 items-start">
+        <div className="rounded-3xl bg-[#FFFDF9] border border-[#EADBBE] shadow-[0_8px_30px_rgb(197,160,89,0.08)] p-5 sm:p-8 lg:p-10 space-y-6 sm:space-y-8">
+          
+          {/* MOBILE ONLY: Paginated 1-by-1 Carousel (< sm) */}
+          <div
+            className="sm:hidden relative"
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+            onMouseEnter={() => setIsPaused(true)}
+            onMouseLeave={() => setIsPaused(false)}
+          >
+            {/* Carousel Stage Card */}
+            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-b from-[#FAF5EB]/80 to-[#FAF5EB]/30 border border-[#EADBBE] p-6 text-center shadow-sm min-h-[220px] flex flex-col items-center justify-center">
+              {/* Header Pill: Step Counter */}
+              <div className="absolute top-3 right-3 text-[10px] font-semibold text-[#8F7234] bg-[#FFFDF9] border border-[#EADBBE] px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-xs">
+                <Sparkles className="w-3 h-3 text-[#C5A059]" />
+                <span>{activeIndex + 1} of {badges.length}</span>
+              </div>
+
+              {/* Quality Content (Smooth animated fade-in on transition) */}
+              <div
+                key={activeIndex}
+                className="flex flex-col items-center text-center animate-in fade-in zoom-in-95 duration-300 space-y-3"
+              >
+                {/* Circular Gold Icon Container */}
+                <div className="relative w-16 h-16 rounded-full border-[1.5px] border-[#C5A059] flex items-center justify-center p-3 bg-gradient-to-br from-[#FFFDF9] to-[#F5EBDA] shadow-[0_4px_16px_rgba(197,160,89,0.2)]">
+                  <div className="absolute inset-[3px] rounded-full border border-[#DDC698]/50 pointer-events-none" />
+                  {badges[activeIndex].icon}
+                </div>
+
+                <div className="space-y-1">
+                  <h4 className="font-editorial text-base font-semibold tracking-wide text-[#1C1917]">
+                    {badges[activeIndex].title}
+                  </h4>
+                  <p className="text-xs text-[#786E5E] leading-relaxed font-light max-w-[240px] mx-auto">
+                    {badges[activeIndex].desc}
+                  </p>
+                </div>
+              </div>
+
+              {/* Prev / Next Circular Navigation Arrows */}
+              <button
+                onClick={() => {
+                  setIsPaused(true);
+                  setActiveIndex((prev) => (prev - 1 + badges.length) % badges.length);
+                }}
+                aria-label="Previous Quality"
+                className="absolute left-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-[#FFFDF9] border border-[#EADBBE] text-[#8F7234] hover:text-[#1C1917] hover:bg-[#FAF5EB] shadow-sm flex items-center justify-center transition-all active:scale-95"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+
+              <button
+                onClick={() => {
+                  setIsPaused(true);
+                  setActiveIndex((prev) => (prev + 1) % badges.length);
+                }}
+                aria-label="Next Quality"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-[#FFFDF9] border border-[#EADBBE] text-[#8F7234] hover:text-[#1C1917] hover:bg-[#FAF5EB] shadow-sm flex items-center justify-center transition-all active:scale-95"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Pagination Dot Indicators */}
+            <div className="flex items-center justify-center gap-2 pt-3.5">
+              {badges.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => {
+                    setIsPaused(true);
+                    setActiveIndex(idx);
+                  }}
+                  aria-label={`Go to quality ${idx + 1}`}
+                  className={`transition-all duration-300 rounded-full ${
+                    idx === activeIndex
+                      ? "w-6 h-2 bg-[#C5A059] shadow-xs"
+                      : "w-2 h-2 bg-[#DDC698]/60 hover:bg-[#C5A059]/80"
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* DESKTOP & TABLET: Clean 5-in-a-row Luxury Grid (sm:) */}
+          <div className="hidden sm:grid sm:grid-cols-3 lg:grid-cols-5 gap-6 lg:gap-8 items-start">
             {badges.map((badge, idx) => (
               <div
                 key={idx}
-                className={`flex flex-col items-center text-center group ${
-                  idx === 4 ? "col-span-2 sm:col-span-1 max-w-[200px] mx-auto sm:max-w-none" : ""
-                }`}
+                className="flex flex-col items-center text-center group"
               >
                 {/* Circular Gold Icon Container */}
-                <div className="relative w-14 h-14 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-full border-[1.5px] border-[#C5A059] flex items-center justify-center p-2.5 sm:p-3 mb-2 sm:mb-3.5 bg-gradient-to-br from-[#FFFDF9] to-[#F5EBDA] shadow-sm transition-all duration-500 group-hover:scale-110 group-hover:-translate-y-1 group-hover:shadow-[0_8px_24px_rgba(197,160,89,0.25)]">
+                <div className="relative w-16 h-16 lg:w-20 lg:h-20 rounded-full border-[1.5px] border-[#C5A059] flex items-center justify-center p-3 mb-3 bg-gradient-to-br from-[#FFFDF9] to-[#F5EBDA] shadow-sm transition-all duration-500 group-hover:scale-110 group-hover:-translate-y-1 group-hover:shadow-[0_8px_24px_rgba(197,160,89,0.25)]">
                   {/* Inner Delicate Ring */}
                   <div className="absolute inset-[3px] rounded-full border border-[#DDC698]/50 pointer-events-none" />
                   {badge.icon}
                 </div>
 
                 {/* Title Matching Brand Card */}
-                <h4 className="font-editorial text-xs sm:text-sm lg:text-base font-semibold tracking-wide text-[#1C1917] group-hover:text-[#8F7234] transition-colors">
+                <h4 className="font-editorial text-sm lg:text-base font-semibold tracking-wide text-[#1C1917] group-hover:text-[#8F7234] transition-colors">
                   {badge.title}
                 </h4>
-                <p className="text-[10px] sm:text-[11px] text-[#786E5E] leading-tight font-light mt-1 max-w-[130px] sm:max-w-[150px]">
+                <p className="text-[11px] text-[#786E5E] leading-tight font-light mt-1 max-w-[150px]">
                   {badge.desc}
                 </p>
               </div>
