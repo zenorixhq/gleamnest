@@ -218,11 +218,6 @@ export function Footer() {
                   Saved Wishlist
                 </Link>
               </li>
-              <li>
-                <Link href="/admin" className="hover:text-primary transition-colors font-medium text-foreground">
-                  Merchant Admin
-                </Link>
-              </li>
             </ul>
           </div>
 

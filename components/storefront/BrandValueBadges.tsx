@@ -81,12 +81,17 @@ export function BrandValueBadges() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Container with warm champagne luxury card styling */}
         <div className="rounded-3xl bg-[#FFFDF9] border border-[#EADBBE] shadow-[0_8px_30px_rgb(197,160,89,0.08)] p-6 sm:p-10 space-y-8">
-          {/* 1. Five Signature Brand Badges - One Line on Mobile, Grid on Tablet/Desktop */}
-          <div className="flex overflow-x-auto no-scrollbar gap-4 sm:gap-6 lg:gap-8 pb-2 -mx-2 px-2 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-3 lg:grid-cols-5 items-start snap-x snap-mandatory">
+          {/* 1. Five Signature Brand Badges - Clean Non-Scrollable Responsive Grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6 lg:gap-8 items-start">
             {badges.map((badge, idx) => (
-              <div key={idx} className="flex-shrink-0 w-[136px] sm:w-auto flex flex-col items-center text-center group snap-center">
+              <div
+                key={idx}
+                className={`flex flex-col items-center text-center group ${
+                  idx === 4 ? "col-span-2 sm:col-span-1 max-w-[200px] mx-auto sm:max-w-none" : ""
+                }`}
+              >
                 {/* Circular Gold Icon Container */}
-                <div className="relative w-14 h-14 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-full border-[1.5px] border-[#C5A059] flex items-center justify-center p-2.5 sm:p-3 mb-2.5 sm:mb-3.5 bg-gradient-to-br from-[#FFFDF9] to-[#F5EBDA] shadow-sm transition-all duration-500 group-hover:scale-110 group-hover:-translate-y-1 group-hover:shadow-[0_8px_24px_rgba(197,160,89,0.25)]">
+                <div className="relative w-14 h-14 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-full border-[1.5px] border-[#C5A059] flex items-center justify-center p-2.5 sm:p-3 mb-2 sm:mb-3.5 bg-gradient-to-br from-[#FFFDF9] to-[#F5EBDA] shadow-sm transition-all duration-500 group-hover:scale-110 group-hover:-translate-y-1 group-hover:shadow-[0_8px_24px_rgba(197,160,89,0.25)]">
                   {/* Inner Delicate Ring */}
                   <div className="absolute inset-[3px] rounded-full border border-[#DDC698]/50 pointer-events-none" />
                   {badge.icon}

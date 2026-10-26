@@ -236,15 +236,6 @@ export function Header() {
                 )}
               </button>
 
-              {/* Admin Portal Shortcut */}
-              <Link
-                href="/admin"
-                className="hidden xl:flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-primary border border-border px-2.5 py-1.5 rounded-full hover:border-primary transition-all"
-                title="Merchant Admin Panel"
-              >
-                <SlidersHorizontal className="w-3.5 h-3.5" />
-                <span>Admin</span>
-              </Link>
             </div>
           </div>
         </div>
@@ -315,17 +306,9 @@ export function Header() {
 
               <div className="pt-3 border-t border-border">
                 <Link
-                  href="/admin"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-2 text-sm font-semibold text-primary py-2"
-                >
-                  <SlidersHorizontal className="w-4 h-4" />
-                  <span>Merchant Admin Dashboard</span>
-                </Link>
-                <Link
                   href="/account"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="block text-sm font-medium text-muted-foreground py-2"
+                  className="block text-sm font-medium text-muted-foreground hover:text-primary py-2"
                 >
                   Customer Account & Orders
                 </Link>
