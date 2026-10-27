@@ -92,7 +92,7 @@ export function CartDrawer() {
                 {isQatar ? (
                   <span className="text-emerald-700 font-semibold flex items-center gap-1">
                     <Sparkles className="w-3.5 h-3.5" />
-                    Free Delivery Across Qatar Included!
+                    Free Delivery Across Qatar (Within 14 Days)!
                   </span>
                 ) : amountNeeded === 0 ? (
                   <span className="text-emerald-600 font-semibold flex items-center gap-1">
@@ -275,7 +275,7 @@ export function CartDrawer() {
                 )}
                 <div className="flex justify-between text-muted-foreground">
                   <span>Estimated Shipping</span>
-                  <span>{shipping === 0 ? (isQatar ? "FREE (Qatar Express)" : "FREE") : formatPrice(shipping, selectedCurrency)}</span>
+                  <span>{shipping === 0 ? (isQatar ? "FREE (Within 14 Days)" : "FREE") : formatPrice(shipping, selectedCurrency)}</span>
                 </div>
                 <div className="flex justify-between text-base font-bold text-foreground pt-2 border-t border-border">
                   <span>Estimated Total</span>

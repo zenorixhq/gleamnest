@@ -19,7 +19,7 @@ export function AnnouncementBar() {
     ? [
         "100% Anti-Tarnish & Waterproof",
         "Premium 304 & 306 Grade Stainless Steel",
-        "Free Delivery Across Qatar on All Orders",
+        "Free Delivery Across Qatar (Within 14 Days)",
         "Hypoallergenic & Shower Safe",
         "Order Directly on WhatsApp",
       ]

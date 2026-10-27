@@ -343,7 +343,7 @@ ${greetingMessage}
                     }`}
                   >
                     <span>🇶🇦</span>
-                    <span>Qatar (QAR) • Free Shipping</span>
+                    <span>Qatar (QAR) • Free Delivery (Within 14 Days)</span>
                   </button>
                 </div>
               </div>
@@ -496,7 +496,7 @@ ${greetingMessage}
                 <li>Clicking <strong>&ldquo;Complete Order on WhatsApp&rdquo;</strong> will open WhatsApp with your item list and delivery address already prepared.</li>
                 {isQatar ? (
                   <>
-                    <li>GleamNest concierge will confirm available stock and coordinate <strong>Complimentary Express Delivery in Qatar</strong>.</li>
+                    <li>GleamNest concierge will confirm available stock and coordinate <strong>Complimentary Delivery in Qatar (within 14 days)</strong>.</li>
                     <li>Pay conveniently via Card / Bank Transfer or Cash on Delivery upon receiving your order.</li>
                   </>
                 ) : (
@@ -613,8 +613,8 @@ ${greetingMessage}
                   </div>
                 )}
                 <div className="flex justify-between text-muted-foreground">
-                  <span>{isQatar ? "Qatar Express Delivery" : "Pan-India Delivery"}</span>
-                  <span>{shipping === 0 ? (isQatar ? "FREE (Qatar)" : "FREE") : formatPrice(shipping, selectedCurrency)}</span>
+                  <span>{isQatar ? "Qatar Delivery (Within 14 Days)" : "Pan-India Delivery"}</span>
+                  <span>{shipping === 0 ? (isQatar ? "FREE (Within 14 Days)" : "FREE") : formatPrice(shipping, selectedCurrency)}</span>
                 </div>
                 <div className="flex justify-between text-base font-black text-foreground pt-3 border-t border-border">
                   <span>Total Payable</span>

@@ -770,9 +770,9 @@ function PoliciesContent() {
                           <td className="p-3 sm:p-4 font-semibold text-foreground">3 – 5 Business Days</td>
                         </tr>
                         <tr className="hover:bg-muted/20">
-                          <td className="p-3 sm:p-4 font-semibold text-foreground">Qatar (Doha) Orders</td>
+                          <td className="p-3 sm:p-4 font-semibold text-foreground">Qatar (Doha & All Zones) Orders</td>
                           <td className="p-3 sm:p-4 font-bold text-emerald-600">FREE Delivery</td>
-                          <td className="p-3 sm:p-4 text-muted-foreground">2 – 4 Days</td>
+                          <td className="p-3 sm:p-4 text-muted-foreground">Within 14 Days</td>
                         </tr>
                       </tbody>
                     </table>

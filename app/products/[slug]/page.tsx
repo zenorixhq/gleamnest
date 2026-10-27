@@ -420,7 +420,7 @@ ${greetingMessage}
               >
                 <Truck className="w-4 h-4 mx-auto text-primary group-hover:scale-110 transition-transform" />
                 <p className="font-bold text-foreground">DTDC & India Post</p>
-                <p className="text-[10px]">{isQatar ? "Qatar Free Delivery" : "Pan-India ₹40 / Free ₹799+"}</p>
+                <p className="text-[10px]">{isQatar ? "Qatar Free Delivery (Within 14 Days)" : "Pan-India ₹40 / Free ₹799+"}</p>
               </button>
             </div>
 

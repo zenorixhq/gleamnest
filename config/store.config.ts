@@ -134,7 +134,7 @@ export const storeConfig: StoreConfig = {
     enableQuickView: true,
     enableStockBadges: true,
     enableAnnouncementBar: true,
-    announcementText: "✨ 100% Anti-Tarnish & Waterproof Jewelry • Premium 304 & 306 Grade Stainless Steel • Free Delivery in Qatar & Pan-India on Orders Above ₹799 • Shipping ₹40 • Order on WhatsApp",
+    announcementText: "✨ 100% Anti-Tarnish & Waterproof Jewelry • Premium 304 & 306 Grade Stainless Steel • Free Delivery in Qatar (Within 14 Days) & Pan-India on Orders Above ₹799 • Shipping ₹40 • Order on WhatsApp",
     enableWhatsAppFloat: true,
     enableCurrencySwitcher: true,
   },

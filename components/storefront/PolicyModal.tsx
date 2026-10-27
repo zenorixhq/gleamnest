@@ -822,7 +822,7 @@ export function PolicyModal({
                       <tr className="hover:bg-muted/20">
                         <td className="p-3 font-semibold text-foreground">State of Qatar Orders</td>
                         <td className="p-3 font-bold text-emerald-600">FREE Delivery</td>
-                        <td className="p-3 text-muted-foreground">2 – 4 Days in Doha</td>
+                        <td className="p-3 text-muted-foreground">Within 14 Days</td>
                       </tr>
                     </tbody>
                   </table>
