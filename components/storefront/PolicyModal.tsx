@@ -218,8 +218,8 @@ export function PolicyModal({
                           <tr>
                             <th className="p-3">Indian Size</th>
                             <th className="p-3">US / Standard Size</th>
-                            <th className="p-3">Inside Diameter (mm)</th>
-                            <th className="p-3">Inside Circumference (mm)</th>
+                            <th className="p-3">Inside Diameter (cm)</th>
+                            <th className="p-3">Inside Circumference (cm)</th>
                             <th className="p-3">Suggested Finger / Fit</th>
                           </tr>
                         </thead>
@@ -227,15 +227,15 @@ export function PolicyModal({
                           <tr className="hover:bg-muted/20">
                             <td className="p-3 font-bold text-primary">Size 7 – 8</td>
                             <td className="p-3 font-semibold">US 4 – 4.5</td>
-                            <td className="p-3 font-mono">14.9 – 15.3 mm</td>
-                            <td className="p-3 font-mono">46.8 – 48.0 mm</td>
+                            <td className="p-3 font-mono">1.49 – 1.53 cm</td>
+                            <td className="p-3 font-mono">4.68 – 4.80 cm</td>
                             <td className="p-3 text-muted-foreground">Pinky / Midi Ring</td>
                           </tr>
                           <tr className="hover:bg-muted/20">
                             <td className="p-3 font-bold text-primary">Size 9 – 10</td>
                             <td className="p-3 font-semibold">US 5 – 5.5</td>
-                            <td className="p-3 font-mono">15.7 – 16.1 mm</td>
-                            <td className="p-3 font-mono">49.3 – 50.6 mm</td>
+                            <td className="p-3 font-mono">1.57 – 1.61 cm</td>
+                            <td className="p-3 font-mono">4.93 – 5.06 cm</td>
                             <td className="p-3 text-muted-foreground">Petite Ring Finger</td>
                           </tr>
                           <tr className="bg-primary/5 hover:bg-primary/10">
@@ -246,36 +246,36 @@ export function PolicyModal({
                               </span>
                             </td>
                             <td className="p-3 font-bold text-foreground">US 6 – 6.5</td>
-                            <td className="p-3 font-mono font-bold">16.5 – 16.9 mm</td>
-                            <td className="p-3 font-mono font-bold">51.9 – 53.1 mm</td>
+                            <td className="p-3 font-mono font-bold">1.65 – 1.69 cm</td>
+                            <td className="p-3 font-mono font-bold">5.19 – 5.31 cm</td>
                             <td className="p-3 font-semibold text-foreground">Standard Ring Finger</td>
                           </tr>
                           <tr className="hover:bg-muted/20">
                             <td className="p-3 font-bold text-primary">Size 13 – 14</td>
                             <td className="p-3 font-semibold">US 7 – 7.5</td>
-                            <td className="p-3 font-mono">17.3 – 17.7 mm</td>
-                            <td className="p-3 font-mono">54.4 – 55.7 mm</td>
+                            <td className="p-3 font-mono">1.73 – 1.77 cm</td>
+                            <td className="p-3 font-mono">5.44 – 5.57 cm</td>
                             <td className="p-3 text-muted-foreground">Middle / Index Finger</td>
                           </tr>
                           <tr className="hover:bg-muted/20">
                             <td className="p-3 font-bold text-primary">Size 15 – 16</td>
                             <td className="p-3 font-semibold">US 8 – 8.5</td>
-                            <td className="p-3 font-mono">18.1 – 18.5 mm</td>
-                            <td className="p-3 font-mono">57.0 – 58.3 mm</td>
+                            <td className="p-3 font-mono">1.81 – 1.85 cm</td>
+                            <td className="p-3 font-mono">5.70 – 5.83 cm</td>
                             <td className="p-3 text-muted-foreground">Index / Larger Fit</td>
                           </tr>
                           <tr className="hover:bg-muted/20">
                             <td className="p-3 font-bold text-primary">Size 17 – 18</td>
                             <td className="p-3 font-semibold">US 9 – 9.5</td>
-                            <td className="p-3 font-mono">18.9 – 19.4 mm</td>
-                            <td className="p-3 font-mono">59.5 – 60.8 mm</td>
+                            <td className="p-3 font-mono">1.89 – 1.94 cm</td>
+                            <td className="p-3 font-mono">5.95 – 6.08 cm</td>
                             <td className="p-3 text-muted-foreground">Statement / Thumb Ring</td>
                           </tr>
                           <tr className="hover:bg-muted/20">
                             <td className="p-3 font-bold text-primary">Size 19 – 22</td>
                             <td className="p-3 font-semibold">US 10 – 11</td>
-                            <td className="p-3 font-mono">19.8 – 20.6 mm</td>
-                            <td className="p-3 font-mono">62.1 – 64.6 mm</td>
+                            <td className="p-3 font-mono">1.98 – 2.06 cm</td>
+                            <td className="p-3 font-mono">6.21 – 6.46 cm</td>
                             <td className="p-3 text-muted-foreground">Men&apos;s / Thumb Ring</td>
                           </tr>
                         </tbody>
@@ -313,7 +313,7 @@ export function PolicyModal({
                       <div className="p-3.5 rounded-xl bg-card border border-border/80 space-y-1">
                         <span className="font-bold text-primary">Step 3: Measure with Ruler</span>
                         <p className="text-muted-foreground">
-                          Lay the paper strip flat against a ruler and measure the length in millimeters (mm). This is your finger&apos;s Inside Circumference.
+                          Lay the paper strip flat against a ruler and measure the length in centimeters (cm). This is your finger&apos;s Inside Circumference.
                         </p>
                       </div>
 
@@ -343,7 +343,7 @@ export function PolicyModal({
                           <tr>
                             <th className="p-3">Bangle Size</th>
                             <th className="p-3">Inside Diameter (Inches)</th>
-                            <th className="p-3">Inside Diameter (mm)</th>
+                            <th className="p-3">Inside Diameter (cm)</th>
                             <th className="p-3">Fit Description</th>
                           </tr>
                         </thead>
@@ -351,13 +351,13 @@ export function PolicyModal({
                           <tr className="hover:bg-muted/20">
                             <td className="p-3 font-bold text-primary">Size 2-2</td>
                             <td className="p-3">2.125 in (2 1/8&quot;)</td>
-                            <td className="p-3 font-mono">54.0 mm</td>
+                            <td className="p-3 font-mono">5.4 cm</td>
                             <td className="p-3 text-muted-foreground">Petite / Extra Small wrist</td>
                           </tr>
                           <tr className="hover:bg-muted/20">
                             <td className="p-3 font-bold text-primary">Size 2-4</td>
                             <td className="p-3">2.250 in (2 1/4&quot;)</td>
-                            <td className="p-3 font-mono">57.2 mm</td>
+                            <td className="p-3 font-mono">5.72 cm</td>
                             <td className="p-3 text-muted-foreground">Small wrist fit</td>
                           </tr>
                           <tr className="bg-primary/5 hover:bg-primary/10">
@@ -368,19 +368,19 @@ export function PolicyModal({
                               </span>
                             </td>
                             <td className="p-3 font-semibold">2.375 in (2 3/8&quot;)</td>
-                            <td className="p-3 font-mono font-semibold">60.3 mm</td>
+                            <td className="p-3 font-mono font-semibold">6.03 cm</td>
                             <td className="p-3 font-semibold text-foreground">Standard Medium wrist fit</td>
                           </tr>
                           <tr className="hover:bg-muted/20">
                             <td className="p-3 font-bold text-primary">Size 2-8</td>
                             <td className="p-3">2.500 in (2 1/2&quot;)</td>
-                            <td className="p-3 font-mono">63.5 mm</td>
+                            <td className="p-3 font-mono">6.35 cm</td>
                             <td className="p-3 text-muted-foreground">Large wrist fit</td>
                           </tr>
                           <tr className="hover:bg-muted/20">
                             <td className="p-3 font-bold text-primary">Size 2-10</td>
                             <td className="p-3">2.625 in (2 5/8&quot;)</td>
-                            <td className="p-3 font-mono">66.7 mm</td>
+                            <td className="p-3 font-mono">6.67 cm</td>
                             <td className="p-3 text-muted-foreground">Extra Large wrist fit</td>
                           </tr>
                         </tbody>
@@ -428,7 +428,7 @@ export function PolicyModal({
                       <div className="p-3.5 rounded-xl bg-card border border-border/80 space-y-1">
                         <span className="font-bold text-primary">Step 3: Mark & Measure</span>
                         <p className="text-muted-foreground">
-                          Mark where the tape or paper overlaps with a pen. Lay it flat against a ruler and measure the length in inches or mm.
+                          Mark where the tape or paper overlaps with a pen. Lay it flat against a ruler and measure the length in centimeters (cm) or inches.
                         </p>
                       </div>
 
