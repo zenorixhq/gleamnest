@@ -148,12 +148,29 @@ export const useCartStore = create<CartStore>()(
         if (found.minSpend && subtotal < found.minSpend) {
           return {
             success: false,
-            message: `Requires minimum spend of $${found.minSpend}. Current subtotal is $${subtotal.toFixed(2)}.`,
+            message: `Requires minimum spend of ₹${found.minSpend}. Current subtotal is ₹${subtotal.toFixed(2)}.`,
           };
         }
 
+        // Check if coupon is strictly restricted to first purchase
+        if (found.firstPurchaseOnly && typeof window !== "undefined") {
+          const hasPurchased = localStorage.getItem("gleamnest_has_purchased") === "true";
+          const placedOrders = localStorage.getItem("gleamnest_placed_orders");
+          if (hasPurchased || (placedOrders && JSON.parse(placedOrders || "[]").length > 0)) {
+            return {
+              success: false,
+              message: `Promo code ${found.code} is valid only on your first purchase.`,
+            };
+          }
+        }
+
         set({ appliedCoupon: found });
-        return { success: true, message: `Promo code ${found.code} applied successfully!` };
+        return {
+          success: true,
+          message: found.firstPurchaseOnly
+            ? `Promo code ${found.code} applied (5% first purchase discount)!`
+            : `Promo code ${found.code} applied successfully!`,
+        };
       },
 
       removeCoupon: () => set({ appliedCoupon: null }),

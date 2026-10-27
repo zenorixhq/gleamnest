@@ -49,6 +49,7 @@ export interface StoreConfig {
       amount: number;
       minSpend?: number;
       description: string;
+      firstPurchaseOnly?: boolean;
     }[];
   };
   features: {
@@ -114,10 +115,25 @@ export const storeConfig: StoreConfig = {
     checkoutMode: "whatsapp",
     activeCoupons: [
       {
+        code: "GLEAM5",
+        discountType: "percentage",
+        amount: 5,
+        firstPurchaseOnly: true,
+        description: "5% off your first jewelry order",
+      },
+      {
+        code: "WELCOME5",
+        discountType: "percentage",
+        amount: 5,
+        firstPurchaseOnly: true,
+        description: "5% off your first jewelry order",
+      },
+      {
         code: "GLEAM10",
         discountType: "percentage",
-        amount: 10,
-        description: "10% off your initial jewelry order",
+        amount: 5,
+        firstPurchaseOnly: true,
+        description: "5% off your first jewelry order",
       },
       {
         code: "FREESHIP",

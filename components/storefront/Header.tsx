@@ -73,7 +73,7 @@ export function Header() {
     { label: "Charms", href: "/products?category=charms" },
     { label: "Hip Chains", href: "/products?category=hip-chains" },
     { label: "Anklets", href: "/products?category=anklets" },
-    { label: "Kids Collection", href: "/products?category=kids-collection" },
+    { label: "Kids", href: "/products?category=kids-collection" },
     { label: "✦ View All Jewelry", href: "/products" },
   ];
 
@@ -89,7 +89,7 @@ export function Header() {
     { label: "Charms", href: "/products?category=charms" },
     { label: "Hip Chains", href: "/products?category=hip-chains" },
     { label: "Anklets", href: "/products?category=anklets" },
-    { label: "Kids Collection", href: "/products?category=kids-collection" },
+    { label: "Kids", href: "/products?category=kids-collection" },
   ];
 
   return (

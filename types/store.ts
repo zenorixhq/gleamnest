@@ -80,9 +80,10 @@ export interface CartItem {
 export interface Coupon {
   code: string;
   discountType: "percentage" | "fixed";
-  amount: number; // percentage (e.g. 10 for 10%) or fixed amount
+  amount: number; // percentage (e.g. 5 for 5%) or fixed amount
   minimumSpend?: number;
   description: string;
+  firstPurchaseOnly?: boolean;
 }
 
 export interface ShippingMethod {

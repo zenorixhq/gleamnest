@@ -179,7 +179,7 @@ ${itemsText}
 💳 *PAYMENT SUMMARY*
 ━━━━━━━━━━━━━━━━━━━━━
 • Subtotal: ${formatPrice(subtotal, selectedCurrency)}
-${discount > 0 ? `• Coupon Discount (${appliedCoupon?.code}): -${formatPrice(discount, selectedCurrency)}\n` : ""}• Shipping: ${shippingText}
+${discount > 0 ? `• Discount (${appliedCoupon?.code}${appliedCoupon?.firstPurchaseOnly ? " - 5% First Purchase" : ""}): -${formatPrice(discount, selectedCurrency)}\n` : ""}• Shipping: ${shippingText}
 ─────────────────────
 ✨ *TOTAL AMOUNT PAYABLE:* *${formatPrice(grandTotal, selectedCurrency)}*
 ─────────────────────
@@ -202,6 +202,16 @@ ${greetingMessage}
         sessionStorage.setItem("gleamnest_last_order_number", orderNumber);
       } catch (e) {
         console.error("Failed to save to sessionStorage:", e);
+      }
+    }
+
+    if (appliedCoupon?.firstPurchaseOnly && typeof window !== "undefined") {
+      const hasPurchased = localStorage.getItem("gleamnest_has_purchased") === "true";
+      if (hasPurchased) {
+        alert(`Promo code ${appliedCoupon.code} is valid only on your first purchase.`);
+        removeCoupon();
+        setIsSubmitting(false);
+        return;
       }
     }
 
@@ -236,8 +246,14 @@ ${greetingMessage}
       }),
     }).catch((err) => console.error("Failed to save order to DB:", err));
 
-    // Open WhatsApp directly
+    // Record completed purchase to enforce first purchase rule
     if (typeof window !== "undefined") {
+      localStorage.setItem("gleamnest_has_purchased", "true");
+      try {
+        const prev = JSON.parse(localStorage.getItem("gleamnest_placed_orders") || "[]");
+        prev.push({ orderNumber, phone: formData.phone, date: new Date().toISOString() });
+        localStorage.setItem("gleamnest_placed_orders", JSON.stringify(prev));
+      } catch (e) {}
       window.open(waUrl, "_blank");
     }
 
@@ -558,7 +574,7 @@ ${greetingMessage}
                   <div className="flex items-center justify-between bg-primary/10 border border-primary/20 px-3 py-2 rounded-lg text-xs">
                     <div className="flex items-center gap-2 text-primary font-semibold">
                       <Tag className="w-3.5 h-3.5" />
-                      <span>{appliedCoupon.code} applied (-{formatPrice(discount, selectedCurrency)})</span>
+                      <span>{appliedCoupon.code} applied ({appliedCoupon.firstPurchaseOnly ? "5% First Purchase" : formatPrice(discount, selectedCurrency)} -{formatPrice(discount, selectedCurrency)})</span>
                     </div>
                     <button
                       type="button"
@@ -572,7 +588,7 @@ ${greetingMessage}
                   <div className="flex gap-2">
                     <input
                       type="text"
-                      placeholder="Coupon (e.g. GLEAM10)"
+                      placeholder="Coupon (e.g. GLEAM5)"
                       value={couponCode}
                       onChange={(e) => {
                         setCouponCode(e.target.value);

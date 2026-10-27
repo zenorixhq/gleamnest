@@ -57,18 +57,18 @@ export default function HomePage() {
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent flex flex-col justify-end p-3.5 sm:p-4 text-white transition-opacity duration-300">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] text-[#EADBBE] font-medium tracking-wider uppercase">
-                      {idx === 0 ? "🔥 Latest Drop" : "Collection"}
-                    </span>
-                    {idx === 0 && (
+                  {idx === 0 && (
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-[10px] text-[#EADBBE] font-medium tracking-wider uppercase">
+                        🔥 Latest Drop
+                      </span>
                       <span className="text-[9px] font-bold bg-[#C5A059] text-white px-2 py-0.5 rounded-full uppercase tracking-wider">
                         New
                       </span>
-                    )}
-                  </div>
+                    </div>
+                  )}
                   <h3 className="font-editorial text-sm sm:text-base font-semibold tracking-wide text-white group-hover:text-[#F3DFB0] transition-colors leading-snug mt-0.5">
-                    {cat.name}
+                    {cat.name.replace(/\s*Collection/gi, "").trim()}
                   </h3>
                 </div>
               </Link>

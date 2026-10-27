@@ -84,7 +84,7 @@ export const categories: Category[] = [
   {
     id: "cat-kids-collection",
     slug: "kids-collection",
-    name: "Kids Collection",
+    name: "Kids",
     description: "Gentle bell charms, mini studs, and lightweight hypoallergenic pieces safe for sensitive skin.",
     image: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&q=80&w=800",
     productCount: 4,

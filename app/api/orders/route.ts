@@ -4,8 +4,25 @@ import { sampleOrders } from "@/data/mockData";
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
+    const { searchParams } = new URL(req.url);
+    const phone = searchParams.get("phone");
+    if (phone) {
+      const cleanPhone = phone.replace(/[^0-9]/g, "");
+      if (cleanPhone.length >= 7) {
+        const existingOrder = await prisma.order.findFirst({
+          where: {
+            customerPhone: {
+              contains: cleanPhone.slice(-8),
+            },
+          },
+        });
+        return NextResponse.json({ isFirstPurchase: !existingOrder });
+      }
+      return NextResponse.json({ isFirstPurchase: true });
+    }
+
     const dbOrders = await prisma.order.findMany({
       orderBy: { createdAt: "desc" },
     });
