@@ -2,7 +2,8 @@
 
 import { useState, useMemo, useEffect, useRef, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import { categories } from "@/data/mockData";
+import { categories as defaultCategories } from "@/data/mockData";
+import { Category } from "@/types/store";
 import { useProductStore } from "@/store/useProductStore";
 import { ProductCard } from "@/components/storefront/ProductCard";
 import {
@@ -27,10 +28,17 @@ function ProductCatalogContent() {
   const products = useProductStore((s) => s.products);
   const fetchProducts = useProductStore((s) => s.fetchProducts);
   const hasLoaded = useProductStore((s) => s.hasLoaded);
+  const [categoryList, setCategoryList] = useState<Category[]>(defaultCategories);
 
   // Sync with database on mount
   useEffect(() => {
     fetchProducts();
+    fetch(`/api/categories?t=${Date.now()}`, { cache: "no-store" })
+      .then((r) => r.json())
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) setCategoryList(data);
+      })
+      .catch(() => {});
   }, [fetchProducts]);
 
   const [selectedCategory, setSelectedCategory] = useState<string>(initialCategory);
@@ -186,7 +194,7 @@ function ProductCatalogContent() {
           <h1 className="text-2xl sm:text-3xl font-black text-foreground">
             {selectedCategory === "all"
               ? "All Jewelry Collection"
-              : categories.find((c) => c.slug === selectedCategory)?.name || "Jewelry Collection"}
+              : categoryList.find((c) => c.slug === selectedCategory)?.name || "Jewelry Collection"}
           </h1>
           <p className="text-xs text-muted-foreground mt-0.5">
             Showing {displayedProducts.length} of {filteredProducts.length} pieces • 4 items per row
@@ -228,7 +236,7 @@ function ProductCatalogContent() {
           <span className="text-[10px] opacity-80">({products.length})</span>
         </button>
 
-        {categories.map((cat) => {
+        {categoryList.map((cat) => {
           const count = products.filter((p) => {
             if (cat.slug === "new-arrivals") return p.isNewArrival || p.category === "new-arrivals";
             if (cat.slug === "necklaces-and-chains" || cat.slug === "necklaces") return p.category === "necklaces-and-chains" || p.category === "necklaces" || /necklace|chain|pendant/i.test(p.title);

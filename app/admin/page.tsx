@@ -3,10 +3,10 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { storeConfig } from "@/config/store.config";
-import { sampleOrders } from "@/data/mockData";
+import { sampleOrders, categories as defaultCategories } from "@/data/mockData";
 import { useProductStore } from "@/store/useProductStore";
 import { formatPrice } from "@/lib/utils";
-import { Order, OrderStatus, Product } from "@/types/store";
+import { Order, OrderStatus, Product, Category } from "@/types/store";
 import {
   TrendingUp,
   ShoppingBag,
@@ -39,6 +39,7 @@ import {
   ShieldCheck,
   Instagram,
   Camera,
+  Sparkles,
 } from "lucide-react";
 import { upload } from "@vercel/blob/client";
 
@@ -57,8 +58,21 @@ export default function AdminDashboardPage() {
   const updateProduct = useProductStore((s) => s.updateProduct);
   const deleteProduct = useProductStore((s) => s.deleteProduct);
 
-  const [activeTab, setActiveTab] = useState<"overview" | "orders" | "inventory" | "config" | "reviews">("inventory");
+  const [activeTab, setActiveTab] = useState<"overview" | "orders" | "inventory" | "config" | "reviews" | "collections">("inventory");
   const [searchQuery, setSearchQuery] = useState("");
+
+  // Curated Collections (Category Cards) State
+  const [categoriesList, setCategoriesList] = useState<Category[]>(defaultCategories);
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [categoryForm, setCategoryForm] = useState({
+    id: "",
+    name: "",
+    slug: "",
+    description: "",
+    image: "",
+  });
+  const [updatingCatId, setUpdatingCatId] = useState<string | null>(null);
 
   // Reviews, Video Reels, Screenshots & Instagram Videos State
   const [reviewsList, setReviewsList] = useState<any[]>([]);
@@ -144,6 +158,17 @@ export default function AdminDashboardPage() {
       .catch((err) => console.error("Error fetching reviews:", err));
   };
 
+  const fetchCategories = () => {
+    fetch(`/api/categories?t=${Date.now()}`, { cache: "no-store" })
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          setCategoriesList(data);
+        }
+      })
+      .catch((err) => console.error("Error fetching categories:", err));
+  };
+
   useEffect(() => {
     // Check if merchant is already authenticated
     if (typeof window !== "undefined") {
@@ -186,6 +211,7 @@ export default function AdminDashboardPage() {
     if (isAuthenticated) {
       fetchProducts();
       fetchReviewsAndVideos();
+      fetchCategories();
 
       fetch("/api/orders")
         .then((res) => res.json())
@@ -609,6 +635,139 @@ export default function AdminDashboardPage() {
     }
   };
 
+  // Curated Collections / Category Cards Handlers
+  const handleCategoryCardImageUpload = async (catId: string, file: File) => {
+    setUpdatingCatId(catId);
+    try {
+      const imageUrl = await uploadFileToServer(file, "images");
+      if (!imageUrl) throw new Error("Image upload failed");
+
+      // Update state immediately
+      setCategoriesList((prev) =>
+        prev.map((c) => (c.id === catId ? { ...c, image: imageUrl } : c))
+      );
+
+      // Persist to Neon PostgreSQL via PUT /api/categories
+      const catToUpdate = categoriesList.find((c) => c.id === catId);
+      const res = await fetch("/api/categories", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...(catToUpdate || {}),
+          id: catId,
+          image: imageUrl,
+        }),
+      });
+
+      const data = await res.json();
+      if (Array.isArray(data.categories)) {
+        setCategoriesList(data.categories);
+      }
+    } catch (err: any) {
+      console.error("Failed to update category card image:", err);
+      alert("Failed to upload and update category image: " + (err?.message || "Unknown error"));
+    } finally {
+      setUpdatingCatId(null);
+    }
+  };
+
+  const handleOpenEditCategory = (cat: Category) => {
+    setEditingCategory(cat);
+    setCategoryForm({
+      id: cat.id,
+      name: cat.name,
+      slug: cat.slug,
+      description: cat.description || "",
+      image: cat.image,
+    });
+    setIsCategoryModalOpen(true);
+  };
+
+  const handleOpenAddCategory = () => {
+    setEditingCategory(null);
+    setCategoryForm({
+      id: `cat-${Date.now()}`,
+      name: "",
+      slug: "",
+      description: "",
+      image: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&q=80&w=800",
+    });
+    setIsCategoryModalOpen(true);
+  };
+
+  const handleCategoryModalImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const publicUrl = await uploadFileToServer(file, "images");
+      setCategoryForm((prev) => ({ ...prev, image: publicUrl }));
+    } catch (err: any) {
+      alert("Image upload notice: " + (err.message || "Failed to upload image"));
+    } finally {
+      e.target.value = "";
+    }
+  };
+
+  const handleSaveCategoryModal = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!categoryForm.name.trim() || !categoryForm.slug.trim()) {
+      alert("Category name and slug are required.");
+      return;
+    }
+    setIsSavingItem(true);
+    try {
+      if (editingCategory) {
+        const res = await fetch("/api/categories", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(categoryForm),
+        });
+        const data = await res.json();
+        if (Array.isArray(data.categories)) {
+          setCategoriesList(data.categories);
+        } else {
+          setCategoriesList((prev) =>
+            prev.map((c) => (c.id === categoryForm.id ? { ...c, ...categoryForm } : c))
+          );
+        }
+      } else {
+        const res = await fetch("/api/categories", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(categoryForm),
+        });
+        const data = await res.json();
+        if (Array.isArray(data.categories)) {
+          setCategoriesList(data.categories);
+        } else {
+          setCategoriesList((prev) => [...prev, { ...categoryForm, productCount: 0 }]);
+        }
+      }
+      setIsCategoryModalOpen(false);
+    } catch (err: any) {
+      console.error("Error saving category:", err);
+      alert("Failed to save category card: " + (err?.message || "Unknown error"));
+    } finally {
+      setIsSavingItem(false);
+    }
+  };
+
+  const handleDeleteCategory = async (catId: string) => {
+    if (!confirm("Are you sure you want to remove this category card from the homepage?")) return;
+    try {
+      const res = await fetch(`/api/categories?id=${encodeURIComponent(catId)}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (Array.isArray(data.categories)) {
+        setCategoriesList(data.categories);
+      } else {
+        setCategoriesList((prev) => prev.filter((c) => c.id !== catId));
+      }
+    } catch (err) {
+      console.error("Error deleting category:", err);
+    }
+  };
 
   const handleStockAdjust = async (productId: string, delta: number) => {
     const prod = products.find((p) => p.id === productId);
@@ -965,6 +1124,18 @@ export default function AdminDashboardPage() {
           >
             <MessageSquare className="w-4 h-4" />
             <span>Reviews & Videos ({reviewsList.length + videosList.length})</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab("collections")}
+            className={`flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-lg transition-all ${
+              activeTab === "collections"
+                ? "bg-primary text-primary-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground hover:bg-muted"
+            }`}
+          >
+            <Sparkles className="w-4 h-4 text-[#C5A059]" />
+            <span>Curated Collections Cards ({categoriesList.length})</span>
           </button>
         </div>
 
@@ -1761,6 +1932,152 @@ export default function AdminDashboardPage() {
                   </div>
                 ))}
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Tab: Curated Collections / Homepage Category Cards */}
+        {activeTab === "collections" && (
+          <div className="bg-card border border-border rounded-2xl p-6 shadow-sm space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/60 pb-5">
+              <div>
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-[#C5A059]" />
+                  <h3 className="text-base font-bold text-foreground">
+                    Curated Collections Cards ({categoriesList.length})
+                  </h3>
+                </div>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Manage the category cards displayed on the Homepage &quot;Shop by Category&quot; section. Upload high-res jewelry photos, change titles, or edit category details.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleOpenAddCategory}
+                  className="px-4 py-2 rounded-xl bg-primary text-primary-foreground font-semibold text-xs flex items-center gap-1.5 shadow-sm hover:bg-primary/90 transition-colors"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Add Collection Card</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Grid of Homepage Category Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+              {categoriesList.map((cat, index) => (
+                <div
+                  key={cat.id || cat.slug || index}
+                  className="group relative rounded-xl border border-border/80 bg-background overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col"
+                >
+                  {/* Card Visual Preview (matching homepage aspect-[4/5] ratio) */}
+                  <div className="relative aspect-[4/5] w-full overflow-hidden bg-stone-100 dark:bg-stone-900">
+                    <img
+                      src={cat.image}
+                      alt={cat.name}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent pointer-events-none" />
+
+                    {/* Order Index Badge */}
+                    <div className="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-md bg-black/60 backdrop-blur-sm text-[10px] font-semibold text-white/90 border border-white/10">
+                      Card #{index + 1}
+                    </div>
+
+                    {/* Quick Direct Upload Overlay / Button */}
+                    <div className="absolute top-2.5 right-2.5">
+                      <label
+                        htmlFor={`cat-img-upload-${cat.id}`}
+                        className={`px-2.5 py-1.5 rounded-lg bg-black/70 hover:bg-black text-white text-[11px] font-medium backdrop-blur-sm border border-white/20 shadow-md cursor-pointer flex items-center gap-1.5 transition-all ${
+                          updatingCatId === cat.id ? "opacity-50 pointer-events-none" : ""
+                        }`}
+                        title="Upload a new photo for this collection card"
+                      >
+                        <Camera className="w-3.5 h-3.5 text-[#C5A059]" />
+                        <span>Change Card Image</span>
+                      </label>
+                      <input
+                        id={`cat-img-upload-${cat.id}`}
+                        type="file"
+                        accept="image/*"
+                        disabled={updatingCatId === cat.id || isUploading}
+                        onChange={(e) => {
+                          const f = e.target.files?.[0];
+                          if (f) handleCategoryCardImageUpload(cat.id, f);
+                          e.target.value = "";
+                        }}
+                        className="hidden"
+                      />
+                    </div>
+
+                    {/* Uploading progress indicator */}
+                    {updatingCatId === cat.id && (
+                      <div className="absolute inset-0 bg-black/75 backdrop-blur-xs flex flex-col items-center justify-center p-4 text-center z-10">
+                        <Clock className="w-6 h-6 text-[#C5A059] animate-spin mb-2" />
+                        <span className="text-xs font-bold text-white">Uploading &amp; Saving...</span>
+                        <span className="text-[10px] text-white/70 mt-1">Updating cloud storage</span>
+                      </div>
+                    )}
+
+                    {/* Text Preview Overlay matching storefront */}
+                    <div className="absolute bottom-3 left-3 right-3 text-white pointer-events-none">
+                      <p className="text-[10px] uppercase tracking-widest text-[#EADBBE] font-medium">
+                        Collection
+                      </p>
+                      <h4 className="text-sm font-bold leading-tight font-serif text-white drop-shadow">
+                        {cat.name}
+                      </h4>
+                      {cat.description && (
+                        <p className="text-[10px] text-white/80 line-clamp-1 mt-0.5">
+                          {cat.description}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Card Actions & Info Bar */}
+                  <div className="p-3 bg-card border-t border-border flex items-center justify-between gap-2 mt-auto">
+                    <div className="min-w-0 flex-1">
+                      <span className="font-bold text-xs text-foreground block truncate">
+                        {cat.name}
+                      </span>
+                      <span className="text-[10px] text-muted-foreground font-mono block truncate">
+                        /{cat.slug}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => handleOpenEditCategory(cat)}
+                        className="p-1.5 rounded-lg border border-border hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                        title="Edit title & description"
+                      >
+                        <Pencil className="w-3.5 h-3.5" />
+                      </button>
+
+                      <Link
+                        href={`/products?category=${cat.slug}`}
+                        target="_blank"
+                        className="p-1.5 rounded-lg border border-border hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                        title="View collection on storefront"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5" />
+                      </Link>
+
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteCategory(cat.id)}
+                        className="p-1.5 rounded-lg border border-red-200 hover:bg-red-50 text-red-600 dark:border-red-900/50 dark:hover:bg-red-950/40 transition-colors"
+                        title="Remove collection card"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         )}
@@ -2814,6 +3131,162 @@ export default function AdminDashboardPage() {
                 >
                   {isSavingItem && <Clock className="w-3.5 h-3.5 animate-spin" />}
                   <span>{isSavingItem ? "Saving..." : "Save Instagram Video"}</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Category Card Add / Edit Modal */}
+      {isCategoryModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+          <div
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={() => setIsCategoryModalOpen(false)}
+          />
+
+          <div className="relative w-full max-w-lg bg-card border border-border rounded-2xl shadow-2xl overflow-hidden z-10 my-8 animate-in fade-in zoom-in-95">
+            <div className="px-6 py-4 border-b border-border flex items-center justify-between">
+              <div>
+                <h3 className="text-base font-bold text-foreground">
+                  {editingCategory ? "Edit Curated Collection Card" : "Add New Collection Card"}
+                </h3>
+                <p className="text-xs text-muted-foreground">
+                  Customize the title, photo, and URL slug shown on the homepage grid.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsCategoryModalOpen(false)}
+                className="p-1.5 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveCategoryModal} className="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-foreground">Collection Name *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Necklaces & Chains"
+                  value={categoryForm.name}
+                  onChange={(e) => {
+                    const name = e.target.value;
+                    setCategoryForm((prev) => ({
+                      ...prev,
+                      name,
+                      slug: !editingCategory
+                        ? name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, "")
+                        : prev.slug,
+                    }));
+                  }}
+                  className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-foreground">Category Slug (URL Path) *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. necklaces-and-chains"
+                  value={categoryForm.slug}
+                  onChange={(e) => setCategoryForm({ ...categoryForm, slug: e.target.value })}
+                  className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none font-mono"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-foreground">Subtitle / Short Description</label>
+                <input
+                  type="text"
+                  placeholder="e.g. Waterproof everyday pendants & chains"
+                  value={categoryForm.description}
+                  onChange={(e) => setCategoryForm({ ...categoryForm, description: e.target.value })}
+                  className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none"
+                />
+              </div>
+
+              {/* Card Image Upload & URL */}
+              <div className="space-y-2 border border-border p-3.5 rounded-xl bg-muted/20">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                    <Camera className="w-3.5 h-3.5 text-primary" />
+                    <span>Card Photo *</span>
+                  </label>
+                  <span className="text-[11px] text-muted-foreground">High-res vertical image</span>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="category-card-modal-upload"
+                    className={`w-full px-3 py-2 rounded-lg border border-dashed border-border hover:border-primary bg-background hover:bg-muted/40 cursor-pointer flex items-center justify-center gap-2 text-xs font-medium text-foreground transition-colors ${
+                      isUploading ? "opacity-50 pointer-events-none" : ""
+                    }`}
+                  >
+                    <Upload className="w-3.5 h-3.5 text-primary" />
+                    <span>Upload Image from Device</span>
+                  </label>
+                  <input
+                    id="category-card-modal-upload"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleCategoryModalImageUpload}
+                    className="hidden"
+                    disabled={isUploading || isSavingItem}
+                  />
+                </div>
+
+                <input
+                  type="text"
+                  placeholder="Or paste image URL: https://..."
+                  value={categoryForm.image}
+                  onChange={(e) => setCategoryForm({ ...categoryForm, image: e.target.value })}
+                  className="w-full px-3 py-1.5 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none font-mono"
+                />
+
+                {categoryForm.image && (
+                  <div className="pt-2 flex items-center gap-3">
+                    <div className="w-16 h-20 rounded-lg overflow-hidden border border-border bg-card">
+                      <img
+                        src={categoryForm.image}
+                        alt="Preview"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="text-xs">
+                      <p className="font-semibold text-foreground">Card Photo Attached ✓</p>
+                      <button
+                        type="button"
+                        onClick={() => setCategoryForm({ ...categoryForm, image: "" })}
+                        className="text-[11px] text-red-600 hover:underline mt-1 block"
+                      >
+                        Remove Photo
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="pt-4 border-t border-border flex items-center justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsCategoryModalOpen(false)}
+                  disabled={isSavingItem || isUploading}
+                  className="px-4 py-2 rounded-xl border border-border text-xs font-semibold hover:bg-muted disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSavingItem || isUploading || !categoryForm.name}
+                  className="px-6 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/90 shadow-md disabled:opacity-50 flex items-center gap-1.5"
+                >
+                  {isSavingItem && <Clock className="w-3.5 h-3.5 animate-spin" />}
+                  <span>{isSavingItem ? "Saving..." : editingCategory ? "Update Card" : "Add Card"}</span>
                 </button>
               </div>
             </form>
