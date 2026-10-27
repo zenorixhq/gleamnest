@@ -221,12 +221,72 @@ export default function AdminDashboardPage() {
   const [uploadProgressText, setUploadProgressText] = useState("");
   const [isSavingItem, setIsSavingItem] = useState(false);
 
+  const compressImageIfNeeded = async (file: File, maxDim = 1600, quality = 0.85): Promise<File> => {
+    if (!file.type.startsWith("image/")) return file;
+    if (file.size <= 800 * 1024) return file;
+
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          let { width, height } = img;
+          if (width > maxDim || height > maxDim) {
+            if (width > height) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
+            } else {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
+          }
+
+          const canvas = document.createElement("canvas");
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          if (!ctx) {
+            resolve(file);
+            return;
+          }
+
+          ctx.drawImage(img, 0, 0, width, height);
+          canvas.toBlob(
+            (blob) => {
+              if (blob && blob.size < file.size) {
+                const optimized = new File([blob], file.name.replace(/\.[^.]+$/, ".jpg"), {
+                  type: "image/jpeg",
+                  lastModified: Date.now(),
+                });
+                resolve(optimized);
+              } else {
+                resolve(file);
+              }
+            },
+            "image/jpeg",
+            quality
+          );
+        };
+        img.onerror = () => resolve(file);
+        img.src = e.target?.result as string;
+      };
+      reader.onerror = () => resolve(file);
+      reader.readAsDataURL(file);
+    });
+  };
+
   const uploadFileToServer = async (file: File, folder: "screenshots" | "videos" | "images") => {
     setIsUploading(true);
-    setUploadProgressText(`Uploading ${file.name} (${(file.size / (1024 * 1024)).toFixed(1)} MB)...`);
     try {
+      let fileToUpload = file;
+      if (file.type.startsWith("image/") && file.size > 800 * 1024) {
+        setUploadProgressText(`Optimizing image (${(file.size / (1024 * 1024)).toFixed(1)} MB)...`);
+        fileToUpload = await compressImageIfNeeded(file);
+      }
+
+      setUploadProgressText(`Uploading ${fileToUpload.name} (${(fileToUpload.size / (1024 * 1024)).toFixed(1)} MB)...`);
       const formData = new FormData();
-      formData.append("file", file);
+      formData.append("file", fileToUpload);
       formData.append("folder", folder);
 
       const res = await fetch("/api/upload", {
@@ -303,7 +363,7 @@ export default function AdminDashboardPage() {
       const publicUrl = await uploadFileToServer(file, "videos");
       setVideoForm((prev) => ({ ...prev, videoUrl: publicUrl }));
     } catch (err: any) {
-      alert("Error uploading video: " + (err.message || "Upload failed"));
+      alert("Video Upload Notice: " + (err.message || "Upload failed") + "\n\nTip: You can also paste an Instagram Reel or direct video URL.");
     } finally {
       e.target.value = "";
     }
@@ -461,7 +521,7 @@ export default function AdminDashboardPage() {
       const publicUrl = await uploadFileToServer(file, "videos");
       setInstaVideoForm((prev) => ({ ...prev, videoUrl: publicUrl }));
     } catch (err: any) {
-      alert("Error uploading video reel: " + (err.message || "Upload failed"));
+      alert("Video Upload Notice: " + (err.message || "Upload failed") + "\n\nTip: You can also paste an Instagram Reel or direct video URL.");
     } finally {
       e.target.value = "";
     }
