@@ -7,12 +7,14 @@ interface BrandLogoProps {
   variant?: "full" | "compact" | "emblem-only";
   showTagline?: boolean;
   className?: string;
+  theme?: "light" | "dark";
 }
 
 export function BrandLogo({
   variant = "full",
   showTagline = true,
   className = "",
+  theme = "light",
 }: BrandLogoProps) {
   return (
     <Link
@@ -35,10 +37,16 @@ export function BrandLogo({
           <img
             src="/images/logo-text.png"
             alt="GleamNest.in"
-            className="h-5 sm:h-6 md:h-6.5 w-auto object-contain object-left"
+            className={`h-5 sm:h-6 md:h-6.5 w-auto object-contain object-left transition-all ${
+              theme === "dark" ? "brightness-0 invert opacity-95" : ""
+            }`}
           />
           {showTagline && (
-            <span className="font-script text-[9.5px] sm:text-xs md:text-[13px] text-[#C5A059] tracking-normal mt-0.5 truncate max-w-[210px] sm:max-w-none">
+            <span
+              className={`font-script text-[9.5px] sm:text-xs md:text-[13px] tracking-normal mt-0.5 truncate max-w-[210px] sm:max-w-none ${
+                theme === "dark" ? "text-[#EADBBE]" : "text-[#C5A059]"
+              }`}
+            >
               The place where elegance and sparkle come together.
             </span>
           )}

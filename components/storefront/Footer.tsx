@@ -4,22 +4,13 @@ import { useState } from "react";
 import Link from "next/link";
 import { storeConfig } from "@/config/store.config";
 import {
-  Mail,
-  Phone,
-  MapPin,
-  ShieldCheck,
-  CheckCircle2,
+  MessageCircle,
   Instagram,
-  Twitter,
   Facebook,
-  Ruler,
-  Sparkles,
-  Truck,
-  RotateCcw,
-  AlertCircle,
+  CheckCircle2,
+  ArrowRight,
 } from "lucide-react";
 import { BrandLogo } from "@/components/storefront/BrandLogo";
-import { ProductFeatureSlider } from "@/components/storefront/ProductFeatureSlider";
 import { PolicyModal, PolicyTab } from "@/components/storefront/PolicyModal";
 
 export function Footer() {
@@ -35,52 +26,46 @@ export function Footer() {
   };
 
   return (
-    <footer className="bg-card border-t border-border mt-20">
-      {/* Interactive Auto-Scrolling Feature Slider */}
-      <div className="border-b border-border/60 py-8 sm:py-10 bg-muted/10">
-        <ProductFeatureSlider onOpenPolicy={(tab) => setPolicyModalTab(tab)} />
-      </div>
-
-      {/* Main Footer Links */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10">
-          {/* Brand Column */}
-          <div className="lg:col-span-2 space-y-4">
-            <BrandLogo variant="full" showTagline={true} />
-            <p className="text-xs sm:text-sm text-muted-foreground max-w-sm font-light">
-              {storeConfig.meta.description}
+    <footer className="bg-[#0C0A09] text-[#FAF7F2] border-t border-stone-800/80 mt-16 sm:mt-24 select-none">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+        {/* Main 4-Column Minimalist Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-12">
+          
+          {/* Column 1: Brand & Atelier Essence (4 cols) */}
+          <div className="lg:col-span-4 space-y-4">
+            <BrandLogo variant="full" showTagline={true} theme="dark" />
+            
+            <p className="text-xs sm:text-sm text-stone-400 font-light leading-relaxed max-w-sm">
+              Fine jewelry for the skin, not the vault. Handcrafted in 304 & 306 surgical-grade stainless steel with mirror PVD gold finish. 100% waterproof and anti-tarnish.
             </p>
 
-            <div className="pt-2 space-y-2 text-xs text-muted-foreground">
-              <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-primary flex-shrink-0" />
-                <span>{storeConfig.brand.contact.address}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Phone className="w-4 h-4 text-primary flex-shrink-0" />
-                <span>{storeConfig.brand.contact.phone}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Mail className="w-4 h-4 text-primary flex-shrink-0" />
-                <span>{storeConfig.brand.contact.email}</span>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3 pt-2">
+            {/* Social & WhatsApp Buttons */}
+            <div className="flex items-center gap-3 pt-1">
               <a
                 href={storeConfig.brand.socials.instagram || "https://www.instagram.com/gleamnest.in?igsh=c3I4M2h1YmprdXI5"}
                 target="_blank"
                 rel="noreferrer"
-                className="w-8 h-8 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary transition-colors"
+                className="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-stone-400 hover:text-[#C5A059] hover:border-[#C5A059]/60 hover:bg-[#C5A059]/10 transition-all"
                 aria-label="Instagram"
               >
                 <Instagram className="w-4 h-4" />
               </a>
+
+              <a
+                href={`https://wa.me/${storeConfig.brand.contact.whatsappNumber}`}
+                target="_blank"
+                rel="noreferrer"
+                className="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-stone-400 hover:text-[#25D366] hover:border-[#25D366]/60 hover:bg-[#25D366]/10 transition-all"
+                aria-label="WhatsApp Concierge"
+              >
+                <MessageCircle className="w-4 h-4" />
+              </a>
+
               <a
                 href={storeConfig.brand.socials.facebook || "https://www.facebook.com/share/1DXg9Puzkj/"}
                 target="_blank"
                 rel="noreferrer"
-                className="w-8 h-8 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary transition-colors"
+                className="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-stone-400 hover:text-[#1877F2] hover:border-[#1877F2]/60 hover:bg-[#1877F2]/10 transition-all"
                 aria-label="Facebook"
               >
                 <Facebook className="w-4 h-4" />
@@ -88,180 +73,149 @@ export function Footer() {
             </div>
           </div>
 
-          {/* Shop Column */}
-          <div className="space-y-3">
-            <h5 className="text-xs font-bold uppercase tracking-wider text-foreground">
-              Shop Collections
+          {/* Column 2: Collections (2 cols) */}
+          <div className="lg:col-span-2 space-y-3">
+            <h5 className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#C5A059]">
+              Collections
             </h5>
-            <ul className="space-y-2 text-sm text-muted-foreground">
+            <ul className="space-y-2 text-xs sm:text-[13px] text-stone-400">
               <li>
-                <Link href="/products" className="hover:text-primary transition-colors">
-                  All Products
+                <Link href="/products?category=new-arrivals" className="hover:text-white transition-colors text-white font-medium flex items-center gap-1">
+                  <span>✦ New Arrivals</span>
                 </Link>
               </li>
               <li>
-                <Link href="/products?category=new-arrivals" className="hover:text-primary transition-colors text-primary font-medium">
-                  ✦ New Arrivals
-                </Link>
-              </li>
-              <li>
-                <Link href="/products?category=necklaces-and-chains" className="hover:text-primary transition-colors">
+                <Link href="/products?category=necklaces-and-chains" className="hover:text-white transition-colors">
                   Necklaces & Chains
                 </Link>
               </li>
               <li>
-                <Link href="/products?category=rings" className="hover:text-primary transition-colors">
-                  Rings
+                <Link href="/products?category=rings" className="hover:text-white transition-colors">
+                  Rings & Bands
                 </Link>
               </li>
               <li>
-                <Link href="/products?category=earrings" className="hover:text-primary transition-colors">
-                  Earrings
+                <Link href="/products?category=earrings" className="hover:text-white transition-colors">
+                  Earrings & Hoops
                 </Link>
               </li>
               <li>
-                <Link href="/products?category=bracelets" className="hover:text-primary transition-colors">
-                  Bracelets
+                <Link href="/products?category=bracelets" className="hover:text-white transition-colors">
+                  Bracelets & Bangles
                 </Link>
               </li>
               <li>
-                <Link href="/products?category=bangles-kada" className="hover:text-primary transition-colors">
-                  Bangles & Kada
-                </Link>
-              </li>
-              <li>
-                <Link href="/products?category=watches" className="hover:text-primary transition-colors">
-                  Watches
-                </Link>
-              </li>
-              <li>
-                <Link href="/products?category=charms" className="hover:text-primary transition-colors">
-                  Charms
-                </Link>
-              </li>
-              <li>
-                <Link href="/products?category=hip-chains" className="hover:text-primary transition-colors">
-                  Hip Chains
-                </Link>
-              </li>
-              <li>
-                <Link href="/products?category=anklets" className="hover:text-primary transition-colors">
-                  Anklets
-                </Link>
-              </li>
-              <li>
-                <Link href="/products?category=kids-collection" className="hover:text-primary transition-colors">
-                  Kids Collection
+                <Link href="/products" className="text-[#C5A059] hover:underline transition-colors flex items-center gap-1 pt-1 font-medium">
+                  <span>All Collections</span>
+                  <span>→</span>
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Customer Care Column */}
-          <div className="space-y-3">
-            <h5 className="text-xs font-bold uppercase tracking-wider text-foreground">
-              Customer Concierge
+          {/* Column 3: Client Care & Policies (3 cols) */}
+          <div className="lg:col-span-3 space-y-3">
+            <h5 className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#C5A059]">
+              Client Concierge
             </h5>
-            <ul className="space-y-2 text-sm text-muted-foreground">
+            <ul className="space-y-2 text-xs sm:text-[13px] text-stone-400">
               <li>
                 <button
                   onClick={() => setPolicyModalTab("size-guide")}
-                  className="hover:text-primary transition-colors text-left flex items-center gap-1.5"
+                  className="hover:text-white transition-colors text-left"
                 >
-                  <Ruler className="w-3.5 h-3.5 text-primary" />
-                  <span>Bangle & Ring Size Guide</span>
+                  Bangle & Ring Size Guide
                 </button>
               </li>
               <li>
                 <button
                   onClick={() => setPolicyModalTab("care-guide")}
-                  className="hover:text-primary transition-colors text-left flex items-center gap-1.5"
+                  className="hover:text-white transition-colors text-left"
                 >
-                  <Sparkles className="w-3.5 h-3.5 text-primary" />
-                  <span>Jewelry Care (304 & 306 Steel)</span>
+                  Jewelry Care (304 & 306 Steel)
                 </button>
               </li>
               <li>
                 <button
                   onClick={() => setPolicyModalTab("shipping")}
-                  className="hover:text-primary transition-colors text-left flex items-center gap-1.5"
+                  className="hover:text-white transition-colors text-left"
                 >
-                  <Truck className="w-3.5 h-3.5 text-primary" />
-                  <span>Shipping via DTDC & India Post</span>
+                  Shipping via DTDC & India Post
                 </button>
               </li>
               <li>
                 <button
                   onClick={() => setPolicyModalTab("return-refund")}
-                  className="hover:text-primary transition-colors text-left flex items-center gap-1.5"
+                  className="hover:text-white transition-colors text-left"
                 >
-                  <RotateCcw className="w-3.5 h-3.5 text-primary" />
-                  <span>Return & Replacement Policy</span>
+                  360° Unboxing & Return Policy
                 </button>
               </li>
               <li>
                 <button
                   onClick={() => setPolicyModalTab("ordering-instructions")}
-                  className="hover:text-primary transition-colors text-left flex items-center gap-1.5"
+                  className="hover:text-white transition-colors text-left"
                 >
-                  <AlertCircle className="w-3.5 h-3.5 text-primary" />
-                  <span>Important Instructions</span>
+                  Pre-Order Instructions
                 </button>
               </li>
-              <li className="pt-1 border-t border-border/50">
-                <Link href="/account" className="hover:text-primary transition-colors">
-                  Order Status & Tracking
-                </Link>
-              </li>
-              <li>
-                <Link href="/account?tab=wishlist" className="hover:text-primary transition-colors">
-                  Saved Wishlist
+              <li className="pt-0.5">
+                <Link href="/account" className="hover:text-white transition-colors text-stone-300">
+                  Track Your Order
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Newsletter Column */}
-          <div className="space-y-3">
-            <h5 className="text-xs font-bold uppercase tracking-wider text-foreground">
-              Stay Informed
+          {/* Column 4: Newsletter / Stay Informed (3 cols) */}
+          <div className="lg:col-span-3 space-y-3">
+            <h5 className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#C5A059]">
+              Stay in Touch
             </h5>
-            <p className="text-xs text-muted-foreground">
-              Subscribe to receive private previews, seasonal catalogs, and 10% off your initial purchase.
+            <p className="text-xs text-stone-400 leading-relaxed font-light">
+              Receive private previews, secret seasonal catalogs, and 10% off your initial purchase.
             </p>
+
             {subscribed ? (
-              <div className="p-3 rounded-lg bg-primary/10 border border-primary/20 text-xs text-primary font-medium flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
-                <span>Thank you! Check your inbox for your 10% welcome voucher.</span>
+              <div className="p-3 rounded-xl bg-[#C5A059]/10 border border-[#C5A059]/30 text-xs text-[#FAF7F2] font-medium flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-[#C5A059] flex-shrink-0" />
+                <span>Thank you! Your 10% voucher code has been sent.</span>
               </div>
             ) : (
-              <form onSubmit={handleSubscribe} className="space-y-2">
+              <form onSubmit={handleSubscribe} className="relative flex items-center pt-1">
                 <input
                   type="email"
                   required
                   placeholder="Enter your email address"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-3 py-2 text-xs rounded-md bg-background border border-border focus:outline-none focus:ring-1 focus:ring-primary"
+                  className="w-full pl-3.5 pr-20 py-2.5 text-xs rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-stone-500 focus:outline-none focus:border-[#C5A059] focus:ring-1 focus:ring-[#C5A059] transition-all font-light"
                 />
                 <button
                   type="submit"
-                  className="w-full py-2 px-3 text-xs font-semibold rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                  className="absolute right-1 px-3.5 py-1.5 text-xs font-bold rounded-lg bg-[#C5A059] text-[#1C1917] hover:bg-[#D5B069] transition-all flex items-center gap-1 shadow-sm active:scale-95"
                 >
-                  Join the List
+                  <span>Join</span>
+                  <ArrowRight className="w-3 h-3" />
                 </button>
               </form>
             )}
+
+            <p className="text-[10px] text-stone-500 pt-1">
+              WhatsApp Support: +{storeConfig.brand.contact.whatsappNumber}
+            </p>
           </div>
         </div>
 
-        {/* Bottom Legal & Payment Badges */}
-        <div className="mt-12 pt-8 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
-          <p>© {new Date().getFullYear()} {storeConfig.meta.name}. All rights reserved.</p>
-          <div className="flex items-center gap-4">
-            <span className="text-[11px] font-medium tracking-wide">SECURE 256-BIT ENCRYPTION</span>
-            <span>•</span>
-            <span>100% SECURE DIRECT CHECKOUT</span>
+        {/* Bottom Legal & Minimal Trust Cues */}
+        <div className="mt-12 pt-8 border-t border-stone-800/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-stone-400">
+          <p>© {new Date().getFullYear()} {storeConfig.meta.name}. Fine Everyday Jewelry. All rights reserved.</p>
+          <div className="flex items-center gap-3 text-[11px] text-stone-400">
+            <span>304 & 306 Grade Steel</span>
+            <span className="text-stone-700">•</span>
+            <span>100% Anti-Tarnish</span>
+            <span className="text-stone-700">•</span>
+            <span>Free Shipping Over ₹799</span>
           </div>
         </div>
       </div>
