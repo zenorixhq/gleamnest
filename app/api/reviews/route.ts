@@ -50,6 +50,16 @@ async function ensureTable() {
 }
 
 async function readData() {
+  let fileData = getInitialData();
+  try {
+    if (fs.existsSync(dataFilePath)) {
+      const content = fs.readFileSync(dataFilePath, "utf8");
+      fileData = sanitizeData(JSON.parse(content));
+    }
+  } catch (e) {
+    console.error("Error reading fallback clientReviews.json:", e);
+  }
+
   // 1. Try reading from Neon PostgreSQL database
   try {
     await ensureTable();
@@ -58,24 +68,17 @@ async function readData() {
     `);
     if (rows && rows.length > 0 && rows[0]?.value) {
       const parsed = JSON.parse(rows[0].value);
-      return sanitizeData(parsed);
+      const sanitized = sanitizeData(parsed);
+      if (!sanitized.instagramVideos || sanitized.instagramVideos.length === 0) {
+        sanitized.instagramVideos = fileData.instagramVideos || [];
+      }
+      return sanitized;
     }
   } catch (e) {
     console.warn("Database read for client_reviews unavailable, checking fallback file:", e);
   }
 
-  // 2. Fallback to reading data/clientReviews.json from disk
-  try {
-    if (fs.existsSync(dataFilePath)) {
-      const content = fs.readFileSync(dataFilePath, "utf8");
-      const parsed = JSON.parse(content);
-      return sanitizeData(parsed);
-    }
-  } catch (e) {
-    console.error("Error reading fallback clientReviews.json:", e);
-  }
-
-  return getInitialData();
+  return fileData;
 }
 
 async function writeData(data: any) {
@@ -251,6 +254,83 @@ export async function POST(req: Request) {
     console.error("Error in POST /api/reviews:", err);
     return NextResponse.json(
       { error: err.message || "Failed to add item" },
+      { status: 500, headers: NO_CACHE_HEADERS }
+    );
+  }
+}
+
+export async function PUT(req: Request) {
+  try {
+    const body = await req.json();
+    const { id, type } = body;
+
+    if (!id) {
+      return NextResponse.json({ error: "Missing id" }, { status: 400, headers: NO_CACHE_HEADERS });
+    }
+
+    const data = await readData();
+    const targetId = String(id).trim();
+
+    if (type === "instagramVideo" || !type) {
+      let found = false;
+      data.instagramVideos = (data.instagramVideos || []).map((v: any) => {
+        if (String(v.id).trim() === targetId) {
+          found = true;
+          return {
+            ...v,
+            ...(body.videoUrl !== undefined ? { videoUrl: body.videoUrl } : {}),
+            ...(body.poster !== undefined ? { poster: body.poster } : {}),
+            ...(body.title !== undefined ? { title: body.title } : {}),
+            ...(body.caption !== undefined ? { caption: body.caption } : {}),
+            ...(body.handle !== undefined ? { handle: body.handle } : {}),
+            ...(body.views !== undefined ? { views: body.views } : {}),
+            ...(body.instagramLink !== undefined ? { instagramLink: body.instagramLink } : {}),
+          };
+        }
+        return v;
+      });
+
+      if (!found && body.videoUrl) {
+        data.instagramVideos.push({
+          id: targetId,
+          title: body.title || "Jewelry Styling Reel",
+          handle: body.handle || "@gleamnest.in",
+          caption: body.caption || "",
+          videoUrl: body.videoUrl,
+          poster: body.poster || "",
+          views: body.views || "25K",
+          instagramLink: body.instagramLink || "",
+        });
+      }
+    } else if (type === "video") {
+      data.videoReels = (data.videoReels || []).map((v: any) => {
+        if (String(v.id).trim() === targetId) {
+          return { ...v, ...body };
+        }
+        return v;
+      });
+    } else if (type === "screenshot") {
+      data.feedbackScreenshots = (data.feedbackScreenshots || []).map((s: any) => {
+        if (String(s.id).trim() === targetId) {
+          return { ...s, ...body };
+        }
+        return s;
+      });
+    } else {
+      data.reviews = (data.reviews || []).map((r: any) => {
+        if (String(r.id).trim() === targetId) {
+          return { ...r, ...body };
+        }
+        return r;
+      });
+    }
+
+    await writeData(data);
+    return NextResponse.json({ success: true, data }, { headers: NO_CACHE_HEADERS });
+  } catch (err: any) {
+    console.error("Error in PUT /api/reviews:", err);
+    return NextResponse.json(
+      { error: err.message || "Failed to update item" },
       { status: 500, headers: NO_CACHE_HEADERS }
     );
   }

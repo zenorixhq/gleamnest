@@ -58,7 +58,7 @@ export default function AdminDashboardPage() {
   const updateProduct = useProductStore((s) => s.updateProduct);
   const deleteProduct = useProductStore((s) => s.deleteProduct);
 
-  const [activeTab, setActiveTab] = useState<"overview" | "orders" | "inventory" | "config" | "reviews" | "collections">("inventory");
+  const [activeTab, setActiveTab] = useState<"overview" | "orders" | "inventory" | "config" | "reviews" | "collections" | "reels">("inventory");
   const [searchQuery, setSearchQuery] = useState("");
 
   // Curated Collections (Category Cards) State
@@ -79,6 +79,8 @@ export default function AdminDashboardPage() {
   const [videosList, setVideosList] = useState<any[]>([]);
   const [feedbackScreenshotsList, setFeedbackScreenshotsList] = useState<any[]>([]);
   const [instagramVideosList, setInstagramVideosList] = useState<any[]>([]);
+  const [editingInstaVideo, setEditingInstaVideo] = useState<any | null>(null);
+  const [updatingInstaVideoId, setUpdatingInstaVideoId] = useState<string | null>(null);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
   const [isScreenshotModalOpen, setIsScreenshotModalOpen] = useState(false);
@@ -551,12 +553,106 @@ export default function AdminDashboardPage() {
   };
 
   // Instagram Video ("Follow The House") Handlers
+  const handleInstaCardVideoUpload = async (videoId: string | number, file: File) => {
+    setUpdatingInstaVideoId(String(videoId));
+    try {
+      const publicUrl = await uploadFileToServer(file, "videos");
+      if (!publicUrl) throw new Error("Video upload failed");
+
+      // Update state locally
+      setInstagramVideosList((prev) =>
+        prev.map((v) => (String(v.id) === String(videoId) ? { ...v, videoUrl: publicUrl } : v))
+      );
+
+      // Persist to DB via PUT /api/reviews
+      const videoToUpdate = instagramVideosList.find((v) => String(v.id) === String(videoId));
+      await fetch("/api/reviews", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...(videoToUpdate || {}),
+          id: videoId,
+          type: "instagramVideo",
+          videoUrl: publicUrl,
+        }),
+      });
+
+      fetchReviewsAndVideos();
+    } catch (err: any) {
+      console.error("Failed to upload video reel:", err);
+      alert("Failed to upload video: " + (err?.message || "Unknown error"));
+    } finally {
+      setUpdatingInstaVideoId(null);
+    }
+  };
+
+  const handleInstaCardPosterUpload = async (videoId: string | number, file: File) => {
+    setUpdatingInstaVideoId(String(videoId));
+    try {
+      const publicUrl = await uploadFileToServer(file, "images");
+      if (!publicUrl) throw new Error("Image upload failed");
+
+      // Update state locally
+      setInstagramVideosList((prev) =>
+        prev.map((v) => (String(v.id) === String(videoId) ? { ...v, poster: publicUrl } : v))
+      );
+
+      // Persist to DB via PUT /api/reviews
+      const videoToUpdate = instagramVideosList.find((v) => String(v.id) === String(videoId));
+      await fetch("/api/reviews", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...(videoToUpdate || {}),
+          id: videoId,
+          type: "instagramVideo",
+          poster: publicUrl,
+        }),
+      });
+
+      fetchReviewsAndVideos();
+    } catch (err: any) {
+      console.error("Failed to upload poster:", err);
+      alert("Failed to upload cover image: " + (err?.message || "Unknown error"));
+    } finally {
+      setUpdatingInstaVideoId(null);
+    }
+  };
+
+  const handleOpenAddInstaVideo = () => {
+    setEditingInstaVideo(null);
+    setInstaVideoForm({
+      title: "",
+      handle: "@gleamnest.in",
+      caption: "",
+      videoUrl: "",
+      poster: "",
+      views: "28.4K",
+      instagramLink: "https://www.instagram.com/gleamnest.in?igsh=c3I4M2h1YmprdXI5",
+    });
+    setIsInstaVideoModalOpen(true);
+  };
+
+  const handleOpenEditInstaVideo = (video: any) => {
+    setEditingInstaVideo(video);
+    setInstaVideoForm({
+      title: video.title || "",
+      handle: video.handle || "@gleamnest.in",
+      caption: video.caption || "",
+      videoUrl: video.videoUrl || "",
+      poster: video.poster || "",
+      views: video.views || "15.4K views",
+      instagramLink: video.instagramLink || "",
+    });
+    setIsInstaVideoModalOpen(true);
+  };
+
   const handleInstaVideoFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 80 * 1024 * 1024) {
-      alert("Video file is larger than 80MB. Please choose a smaller video clip.");
+    if (file.size > 150 * 1024 * 1024) {
+      alert("Video file is larger than 150MB. Please choose a smaller video clip.");
       return;
     }
 
@@ -592,16 +688,35 @@ export default function AdminDashboardPage() {
     }
     setIsSavingItem(true);
     try {
-      const res = await fetch("/api/reviews", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...instaVideoForm, type: "instagramVideo" }),
-      });
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        throw new Error(data.error || "Failed to add Instagram video");
+      if (editingInstaVideo) {
+        // PUT
+        const res = await fetch("/api/reviews", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ...instaVideoForm,
+            id: editingInstaVideo.id,
+            type: "instagramVideo",
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          throw new Error(data.error || "Failed to update Instagram video");
+        }
+      } else {
+        // POST
+        const res = await fetch("/api/reviews", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ...instaVideoForm, type: "instagramVideo" }),
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          throw new Error(data.error || "Failed to add Instagram video");
+        }
       }
       setIsInstaVideoModalOpen(false);
+      setEditingInstaVideo(null);
       setInstaVideoForm({
         title: "Jewelry Styling Reel",
         handle: "@gleamnest.in",
@@ -613,7 +728,7 @@ export default function AdminDashboardPage() {
       });
       fetchReviewsAndVideos();
     } catch (err: any) {
-      alert(err.message || "Error adding Instagram video");
+      alert(err.message || "Error saving Instagram video");
     } finally {
       setIsSavingItem(false);
     }
@@ -1136,6 +1251,18 @@ export default function AdminDashboardPage() {
           >
             <Sparkles className="w-4 h-4 text-[#C5A059]" />
             <span>Curated Collections Cards ({categoriesList.length})</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab("reels")}
+            className={`flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-lg transition-all ${
+              activeTab === "reels"
+                ? "bg-primary text-primary-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground hover:bg-muted"
+            }`}
+          >
+            <Instagram className="w-4 h-4 text-[#E1306C]" />
+            <span>Follow The House (Reels) ({instagramVideosList.length})</span>
           </button>
         </div>
 
@@ -2081,6 +2208,243 @@ export default function AdminDashboardPage() {
             </div>
           </div>
         )}
+
+        {/* Tab: Follow The House Video Reels */}
+        {activeTab === "reels" && (
+          <div className="bg-card border border-border rounded-2xl p-6 shadow-sm space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/60 pb-5">
+              <div>
+                <div className="flex items-center gap-2">
+                  <Instagram className="w-5 h-5 text-[#E1306C]" />
+                  <h3 className="text-base font-bold text-foreground">
+                    Follow The House — Instagram Video Reels ({instagramVideosList.length})
+                  </h3>
+                </div>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Manage the playable jewelry videos featured in the homepage &quot;FOLLOW THE HOUSE&quot; section. Upload MP4 video reels from your phone/PC, change thumbnails, or edit reel details.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2.5 flex-wrap">
+                <a
+                  href="https://www.instagram.com/gleamnest.in?igsh=c3I4M2h1YmprdXI5"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="px-3 py-2 rounded-xl border border-border hover:bg-muted text-xs font-semibold text-muted-foreground hover:text-foreground flex items-center gap-1.5 transition-colors"
+                >
+                  <Instagram className="w-3.5 h-3.5 text-[#E1306C]" />
+                  <span>@gleamnest.in ↗</span>
+                </a>
+                <button
+                  type="button"
+                  onClick={handleOpenAddInstaVideo}
+                  className="px-4 py-2 rounded-xl bg-primary text-primary-foreground font-semibold text-xs flex items-center gap-1.5 shadow-sm hover:bg-primary/90 transition-colors"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>+ Upload New Reel</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Grid of Follow The House Video Cards */}
+            {instagramVideosList.length === 0 ? (
+              <div className="p-12 rounded-xl border border-dashed border-border text-center space-y-3">
+                <div className="w-12 h-12 rounded-full bg-pink-500/10 text-[#E1306C] flex items-center justify-center mx-auto">
+                  <Instagram className="w-6 h-6" />
+                </div>
+                <p className="text-sm font-bold text-foreground">No Video Reels Added Yet</p>
+                <p className="text-xs text-muted-foreground max-w-sm mx-auto">
+                  Upload MP4 styling videos, shower tests, or unboxing reels from your device to feature on the homepage.
+                </p>
+                <button
+                  type="button"
+                  onClick={handleOpenAddInstaVideo}
+                  className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/90 shadow-sm"
+                >
+                  + Upload First Video Reel
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+                {instagramVideosList.map((video, index) => {
+                  const isDirectVideo =
+                    video.videoUrl &&
+                    (video.videoUrl.includes(".mp4") ||
+                      video.videoUrl.includes(".webm") ||
+                      video.videoUrl.includes("blob.vercel-storage.com") ||
+                      video.videoUrl.startsWith("/uploads/") ||
+                      video.videoUrl.startsWith("data:video") ||
+                      video.videoUrl.includes("assets.mixkit.co"));
+
+                  return (
+                    <div
+                      key={video.id || index}
+                      className="group relative rounded-xl border border-border/80 bg-background overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col"
+                    >
+                      {/* Reel Video Preview Container */}
+                      <div className="relative aspect-[9/15] w-full overflow-hidden bg-stone-900">
+                        {isDirectVideo ? (
+                          <video
+                            src={video.videoUrl}
+                            poster={video.poster}
+                            autoPlay
+                            loop
+                            muted
+                            playsInline
+                            preload="metadata"
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          />
+                        ) : (
+                          <img
+                            src={
+                              video.poster ||
+                              "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&q=80&w=700"
+                            }
+                            alt={video.title}
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          />
+                        )}
+
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-black/35 pointer-events-none" />
+
+                        {/* Top Badges */}
+                        <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5">
+                          <span className="px-2 py-0.5 rounded-md bg-black/60 backdrop-blur-sm text-[10px] font-semibold text-white/90 border border-white/10">
+                            Reel #{index + 1}
+                          </span>
+                          <span className="px-2 py-0.5 rounded-md bg-[#E1306C]/80 backdrop-blur-sm text-[10px] font-semibold text-white">
+                            {video.views || "28K views"}
+                          </span>
+                        </div>
+
+                        {/* Direct 1-Click Upload Buttons */}
+                        <div className="absolute top-2.5 right-2.5 flex flex-col gap-1.5">
+                          {/* 1-Click Change Video (MP4) */}
+                          <label
+                            htmlFor={`reel-vid-file-${video.id}`}
+                            className={`px-2.5 py-1.5 rounded-lg bg-black/80 hover:bg-black text-white text-[11px] font-medium backdrop-blur-sm border border-white/20 shadow-md cursor-pointer flex items-center gap-1.5 transition-all ${
+                              updatingInstaVideoId === String(video.id)
+                                ? "opacity-50 pointer-events-none"
+                                : ""
+                            }`}
+                            title="Upload new video reel file (MP4/WebM) from your device"
+                          >
+                            <Upload className="w-3.5 h-3.5 text-pink-400" />
+                            <span>Change Video</span>
+                          </label>
+                          <input
+                            id={`reel-vid-file-${video.id}`}
+                            type="file"
+                            accept="video/mp4,video/webm,video/quicktime,video/*"
+                            disabled={updatingInstaVideoId === String(video.id) || isUploading}
+                            onChange={(e) => {
+                              const f = e.target.files?.[0];
+                              if (f) handleInstaCardVideoUpload(video.id, f);
+                              e.target.value = "";
+                            }}
+                            className="hidden"
+                          />
+
+                          {/* 1-Click Change Cover / Thumbnail */}
+                          <label
+                            htmlFor={`reel-poster-file-${video.id}`}
+                            className={`px-2.5 py-1.5 rounded-lg bg-black/80 hover:bg-black text-white text-[11px] font-medium backdrop-blur-sm border border-white/20 shadow-md cursor-pointer flex items-center gap-1.5 transition-all ${
+                              updatingInstaVideoId === String(video.id)
+                                ? "opacity-50 pointer-events-none"
+                                : ""
+                            }`}
+                            title="Upload new cover image from your device"
+                          >
+                            <Camera className="w-3.5 h-3.5 text-[#C5A059]" />
+                            <span>Change Cover</span>
+                          </label>
+                          <input
+                            id={`reel-poster-file-${video.id}`}
+                            type="file"
+                            accept="image/*"
+                            disabled={updatingInstaVideoId === String(video.id) || isUploading}
+                            onChange={(e) => {
+                              const f = e.target.files?.[0];
+                              if (f) handleInstaCardPosterUpload(video.id, f);
+                              e.target.value = "";
+                            }}
+                            className="hidden"
+                          />
+                        </div>
+
+                        {/* Uploading progress indicator */}
+                        {updatingInstaVideoId === String(video.id) && (
+                          <div className="absolute inset-0 bg-black/80 backdrop-blur-xs flex flex-col items-center justify-center p-4 text-center z-10">
+                            <Clock className="w-6 h-6 text-pink-400 animate-spin mb-2" />
+                            <span className="text-xs font-bold text-white">Uploading &amp; Saving Reel...</span>
+                            <span className="text-[10px] text-white/70 mt-1">Direct upload to Cloud CDN</span>
+                          </div>
+                        )}
+
+                        {/* Bottom Text Details */}
+                        <div className="absolute bottom-3 left-3 right-3 text-white pointer-events-none space-y-0.5">
+                          <p className="text-[10px] text-[#F3DFB0] font-mono tracking-wider">
+                            {video.handle || "@gleamnest.in"}
+                          </p>
+                          <h4 className="text-xs sm:text-sm font-bold leading-tight text-white drop-shadow line-clamp-1">
+                            {video.title}
+                          </h4>
+                          {video.caption && (
+                            <p className="text-[11px] text-white/80 line-clamp-1 font-light drop-shadow-sm">
+                              {video.caption}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Card Actions Footer */}
+                      <div className="p-3 bg-card border-t border-border flex items-center justify-between gap-2 mt-auto">
+                        <div className="min-w-0 flex-1">
+                          <span className="font-bold text-xs text-foreground block truncate">
+                            {video.title}
+                          </span>
+                          <span className="text-[10px] text-muted-foreground font-mono block truncate">
+                            {video.handle || "@gleamnest.in"} • {video.views || "28K"}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center gap-1">
+                          <button
+                            type="button"
+                            onClick={() => handleOpenEditInstaVideo(video)}
+                            className="p-1.5 rounded-lg border border-border hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                            title="Edit reel caption, title, or links"
+                          >
+                            <Pencil className="w-3.5 h-3.5" />
+                          </button>
+
+                          <a
+                            href={video.instagramLink || video.videoUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="p-1.5 rounded-lg border border-border hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                            title="View video link / Instagram"
+                          >
+                            <ExternalLink className="w-3.5 h-3.5" />
+                          </a>
+
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteInstaVideo(video.id)}
+                            className="p-1.5 rounded-lg border border-red-200 hover:bg-red-50 text-red-600 dark:border-red-900/50 dark:hover:bg-red-950/40 transition-colors"
+                            title="Remove video reel"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Product Add / Edit Modal */}
@@ -2921,9 +3285,13 @@ export default function AdminDashboardPage() {
           <div className="relative w-full max-w-lg bg-card border border-border rounded-2xl shadow-2xl overflow-hidden z-10 my-8 animate-in fade-in zoom-in-95">
             <div className="px-6 py-4 border-b border-border flex items-center justify-between">
               <div>
-                <h3 className="text-base font-bold text-foreground">Add Instagram Video</h3>
+                <h3 className="text-base font-bold text-foreground">
+                  {editingInstaVideo ? "Edit Follow The House Reel" : "Add Follow The House Reel"}
+                </h3>
                 <p className="text-xs text-muted-foreground">
-                  Paste Instagram reel link OR upload styling video from device
+                  {editingInstaVideo
+                    ? "Update video file, cover thumbnail, caption, or Instagram link"
+                    : "Upload styling reel (MP4) from device OR paste Instagram reel link"}
                 </p>
               </div>
               <button
@@ -2988,17 +3356,29 @@ export default function AdminDashboardPage() {
                 </div>
 
                 {instaVideoForm.videoUrl && (
-                  <div className="pt-2 flex items-center justify-between text-xs border-t border-border/60">
-                    <span className="text-emerald-600 font-semibold truncate max-w-[280px]">
-                      ✓ Video Linked ({instaVideoForm.videoUrl.slice(-25)})
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => setInstaVideoForm({ ...instaVideoForm, videoUrl: "" })}
-                      className="text-[11px] text-red-600 hover:underline"
-                    >
-                      Clear
-                    </button>
+                  <div className="pt-2 space-y-2 border-t border-border/60">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-emerald-600 font-semibold truncate max-w-[280px]">
+                        ✓ Video Attached ({instaVideoForm.videoUrl.slice(-30)})
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setInstaVideoForm({ ...instaVideoForm, videoUrl: "" })}
+                        className="text-[11px] text-red-600 hover:underline"
+                      >
+                        Remove Video
+                      </button>
+                    </div>
+                    {instaVideoForm.videoUrl.startsWith("http") && !instaVideoForm.videoUrl.includes("instagram.com/reel") && (
+                      <div className="w-28 aspect-[9/14] rounded-lg overflow-hidden border border-border bg-black">
+                        <video
+                          src={instaVideoForm.videoUrl}
+                          controls
+                          muted
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -3130,7 +3510,7 @@ export default function AdminDashboardPage() {
                   className="px-6 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/90 shadow-md disabled:opacity-50 flex items-center gap-1.5"
                 >
                   {isSavingItem && <Clock className="w-3.5 h-3.5 animate-spin" />}
-                  <span>{isSavingItem ? "Saving..." : "Save Instagram Video"}</span>
+                  <span>{isSavingItem ? "Saving..." : editingInstaVideo ? "Update Video Reel" : "Save Video Reel"}</span>
                 </button>
               </div>
             </form>

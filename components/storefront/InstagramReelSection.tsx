@@ -206,7 +206,7 @@ export function InstagramReelSection() {
     fetch(`/api/reviews?t=${Date.now()}`, { cache: "no-store" })
       .then((res) => res.json())
       .then((data) => {
-        if (Array.isArray(data.instagramVideos)) {
+        if (Array.isArray(data.instagramVideos) && data.instagramVideos.length > 0) {
           setVideos(data.instagramVideos);
         }
       })
