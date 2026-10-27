@@ -9,8 +9,7 @@ import {
   X,
   ExternalLink,
   Sparkles,
-  ChevronLeft,
-  ChevronRight,
+  Maximize2,
 } from "lucide-react";
 
 export interface InstagramVideoItem {
@@ -68,6 +67,135 @@ const defaultInstagramVideos: InstagramVideoItem[] = [
   },
 ];
 
+function AutoPlayingInstaCard({
+  vid,
+  onClick,
+}: {
+  vid: InstagramVideoItem;
+  onClick: () => void;
+}) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [isMuted, setIsMuted] = useState(true);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            video.play().catch(() => {});
+          } else {
+            video.pause();
+          }
+        });
+      },
+      { threshold: 0.2 }
+    );
+
+    observer.observe(video);
+    video.play().catch(() => {});
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [vid.videoUrl]);
+
+  const toggleSound = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (videoRef.current) {
+      videoRef.current.muted = !isMuted;
+      setIsMuted(!isMuted);
+    }
+  };
+
+  const isDirectVideo =
+    vid.videoUrl &&
+    (vid.videoUrl.includes(".mp4") ||
+      vid.videoUrl.includes(".webm") ||
+      vid.videoUrl.includes("blob.vercel-storage.com") ||
+      vid.videoUrl.startsWith("/uploads/") ||
+      vid.videoUrl.startsWith("data:video") ||
+      vid.videoUrl.includes("assets.mixkit.co"));
+
+  return (
+    <div
+      onClick={onClick}
+      className="group relative aspect-[9/15] rounded-2xl overflow-hidden bg-stone-900 shadow-md hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-500 ease-out cursor-pointer border border-[#EADBBE]"
+    >
+      {/* Active playing video directly in card */}
+      {isDirectVideo ? (
+        <video
+          ref={videoRef}
+          src={vid.videoUrl}
+          poster={vid.poster}
+          autoPlay
+          loop
+          muted={isMuted}
+          playsInline
+          preload="metadata"
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+        />
+      ) : (
+        <img
+          src={
+            vid.poster ||
+            "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&q=80&w=700"
+          }
+          alt={vid.title}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+        />
+      )}
+
+      {/* Gradient Dark Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/15 to-black/35 flex flex-col justify-between p-3.5 sm:p-4 text-white pointer-events-none">
+        {/* Top Badges */}
+        <div className="flex items-center justify-between text-xs pointer-events-auto">
+          <div className="flex items-center gap-1.5 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] font-semibold tracking-wide">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span>{vid.views ? `${vid.views} views` : "Reel"}</span>
+          </div>
+
+          <div className="flex items-center gap-1.5">
+            {isDirectVideo && (
+              <button
+                type="button"
+                onClick={toggleSound}
+                className="w-7 h-7 rounded-full bg-black/60 hover:bg-black/90 backdrop-blur flex items-center justify-center text-white transition-all shadow"
+                title={isMuted ? "Unmute sound" : "Mute sound"}
+              >
+                {isMuted ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5 text-amber-400" />}
+              </button>
+            )}
+            <div className="w-7 h-7 rounded-full bg-white/20 backdrop-blur flex items-center justify-center group-hover:bg-[#E1306C] transition-colors">
+              <Instagram className="w-3.5 h-3.5 text-white" />
+            </div>
+          </div>
+        </div>
+
+        {/* Center Hover Action */}
+        <div className="self-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 w-11 h-11 rounded-full bg-white/90 text-stone-900 flex items-center justify-center shadow-xl group-hover:scale-110">
+          <Maximize2 className="w-4 h-4 text-[#1C1917]" />
+        </div>
+
+        {/* Bottom Details */}
+        <div className="space-y-1">
+          <p className="text-xs sm:text-sm font-semibold text-white line-clamp-1 leading-snug drop-shadow-sm">
+            {vid.title}
+          </p>
+          <p className="text-[11px] text-white/85 line-clamp-1 font-light drop-shadow-sm">
+            {vid.caption}
+          </p>
+          <span className="inline-block text-[10px] text-[#F3DFB0] font-mono tracking-wider">
+            {vid.handle || "@gleamnest.in"}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function InstagramReelSection() {
   const [videos, setVideos] = useState<InstagramVideoItem[]>(defaultInstagramVideos);
   const [activeVideo, setActiveVideo] = useState<InstagramVideoItem | null>(null);
@@ -100,11 +228,10 @@ export function InstagramReelSection() {
     return null;
   }
 
-
   return (
-    <section className="w-full bg-[#FAF7F2] py-16 sm:py-20 border-t border-[#EADBBE]/80 overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-        {/* Header: FOLLOW THE HOUSE & Large Editorial Handle */}
+    <section className="w-full bg-[#FAF7F2] py-16 sm:py-24 border-t border-[#EADBBE]/80 text-[#1C1917]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 sm:space-y-12">
+        {/* Section Header */}
         <div className="text-center space-y-2">
           <div className="flex items-center justify-center gap-2">
             <span className="w-2 h-2 rounded-full bg-[#C5A059] animate-pulse" />
@@ -123,56 +250,18 @@ export function InstagramReelSection() {
             <Instagram className="w-6 h-6 sm:w-8 sm:h-8 text-[#C5A059]" />
           </a>
           <p className="text-xs sm:text-sm text-stone-600 font-light max-w-md mx-auto">
-            Watch our latest Instagram styling reels, water tests, and styling inspiration directly on site.
+            Watch our latest styling reels, water tests, and styling inspiration directly on site.
           </p>
         </div>
 
-        {/* Video Reels Grid (Shown directly in the site) */}
+        {/* Video Reels Grid (Continuous Autoplay on Site) */}
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
           {videos.map((vid) => (
-            <div
+            <AutoPlayingInstaCard
               key={vid.id}
+              vid={vid}
               onClick={() => setActiveVideo(vid)}
-              className="group relative aspect-[9/15] rounded-2xl overflow-hidden bg-stone-900 shadow-md hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-500 ease-out cursor-pointer border border-[#EADBBE]"
-            >
-              {/* Poster Image / Background */}
-              <img
-                src={vid.poster || "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&q=80&w=700"}
-                alt={vid.title}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-              />
-
-              {/* Gradient Dark Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-black/30 flex flex-col justify-between p-3.5 sm:p-4 text-white">
-                {/* Top Badge: Views & Instagram Logo */}
-                <div className="flex items-center justify-between text-xs">
-                  <span className="bg-black/60 backdrop-blur-md px-2.5 py-0.5 rounded-full text-[10px] font-semibold tracking-wide">
-                    {vid.views ? `${vid.views} views` : "Instagram Reel"}
-                  </span>
-                  <div className="w-7 h-7 rounded-full bg-white/20 backdrop-blur flex items-center justify-center group-hover:bg-[#E1306C] transition-colors">
-                    <Instagram className="w-3.5 h-3.5 text-white" />
-                  </div>
-                </div>
-
-                {/* Center Animated Play Button */}
-                <div className="self-center w-12 h-12 rounded-full bg-white/95 text-stone-900 flex items-center justify-center shadow-xl group-hover:scale-115 group-hover:bg-white transition-all duration-300">
-                  <Play className="w-5 h-5 fill-current ml-0.5 text-[#1C1917]" />
-                </div>
-
-                {/* Bottom Video Details */}
-                <div className="space-y-1">
-                  <p className="text-xs sm:text-sm font-semibold text-white line-clamp-1 leading-snug">
-                    {vid.title}
-                  </p>
-                  <p className="text-[11px] text-white/80 line-clamp-1 font-light">
-                    {vid.caption}
-                  </p>
-                  <span className="inline-block text-[10px] text-[#F3DFB0] font-mono tracking-wider">
-                    {vid.handle || "@gleamnest.in"}
-                  </span>
-                </div>
-              </div>
-            </div>
+            />
           ))}
         </div>
 
@@ -191,7 +280,7 @@ export function InstagramReelSection() {
         </div>
       </div>
 
-      {/* Video Modal Player (Plays video right inside the site!) */}
+      {/* Video Modal Player (Expanded View with Audio) */}
       {activeVideo && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200"
@@ -248,31 +337,29 @@ export function InstagramReelSection() {
                   loop
                   playsInline
                   muted={isMuted}
-                  controls
                   className="w-full h-full object-cover"
                 />
               )}
             </div>
 
-            {/* Video Footer & Instagram Link */}
-            <div className="p-4 bg-stone-900 space-y-2 text-white">
-              <p className="text-xs text-stone-300 font-light leading-relaxed line-clamp-2">
-                {activeVideo.caption}
-              </p>
-              <div className="pt-2 flex items-center justify-between border-t border-stone-800 text-xs">
-                <span className="text-stone-400 text-[11px] font-mono">
-                  {activeVideo.views ? `${activeVideo.views} views` : "GleamNest Reel"}
-                </span>
+            {/* Caption & Instagram CTA Bar */}
+            <div className="p-4 bg-stone-900 border-t border-stone-800 flex items-center justify-between gap-3 text-white">
+              <div className="space-y-0.5 max-w-[65%]">
+                <p className="text-xs font-semibold truncate">{activeVideo.title}</p>
+                <p className="text-[11px] text-stone-400 line-clamp-1">{activeVideo.caption}</p>
+              </div>
+
+              {activeVideo.instagramLink && (
                 <a
-                  href={activeVideo.instagramLink || "https://www.instagram.com/gleamnest.in?igsh=c3I4M2h1YmprdXI5"}
+                  href={activeVideo.instagramLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-3 py-1.5 rounded-lg bg-[#E1306C] hover:bg-[#c9245c] text-white text-[11px] font-bold flex items-center gap-1.5 transition-colors shadow-sm"
+                  className="px-3.5 py-1.5 rounded-full bg-[#E1306C] text-white text-xs font-semibold hover:bg-[#C1275B] transition-colors flex items-center gap-1.5 shrink-0"
                 >
                   <Instagram className="w-3.5 h-3.5" />
-                  <span>Open in Instagram</span>
+                  <span>View Post</span>
                 </a>
-              </div>
+              )}
             </div>
           </div>
         </div>

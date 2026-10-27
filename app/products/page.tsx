@@ -26,6 +26,7 @@ function ProductCatalogContent() {
 
   const products = useProductStore((s) => s.products);
   const fetchProducts = useProductStore((s) => s.fetchProducts);
+  const hasLoaded = useProductStore((s) => s.hasLoaded);
 
   // Sync with database on mount
   useEffect(() => {
@@ -323,7 +324,19 @@ function ProductCatalogContent() {
       </div>
 
       {/* 4. Product Grid: Exactly 4 Items per Row on Desktop */}
-      {displayedProducts.length === 0 ? (
+      {!hasLoaded && products.length === 0 ? (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 py-4">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div
+              key={i}
+              className="aspect-[3/4] rounded-2xl bg-[#EADBBE]/20 animate-pulse border border-[#EADBBE]/40 flex flex-col justify-end p-4 space-y-2"
+            >
+              <div className="h-4 bg-stone-200/80 rounded w-3/4 animate-pulse" />
+              <div className="h-3 bg-stone-200/60 rounded w-1/2 animate-pulse" />
+            </div>
+          ))}
+        </div>
+      ) : displayedProducts.length === 0 ? (
         <div className="py-20 text-center rounded-2xl border border-dashed border-border bg-card p-8 space-y-4">
           <div className="w-12 h-12 rounded-full bg-muted mx-auto flex items-center justify-center text-muted-foreground">
             <Search className="w-6 h-6" />

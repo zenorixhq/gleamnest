@@ -48,8 +48,7 @@ export async function GET() {
     });
 
     if (dbProducts.length === 0) {
-      // Return fallback products if DB empty
-      return NextResponse.json(fallbackProducts);
+      return NextResponse.json([]);
     }
 
     // Format DB products into application Product interface
@@ -57,7 +56,7 @@ export async function GET() {
     return NextResponse.json(formatted);
   } catch (err) {
     console.error("GET /api/products error:", err);
-    return NextResponse.json(fallbackProducts);
+    return NextResponse.json([]);
   }
 }
 

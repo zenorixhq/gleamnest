@@ -3,8 +3,9 @@
 import { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { sampleOrders, products } from "@/data/mockData";
+import { sampleOrders } from "@/data/mockData";
 import { useCartStore } from "@/store/useCartStore";
+import { useProductStore } from "@/store/useProductStore";
 import { formatPrice } from "@/lib/utils";
 import { ProductCard } from "@/components/storefront/ProductCard";
 import {
@@ -27,6 +28,7 @@ function AccountPageContent() {
   const wishlist = useCartStore((s) => s.wishlist);
   const selectedCurrency = useCartStore((s) => s.selectedCurrency);
   const addItem = useCartStore((s) => s.addItem);
+  const products = useProductStore((s) => s.products);
 
   const wishlistProducts = products.filter((p) => wishlist.includes(p.id));
 
