@@ -592,21 +592,23 @@ export default function AdminDashboardPage() {
     }
   };
 
-  const handleImageFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 5 * 1024 * 1024) {
-      alert("Image is larger than 5MB. Please choose an optimized image under 5MB.");
+    if (file.size > 25 * 1024 * 1024) {
+      alert("Image is larger than 25MB. Please choose a smaller image.");
       return;
     }
 
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const dataUrl = reader.result as string;
-      setFormState((prev) => ({ ...prev, imageUrl: dataUrl }));
-    };
-    reader.readAsDataURL(file);
+    try {
+      const publicUrl = await uploadFileToServer(file, "images");
+      setFormState((prev) => ({ ...prev, imageUrl: publicUrl }));
+    } catch (err: any) {
+      alert("Error uploading image: " + (err.message || "Upload failed"));
+    } finally {
+      e.target.value = "";
+    }
   };
 
   const handleSaveProduct = async (e: React.FormEvent) => {
