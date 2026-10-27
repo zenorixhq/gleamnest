@@ -40,6 +40,7 @@ import {
   Instagram,
   Camera,
 } from "lucide-react";
+import { upload } from "@vercel/blob/client";
 
 export default function AdminDashboardPage() {
   // Authentication State
@@ -285,6 +286,22 @@ export default function AdminDashboardPage() {
       }
 
       setUploadProgressText(`Uploading ${fileToUpload.name} (${(fileToUpload.size / (1024 * 1024)).toFixed(1)} MB)...`);
+
+      // 1. Direct client-to-cloud Vercel Blob upload (supports files up to 150MB directly to CDN)
+      try {
+        const cleanName = `${folder}/${Date.now()}-${fileToUpload.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
+        const newBlob = await upload(cleanName, fileToUpload, {
+          access: "public",
+          handleUploadUrl: "/api/upload/blob",
+        });
+        if (newBlob && newBlob.url) {
+          return newBlob.url;
+        }
+      } catch (blobErr: any) {
+        console.warn("Direct blob upload unavailable, trying server API route:", blobErr?.message);
+      }
+
+      // 2. Server API route upload fallback
       const formData = new FormData();
       formData.append("file", fileToUpload);
       formData.append("folder", folder);
