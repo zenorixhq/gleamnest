@@ -59,21 +59,22 @@ export function Header() {
     : [];
 
   const primaryNavLinks = [
-    { label: "Shop All", href: "/products" },
     { label: "✦ New Arrivals", href: "/products?category=new-arrivals", highlight: true },
-    { label: "Necklaces & Chains", href: "/products?category=necklaces-and-chains" },
+    { label: "Necklaces", href: "/products?category=necklaces-and-chains" },
     { label: "Rings", href: "/products?category=rings" },
     { label: "Earrings", href: "/products?category=earrings" },
-    { label: "Bangles & Kada", href: "/products?category=bangles-kada" },
+    { label: "Bangles & Bracelets", href: "/products?category=bangles-kada" },
   ];
 
   const moreCategoryLinks = [
     { label: "Bracelets", href: "/products?category=bracelets" },
+    { label: "Bangles & Kada", href: "/products?category=bangles-kada" },
     { label: "Watches", href: "/products?category=watches" },
     { label: "Charms", href: "/products?category=charms" },
     { label: "Hip Chains", href: "/products?category=hip-chains" },
     { label: "Anklets", href: "/products?category=anklets" },
     { label: "Kids Collection", href: "/products?category=kids-collection" },
+    { label: "✦ View All Jewelry", href: "/products" },
   ];
 
   const allNavLinks = [
@@ -113,20 +114,20 @@ export function Header() {
               </button>
             </div>
 
-            {/* Brand Logo & Tagline */}
-            <div className="flex items-center">
-              <BrandLogo variant="full" showTagline={true} />
+            {/* Brand Logo (Clean wordmark + emblem, without crowded tagline on header) */}
+            <div className="flex items-center flex-shrink-0">
+              <BrandLogo variant="full" showTagline={false} />
             </div>
 
-            {/* Desktop Navigation Links */}
-            <nav className="hidden lg:flex items-center space-x-6">
+            {/* Desktop Navigation Links (Airy, centered, and generously spaced) */}
+            <nav className="hidden lg:flex items-center justify-center flex-1 px-4 xl:px-8 gap-5 xl:gap-8">
               {primaryNavLinks.map((link) => {
                 const isActive = pathname === link.href;
                 return (
                   <Link
                     key={link.href}
                     href={link.href}
-                    className={`text-sm font-medium tracking-wide transition-colors hover:text-primary ${
+                    className={`text-xs xl:text-sm font-medium tracking-wide transition-colors whitespace-nowrap hover:text-primary ${
                       link.highlight
                         ? "text-[#8F7234] font-semibold"
                         : isActive
@@ -143,14 +144,14 @@ export function Header() {
               <div className="relative group">
                 <button
                   type="button"
-                  className="flex items-center gap-1 text-sm font-medium text-foreground/80 hover:text-primary transition-colors py-2 cursor-pointer"
+                  className="flex items-center gap-1 text-xs xl:text-sm font-medium text-foreground/80 hover:text-primary transition-colors py-2 cursor-pointer whitespace-nowrap"
                 >
                   <span>More</span>
                   <ChevronDown className="w-3.5 h-3.5 group-hover:rotate-180 transition-transform duration-200 text-muted-foreground" />
                 </button>
 
-                <div className="absolute left-0 top-full pt-1 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-200 z-50">
-                  <div className="w-48 bg-[#FFFDF9] border border-[#EADBBE] rounded-xl shadow-xl py-2 px-1 divide-y divide-[#EADBBE]/40">
+                <div className="absolute left-1/2 -translate-x-1/2 top-full pt-1 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-200 z-50">
+                  <div className="w-52 bg-[#FFFDF9] border border-[#EADBBE] rounded-xl shadow-xl py-2 px-1 divide-y divide-[#EADBBE]/40">
                     <div className="py-1">
                       {moreCategoryLinks.map((item) => (
                         <Link
@@ -167,13 +168,12 @@ export function Header() {
               </div>
             </nav>
 
-            {/* Right Action Icons */}
-            <div className="flex items-center space-x-3 sm:space-x-5">
+            {/* Right Action Icons (Spacious, refined luxury styling) */}
+            <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
               {/* Currency / Region Selector */}
               {storeConfig.features.enableCurrencySwitcher && (
                 <div className="relative group hidden sm:flex items-center">
-                  <div className="flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1.5 rounded-lg border border-border/70 hover:bg-muted cursor-pointer text-foreground transition-colors">
-                    <Globe className="w-3.5 h-3.5 text-primary" />
+                  <div className="flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1.5 rounded-full border border-border/80 hover:bg-muted cursor-pointer text-foreground transition-colors shadow-2xs">
                     <span>{selectedCurrency === "QAR" ? "🇶🇦 QAR" : "🇮🇳 INR"}</span>
                     <ChevronDown className="w-3 h-3 text-muted-foreground" />
                   </div>
@@ -200,22 +200,22 @@ export function Header() {
               {/* Search Trigger */}
               <button
                 onClick={() => setSearchOpen(true)}
-                className="p-2 rounded-full hover:bg-muted text-foreground transition-colors"
+                className="w-9 h-9 rounded-full hover:bg-muted text-foreground flex items-center justify-center transition-colors"
                 aria-label="Search products"
               >
-                <Search className="w-5 h-5" />
+                <Search className="w-4 h-4" />
               </button>
 
               {/* Wishlist Link */}
               {storeConfig.features.enableWishlist && (
                 <Link
                   href="/account?tab=wishlist"
-                  className="p-2 sm:p-2.5 rounded-full hover:bg-muted text-foreground transition-colors relative flex items-center justify-center min-w-[40px] min-h-[40px]"
+                  className="w-9 h-9 rounded-full hover:bg-muted text-foreground transition-colors relative flex items-center justify-center"
                   aria-label="Wishlist"
                 >
-                  <Heart className="w-5 h-5" />
+                  <Heart className="w-4 h-4" />
                   {mounted && wishlistCount > 0 && (
-                    <span className="absolute top-0.5 right-0.5 bg-accent text-accent-foreground text-[10px] font-bold min-w-[18px] h-[18px] px-1 rounded-full flex items-center justify-center shadow-sm">
+                    <span className="absolute top-0 right-0 bg-accent text-accent-foreground text-[9px] font-bold min-w-[16px] h-[16px] px-1 rounded-full flex items-center justify-center shadow-sm">
                       {wishlistCount}
                     </span>
                   )}
@@ -225,17 +225,16 @@ export function Header() {
               {/* Cart Drawer Trigger */}
               <button
                 onClick={openCart}
-                className="p-2 sm:p-2.5 rounded-full hover:bg-muted text-foreground transition-colors relative flex items-center justify-center min-w-[40px] min-h-[40px]"
+                className="w-9 h-9 rounded-full hover:bg-muted text-foreground transition-colors relative flex items-center justify-center"
                 aria-label="Shopping Cart"
               >
-                <ShoppingBag className="w-5 h-5" />
+                <ShoppingBag className="w-4 h-4" />
                 {mounted && itemCount > 0 && (
-                  <span className="absolute top-0.5 right-0.5 bg-primary text-primary-foreground text-[10px] font-bold min-w-[18px] h-[18px] px-1 rounded-full flex items-center justify-center shadow-sm animate-in zoom-in-75">
+                  <span className="absolute top-0 right-0 bg-primary text-primary-foreground text-[9px] font-bold min-w-[16px] h-[16px] px-1 rounded-full flex items-center justify-center shadow-sm animate-in zoom-in-75">
                     {itemCount}
                   </span>
                 )}
               </button>
-
             </div>
           </div>
         </div>
