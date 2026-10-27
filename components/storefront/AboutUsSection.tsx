@@ -6,7 +6,7 @@ export function AboutUsSection() {
   return (
     <section
       id="about-us"
-      className="relative w-full min-h-[560px] md:h-screen md:max-h-[100vh] lg:h-[100svh] flex flex-col justify-between py-6 sm:py-8 md:py-2 lg:py-4 bg-[#FAF6EF] text-[#1C1917] overflow-hidden border-b border-[#EADBBE]/80 select-none"
+      className="relative w-full min-h-[560px] md:h-[calc(100vh-4.5rem)] lg:h-[calc(100vh-5rem)] md:max-h-[calc(100vh-4.5rem)] lg:max-h-[calc(100vh-5rem)] flex flex-col justify-between py-6 sm:py-8 md:py-2 lg:py-3 bg-[#FAF6EF] text-[#1C1917] overflow-hidden border-b border-[#EADBBE]/80 select-none scroll-mt-20"
     >
       {/* Background Topographic Wave Contours (Whisper-Light Ambient Motif, Non-Intrusive) */}
       <svg
@@ -42,16 +42,16 @@ export function AboutUsSection() {
           </p>
         </div>
 
-        {/* 2. Main Two-Column Editorial Spread (Fills Remaining Screen Height Cleanly with ZERO Overflow) */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 lg:gap-8 items-center flex-1 min-h-0 py-1 sm:py-2">
+        {/* 2. Main Two-Column Editorial Spread (Fills Single Desktop Window Cleanly with ZERO Overflow) */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 lg:gap-10 xl:gap-14 items-center flex-1 min-h-0 py-1 sm:py-2">
           
-          {/* Left Column: Number 03 + Landscape Photo + Story + Oval Pill Button */}
-          <div className="md:col-span-5 flex flex-col justify-center h-full space-y-2 sm:space-y-3">
+          {/* Left Column: Number 03 + Enlarged Landscape Photo on Desktop + Story + Oval Pill Button */}
+          <div className="md:col-span-6 flex flex-col justify-center h-full space-y-2.5 sm:space-y-3 md:space-y-3.5">
             <div>
               <span className="font-editorial text-xs italic text-[#8F7842] block mb-1 tracking-wider">
                 03
               </span>
-              <div className="w-full max-w-[300px] sm:max-w-[330px] lg:max-w-[350px] aspect-[16/9] max-h-[22vh] rounded-sm overflow-hidden shadow-sm border border-[#E2D5BE] bg-[#F0E6D2]">
+              <div className="w-full max-w-[300px] sm:max-w-[330px] md:max-w-[480px] lg:max-w-[540px] xl:max-w-[580px] aspect-[16/9] md:aspect-[16/10] max-h-[22vh] md:max-h-[32vh] lg:max-h-[34vh] rounded-sm overflow-hidden shadow-sm md:shadow-md border border-[#E2D5BE] bg-[#F0E6D2]">
                 <img
                   src="/images/about-model-landscape.jpg"
                   alt="GleamNest Waterproof Necklace & Ring Lifestyle Landscape"
@@ -60,15 +60,15 @@ export function AboutUsSection() {
               </div>
             </div>
 
-            <div className="space-y-1.5 sm:space-y-2 max-w-xs pt-0.5">
-              <p className="text-[11px] sm:text-xs text-[#5C5346] leading-relaxed font-light">
+            <div className="space-y-1.5 sm:space-y-2 max-w-xs md:max-w-md lg:max-w-lg pt-0.5">
+              <p className="text-[11px] sm:text-xs md:text-sm text-[#5C5346] leading-relaxed font-light">
                 Our goal is to create products that are made for life. We encourage people to think about jewellery as part of their identity and legacy.
               </p>
 
               <div>
                 <Link
                   href="/products"
-                  className="inline-flex items-center gap-2 px-5 py-1.5 rounded-full border border-[#1C1917] text-[#1C1917] hover:bg-[#1C1917] hover:text-white text-xs font-medium tracking-wide transition-all shadow-sm active:scale-95 group"
+                  className="inline-flex items-center gap-2 px-5 py-1.5 md:py-2 md:px-6 rounded-full border border-[#1C1917] text-[#1C1917] hover:bg-[#1C1917] hover:text-white text-xs md:text-sm font-medium tracking-wide transition-all shadow-sm active:scale-95 group"
                 >
                   <span>More Information</span>
                   <span className="group-hover:translate-x-1 transition-transform">→</span>
@@ -77,16 +77,13 @@ export function AboutUsSection() {
             </div>
           </div>
 
-          {/* Spacer Column */}
-          <div className="hidden md:block md:col-span-1" />
-
-          {/* Right Column: Number 04 + Portrait Photo (Shifted to the right, strict 2:3 ratio, full pendant visibility) */}
+          {/* Right Column: Number 04 + Enlarged Portrait Photo on Desktop */}
           <div className="md:col-span-6 flex flex-col justify-center items-end h-full">
-            <div className="flex flex-col items-start max-h-[48vh] sm:max-h-[52vh] lg:max-h-[55vh] aspect-[2/3] w-auto ml-auto mr-1 sm:mr-4 md:mr-8 lg:mr-12">
+            <div className="flex flex-col items-start max-h-[48vh] sm:max-h-[52vh] md:max-h-[62vh] lg:max-h-[66vh] xl:max-h-[68vh] aspect-[2/3] w-auto ml-auto mr-1 sm:mr-4 md:mr-0">
               <span className="font-editorial text-xs italic text-[#8F7842] block mb-1 tracking-wider">
                 04
               </span>
-              <div className="w-full flex-1 aspect-[2/3] rounded-sm overflow-hidden shadow-md border border-[#E2D5BE] bg-[#F0E6D2]">
+              <div className="w-full flex-1 aspect-[2/3] rounded-sm overflow-hidden shadow-md md:shadow-xl border border-[#E2D5BE] bg-[#F0E6D2]">
                 <img
                   src="/images/about-model-portrait.jpg"
                   alt="GleamNest Fine Jewelry Portrait"
