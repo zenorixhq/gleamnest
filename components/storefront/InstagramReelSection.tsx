@@ -75,27 +75,15 @@ export function InstagramReelSection() {
   const videoPlayerRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    fetch("/api/reviews")
+    fetch(`/api/reviews?t=${Date.now()}`, { cache: "no-store" })
       .then((res) => res.json())
       .then((data) => {
-        if (data.instagramVideos && data.instagramVideos.length > 0) {
+        if (Array.isArray(data.instagramVideos)) {
           setVideos(data.instagramVideos);
         }
       })
       .catch((e) => console.error("Error fetching Instagram videos:", e));
   }, []);
-
-  // Lock body scroll when playing video modal
-  useEffect(() => {
-    if (activeVideo) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [activeVideo]);
 
   // Handle escape key
   useEffect(() => {
@@ -107,6 +95,11 @@ export function InstagramReelSection() {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [activeVideo]);
+
+  if (!videos || videos.length === 0) {
+    return null;
+  }
+
 
   return (
     <section className="w-full bg-[#FAF7F2] py-16 sm:py-20 border-t border-[#EADBBE]/80 overflow-hidden">

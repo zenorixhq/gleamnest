@@ -132,13 +132,13 @@ export default function AdminDashboardPage() {
   });
 
   const fetchReviewsAndVideos = () => {
-    fetch("/api/reviews")
+    fetch(`/api/reviews?t=${Date.now()}`, { cache: "no-store" })
       .then((res) => res.json())
       .then((data) => {
-        if (data.reviews) setReviewsList(data.reviews);
-        if (data.videoReels) setVideosList(data.videoReels);
-        if (data.feedbackScreenshots) setFeedbackScreenshotsList(data.feedbackScreenshots);
-        if (data.instagramVideos) setInstagramVideosList(data.instagramVideos);
+        if (Array.isArray(data.reviews)) setReviewsList(data.reviews);
+        if (Array.isArray(data.videoReels)) setVideosList(data.videoReels);
+        if (Array.isArray(data.feedbackScreenshots)) setFeedbackScreenshotsList(data.feedbackScreenshots);
+        if (Array.isArray(data.instagramVideos)) setInstagramVideosList(data.instagramVideos);
       })
       .catch((err) => console.error("Error fetching reviews:", err));
   };
@@ -216,178 +216,322 @@ export default function AdminDashboardPage() {
     }
   };
 
+  // Media Upload & Saving States
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgressText, setUploadProgressText] = useState("");
+  const [isSavingItem, setIsSavingItem] = useState(false);
+
+  const uploadFileToServer = async (file: File, folder: "screenshots" | "videos" | "images") => {
+    setIsUploading(true);
+    setUploadProgressText(`Uploading ${file.name} (${(file.size / (1024 * 1024)).toFixed(1)} MB)...`);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("folder", folder);
+
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || "Upload failed");
+      }
+      return data.url as string;
+    } finally {
+      setIsUploading(false);
+      setUploadProgressText("");
+    }
+  };
+
   const handleAddReview = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!reviewForm.author || !reviewForm.quote) {
+    if (!reviewForm.author.trim() || !reviewForm.quote.trim()) {
       alert("Please enter author name and review quote.");
       return;
     }
+    setIsSavingItem(true);
     try {
       const res = await fetch("/api/reviews", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...reviewForm, type: "review" }),
       });
-      if (res.ok) {
-        setIsReviewModalOpen(false);
-        setReviewForm({ author: "", location: "Kerala, India", piece: "", rating: 5, quote: "" });
-        fetchReviewsAndVideos();
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || "Failed to add review");
       }
-    } catch (err) {
-      alert("Error adding review");
+      setIsReviewModalOpen(false);
+      setReviewForm({ author: "", location: "Kerala, India", piece: "", rating: 5, quote: "" });
+      fetchReviewsAndVideos();
+    } catch (err: any) {
+      alert(err.message || "Error adding review");
+    } finally {
+      setIsSavingItem(false);
     }
   };
 
   const handleDeleteReview = async (id: string | number) => {
     if (!confirm("Are you sure you want to remove this client review?")) return;
     try {
-      await fetch(`/api/reviews?type=review&id=${id}`, { method: "DELETE" });
+      // Optimistic update
+      setReviewsList((prev) => prev.filter((r) => String(r.id) !== String(id)));
+      const res = await fetch(`/api/reviews?type=review&id=${encodeURIComponent(id)}`, { method: "DELETE" });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || "Failed to delete review");
+      }
       fetchReviewsAndVideos();
-    } catch (err) {
-      alert("Error deleting review");
+    } catch (err: any) {
+      alert(err.message || "Error deleting review");
+      fetchReviewsAndVideos();
+    }
+  };
+
+  // Video Reel File Upload Handlers
+  const handleVideoFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 80 * 1024 * 1024) {
+      alert("Video file is larger than 80MB. Please choose a smaller video clip.");
+      return;
+    }
+
+    try {
+      const publicUrl = await uploadFileToServer(file, "videos");
+      setVideoForm((prev) => ({ ...prev, videoUrl: publicUrl }));
+    } catch (err: any) {
+      alert("Error uploading video: " + (err.message || "Upload failed"));
+    } finally {
+      e.target.value = "";
+    }
+  };
+
+  const handleVideoPosterUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const publicUrl = await uploadFileToServer(file, "images");
+      setVideoForm((prev) => ({ ...prev, poster: publicUrl }));
+    } catch (err: any) {
+      alert("Error uploading thumbnail: " + (err.message || "Upload failed"));
+    } finally {
+      e.target.value = "";
     }
   };
 
   const handleAddVideo = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!videoForm.title || !videoForm.videoUrl) {
-      alert("Please enter video title and URL.");
+    if (!videoForm.title.trim() || !videoForm.videoUrl.trim()) {
+      alert("Please enter video title and provide a video (upload file or enter URL).");
       return;
     }
+    setIsSavingItem(true);
     try {
       const res = await fetch("/api/reviews", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...videoForm, type: "video" }),
       });
-      if (res.ok) {
-        setIsVideoModalOpen(false);
-        setVideoForm({
-          influencer: "",
-          handle: "",
-          title: "",
-          videoUrl: "",
-          poster: "",
-          views: "18.4K views",
-          productTitle: "",
-          productSlug: "",
-          productPrice: 150,
-        });
-        fetchReviewsAndVideos();
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || "Failed to add video reel");
       }
-    } catch (err) {
-      alert("Error adding video reel");
+      setIsVideoModalOpen(false);
+      setVideoForm({
+        influencer: "",
+        handle: "",
+        title: "",
+        videoUrl: "",
+        poster: "",
+        views: "18.4K views",
+        productTitle: "",
+        productSlug: "",
+        productPrice: 150,
+      });
+      fetchReviewsAndVideos();
+    } catch (err: any) {
+      alert(err.message || "Error adding video reel");
+    } finally {
+      setIsSavingItem(false);
     }
   };
 
   const handleDeleteVideo = async (id: string | number) => {
     if (!confirm("Are you sure you want to remove this video reel?")) return;
     try {
-      await fetch(`/api/reviews?type=video&id=${id}`, { method: "DELETE" });
+      setVideosList((prev) => prev.filter((v) => String(v.id) !== String(id)));
+      const res = await fetch(`/api/reviews?type=video&id=${encodeURIComponent(id)}`, { method: "DELETE" });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || "Failed to delete video reel");
+      }
       fetchReviewsAndVideos();
-    } catch (err) {
-      alert("Error deleting video reel");
+    } catch (err: any) {
+      alert(err.message || "Error deleting video reel");
+      fetchReviewsAndVideos();
     }
   };
 
   // Feedback Screenshot Handlers
-  const handleScreenshotFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleScreenshotFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 8 * 1024 * 1024) {
-      alert("Image is larger than 8MB. Please choose a smaller image.");
+    if (file.size > 25 * 1024 * 1024) {
+      alert("Screenshot is larger than 25MB. Please choose a smaller image.");
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const base64 = event.target?.result as string;
-      setScreenshotForm((prev) => ({ ...prev, imageUrl: base64 }));
-    };
-    reader.readAsDataURL(file);
+    try {
+      const publicUrl = await uploadFileToServer(file, "screenshots");
+      setScreenshotForm((prev) => ({ ...prev, imageUrl: publicUrl }));
+    } catch (err: any) {
+      alert("Error uploading screenshot: " + (err.message || "Upload failed"));
+    } finally {
+      e.target.value = "";
+    }
   };
 
   const handleAddScreenshot = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!screenshotForm.imageUrl) {
+    if (!screenshotForm.imageUrl.trim()) {
       alert("Please upload a screenshot from your device or paste an image URL.");
       return;
     }
+    setIsSavingItem(true);
     try {
       const res = await fetch("/api/reviews", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...screenshotForm, type: "screenshot" }),
       });
-      if (res.ok) {
-        setIsScreenshotModalOpen(false);
-        setScreenshotForm({
-          title: "WhatsApp / DM Customer Review",
-          customerName: "",
-          location: "Kerala, India",
-          piece: "",
-          imageUrl: "",
-          caption: "",
-          date: "Verified Recent Buyer",
-        });
-        fetchReviewsAndVideos();
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || "Failed to save screenshot");
       }
-    } catch (err) {
-      alert("Error saving client feedback screenshot");
+      setIsScreenshotModalOpen(false);
+      setScreenshotForm({
+        title: "WhatsApp / DM Customer Review",
+        customerName: "",
+        location: "Kerala, India",
+        piece: "",
+        imageUrl: "",
+        caption: "",
+        date: "Verified Recent Buyer",
+      });
+      fetchReviewsAndVideos();
+    } catch (err: any) {
+      alert(err.message || "Error saving client feedback screenshot");
+    } finally {
+      setIsSavingItem(false);
     }
   };
 
   const handleDeleteScreenshot = async (id: string | number) => {
     if (!confirm("Are you sure you want to remove this client feedback screenshot?")) return;
     try {
-      await fetch(`/api/reviews?type=screenshot&id=${id}`, { method: "DELETE" });
+      setFeedbackScreenshotsList((prev) => prev.filter((s) => String(s.id) !== String(id)));
+      const res = await fetch(`/api/reviews?type=screenshot&id=${encodeURIComponent(id)}`, { method: "DELETE" });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || "Failed to delete feedback screenshot");
+      }
       fetchReviewsAndVideos();
-    } catch (err) {
-      alert("Error deleting feedback screenshot");
+    } catch (err: any) {
+      alert(err.message || "Error deleting feedback screenshot");
+      fetchReviewsAndVideos();
     }
   };
 
   // Instagram Video ("Follow The House") Handlers
-  const handleAddInstaVideo = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!instaVideoForm.videoUrl) {
-      alert("Please provide the Instagram Reel URL or video link.");
+  const handleInstaVideoFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 80 * 1024 * 1024) {
+      alert("Video file is larger than 80MB. Please choose a smaller video clip.");
       return;
     }
+
+    try {
+      const publicUrl = await uploadFileToServer(file, "videos");
+      setInstaVideoForm((prev) => ({ ...prev, videoUrl: publicUrl }));
+    } catch (err: any) {
+      alert("Error uploading video reel: " + (err.message || "Upload failed"));
+    } finally {
+      e.target.value = "";
+    }
+  };
+
+  const handleInstaPosterUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const publicUrl = await uploadFileToServer(file, "images");
+      setInstaVideoForm((prev) => ({ ...prev, poster: publicUrl }));
+    } catch (err: any) {
+      alert("Error uploading thumbnail: " + (err.message || "Upload failed"));
+    } finally {
+      e.target.value = "";
+    }
+  };
+
+  const handleAddInstaVideo = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!instaVideoForm.videoUrl.trim()) {
+      alert("Please provide the Instagram Reel link or upload a video reel.");
+      return;
+    }
+    setIsSavingItem(true);
     try {
       const res = await fetch("/api/reviews", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...instaVideoForm, type: "instagramVideo" }),
       });
-      if (res.ok) {
-        setIsInstaVideoModalOpen(false);
-        setInstaVideoForm({
-          title: "Jewelry Styling Reel",
-          handle: "@gleamnest.in",
-          caption: "",
-          videoUrl: "",
-          poster: "",
-          views: "15.4K views",
-          instagramLink: "",
-        });
-        fetchReviewsAndVideos();
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || "Failed to add Instagram video");
       }
-    } catch (err) {
-      alert("Error adding Instagram video");
+      setIsInstaVideoModalOpen(false);
+      setInstaVideoForm({
+        title: "Jewelry Styling Reel",
+        handle: "@gleamnest.in",
+        caption: "",
+        videoUrl: "",
+        poster: "",
+        views: "15.4K views",
+        instagramLink: "",
+      });
+      fetchReviewsAndVideos();
+    } catch (err: any) {
+      alert(err.message || "Error adding Instagram video");
+    } finally {
+      setIsSavingItem(false);
     }
   };
 
   const handleDeleteInstaVideo = async (id: string | number) => {
     if (!confirm("Are you sure you want to remove this Instagram video?")) return;
     try {
-      await fetch(`/api/reviews?type=instagramVideo&id=${id}`, { method: "DELETE" });
+      setInstagramVideosList((prev) => prev.filter((v) => String(v.id) !== String(id)));
+      const res = await fetch(`/api/reviews?type=instagramVideo&id=${encodeURIComponent(id)}`, { method: "DELETE" });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || "Failed to delete Instagram video");
+      }
       fetchReviewsAndVideos();
-    } catch (err) {
-      alert("Error deleting Instagram video");
+    } catch (err: any) {
+      alert(err.message || "Error deleting Instagram video");
+      fetchReviewsAndVideos();
     }
   };
+
 
   const handleStockAdjust = async (productId: string, delta: number) => {
     const prod = products.find((p) => p.id === productId);
@@ -1279,11 +1423,13 @@ export default function AdminDashboardPage() {
                             <span>Verified Buyer</span>
                           </span>
                           <button
+                            type="button"
                             onClick={() => handleDeleteScreenshot(item.id)}
-                            className="p-1.5 rounded-md hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+                            className="px-2.5 py-1 rounded-lg bg-red-50 hover:bg-red-100 dark:bg-red-950/40 dark:hover:bg-red-900/60 text-red-600 dark:text-red-400 font-semibold text-[11px] flex items-center gap-1 transition-colors"
                             title="Delete Screenshot"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 className="w-3.5 h-3.5" />
+                            <span>Delete</span>
                           </button>
                         </div>
                       </div>
@@ -1382,11 +1528,13 @@ export default function AdminDashboardPage() {
                             <ExternalLink className="w-3 h-3" />
                           </a>
                           <button
+                            type="button"
                             onClick={() => handleDeleteInstaVideo(video.id)}
-                            className="p-1.5 rounded-md hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+                            className="px-2.5 py-1 rounded-lg bg-red-50 hover:bg-red-100 dark:bg-red-950/40 dark:hover:bg-red-900/60 text-red-600 dark:text-red-400 font-semibold text-[11px] flex items-center gap-1 transition-colors"
                             title="Delete Video"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 className="w-3.5 h-3.5" />
+                            <span>Delete</span>
                           </button>
                         </div>
                       </div>
@@ -1430,11 +1578,13 @@ export default function AdminDashboardPage() {
                           ))}
                         </div>
                         <button
+                          type="button"
                           onClick={() => handleDeleteReview(rev.id)}
-                          className="opacity-0 group-hover:opacity-100 p-1.5 rounded-md hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-all"
+                          className="px-2.5 py-1 rounded-lg bg-red-50 hover:bg-red-100 dark:bg-red-950/40 dark:hover:bg-red-900/60 text-red-600 dark:text-red-400 font-semibold text-[11px] flex items-center gap-1 transition-colors"
                           title="Delete Review"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="w-3.5 h-3.5" />
+                          <span>Delete</span>
                         </button>
                       </div>
 
@@ -1520,11 +1670,13 @@ export default function AdminDashboardPage() {
                         </span>
                       </div>
                       <button
+                        type="button"
                         onClick={() => handleDeleteVideo(video.id)}
-                        className="p-1.5 rounded-md hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+                        className="px-2.5 py-1 rounded-lg bg-red-50 hover:bg-red-100 dark:bg-red-950/40 dark:hover:bg-red-900/60 text-red-600 dark:text-red-400 font-semibold text-[11px] flex items-center gap-1 transition-colors"
                         title="Delete Video Reel"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Delete</span>
                       </button>
                     </div>
                   </div>
@@ -1938,7 +2090,7 @@ export default function AdminDashboardPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
           <div
             className="fixed inset-0 bg-black/60 backdrop-blur-sm"
-            onClick={() => setIsVideoModalOpen(false)}
+            onClick={() => !isSavingItem && !isUploading && setIsVideoModalOpen(false)}
           />
 
           <div className="relative w-full max-w-lg bg-card border border-border rounded-2xl shadow-2xl overflow-hidden z-10 my-8 animate-in fade-in zoom-in-95">
@@ -1946,18 +2098,148 @@ export default function AdminDashboardPage() {
               <div>
                 <h3 className="text-base font-bold text-foreground">Add Styling Video Reel</h3>
                 <p className="text-xs text-muted-foreground">
-                  Publish a client unboxing or styling video test to the storefront
+                  Upload a video from your device or paste a video link with tagged piece
                 </p>
               </div>
               <button
+                type="button"
                 onClick={() => setIsVideoModalOpen(false)}
-                className="p-1.5 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground"
+                disabled={isSavingItem || isUploading}
+                className="p-1.5 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground disabled:opacity-50"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleAddVideo} className="p-6 space-y-4">
+            <form onSubmit={handleAddVideo} className="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+              {isUploading && (
+                <div className="p-3 rounded-xl bg-primary/10 border border-primary/20 text-primary text-xs font-medium flex items-center gap-2 animate-pulse">
+                  <Clock className="w-4 h-4 animate-spin shrink-0" />
+                  <span>{uploadProgressText || "Uploading file to server..."}</span>
+                </div>
+              )}
+
+              {/* Video Source: Upload or URL */}
+              <div className="space-y-2 border border-border p-3.5 rounded-xl bg-muted/20">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                    <Video className="w-3.5 h-3.5 text-primary" />
+                    <span>Video File / URL *</span>
+                  </label>
+                  <span className="text-[11px] text-muted-foreground">Device video or web link</span>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="video-reel-file-upload"
+                    className={`w-full px-3 py-2.5 rounded-lg border border-dashed border-border hover:border-primary bg-background hover:bg-muted/40 cursor-pointer flex items-center justify-center gap-2 text-xs font-medium text-foreground transition-colors ${
+                      isUploading ? "opacity-50 pointer-events-none" : ""
+                    }`}
+                  >
+                    <Upload className="w-4 h-4 text-primary" />
+                    <span>Choose Video from Device / Phone (MP4, WebM)</span>
+                  </label>
+                  <input
+                    id="video-reel-file-upload"
+                    type="file"
+                    accept="video/*"
+                    onChange={handleVideoFileUpload}
+                    className="hidden"
+                    disabled={isUploading || isSavingItem}
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[11px] text-muted-foreground">Or paste direct Video URL:</label>
+                  <input
+                    type="text"
+                    placeholder="https://...mp4 or /uploads/videos/..."
+                    value={videoForm.videoUrl}
+                    onChange={(e) => setVideoForm({ ...videoForm, videoUrl: e.target.value })}
+                    className="w-full px-3 py-1.5 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none font-mono"
+                  />
+                </div>
+
+                {videoForm.videoUrl && (
+                  <div className="pt-2 flex items-center justify-between text-xs border-t border-border/60">
+                    <span className="text-emerald-600 font-semibold truncate max-w-[280px]">
+                      ✓ Video Attached ({videoForm.videoUrl.slice(-25)})
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setVideoForm({ ...videoForm, videoUrl: "" })}
+                      className="text-[11px] text-red-600 hover:underline"
+                    >
+                      Clear
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Poster / Thumbnail Upload or URL */}
+              <div className="space-y-2 border border-border p-3.5 rounded-xl bg-muted/20">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                    <Camera className="w-3.5 h-3.5 text-primary" />
+                    <span>Thumbnail Image (Optional)</span>
+                  </label>
+                  <span className="text-[11px] text-muted-foreground">Poster cover image</span>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="video-poster-file-upload"
+                    className={`w-full px-3 py-2 rounded-lg border border-dashed border-border hover:border-primary bg-background hover:bg-muted/40 cursor-pointer flex items-center justify-center gap-2 text-xs font-medium text-foreground transition-colors ${
+                      isUploading ? "opacity-50 pointer-events-none" : ""
+                    }`}
+                  >
+                    <Upload className="w-3.5 h-3.5 text-primary" />
+                    <span>Upload Thumbnail from Device</span>
+                  </label>
+                  <input
+                    id="video-poster-file-upload"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleVideoPosterUpload}
+                    className="hidden"
+                    disabled={isUploading || isSavingItem}
+                  />
+                </div>
+
+                <input
+                  type="text"
+                  placeholder="Or paste thumbnail image URL: https://..."
+                  value={videoForm.poster}
+                  onChange={(e) => setVideoForm({ ...videoForm, poster: e.target.value })}
+                  className="w-full px-3 py-1.5 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none font-mono"
+                />
+
+                {videoForm.poster && (
+                  <div className="pt-1 flex items-center gap-2">
+                    <img src={videoForm.poster} alt="Poster preview" className="w-12 h-14 object-cover rounded border border-border" />
+                    <button
+                      type="button"
+                      onClick={() => setVideoForm({ ...videoForm, poster: "" })}
+                      className="text-[11px] text-red-600 hover:underline"
+                    >
+                      Remove Thumbnail
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-foreground">Video Title / Caption *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. 100% Waterproof Shower Test 💧"
+                  value={videoForm.title}
+                  onChange={(e) => setVideoForm({ ...videoForm, title: e.target.value })}
+                  className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none"
+                />
+              </div>
+
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
                   <label className="text-xs font-semibold text-foreground">Creator Name</label>
@@ -1980,41 +2262,6 @@ export default function AdminDashboardPage() {
                     className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none font-mono"
                   />
                 </div>
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-xs font-semibold text-foreground">Video Title / Caption *</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. 100% Waterproof Shower Test 💧"
-                  value={videoForm.title}
-                  onChange={(e) => setVideoForm({ ...videoForm, title: e.target.value })}
-                  className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-xs font-semibold text-foreground">Video URL (MP4 / Web Video) *</label>
-                <input
-                  type="url"
-                  required
-                  placeholder="https://...mp4 or CDN video link"
-                  value={videoForm.videoUrl}
-                  onChange={(e) => setVideoForm({ ...videoForm, videoUrl: e.target.value })}
-                  className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none font-mono"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-xs font-semibold text-foreground">Poster / Thumbnail Image URL</label>
-                <input
-                  type="url"
-                  placeholder="https://images.unsplash.com/... or public image URL"
-                  value={videoForm.poster}
-                  onChange={(e) => setVideoForm({ ...videoForm, poster: e.target.value })}
-                  className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none font-mono"
-                />
               </div>
 
               <div className="grid grid-cols-3 gap-3">
@@ -2069,15 +2316,18 @@ export default function AdminDashboardPage() {
                 <button
                   type="button"
                   onClick={() => setIsVideoModalOpen(false)}
-                  className="px-4 py-2 rounded-xl border border-border text-xs font-semibold hover:bg-muted"
+                  disabled={isSavingItem || isUploading}
+                  className="px-4 py-2 rounded-xl border border-border text-xs font-semibold hover:bg-muted disabled:opacity-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/90 shadow-md"
+                  disabled={isSavingItem || isUploading}
+                  className="px-6 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/90 shadow-md disabled:opacity-50 flex items-center gap-1.5"
                 >
-                  Save Video Reel
+                  {isSavingItem && <Clock className="w-3.5 h-3.5 animate-spin" />}
+                  <span>{isSavingItem ? "Saving..." : "Save Video Reel"}</span>
                 </button>
               </div>
             </form>
@@ -2090,7 +2340,7 @@ export default function AdminDashboardPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
           <div
             className="fixed inset-0 bg-black/60 backdrop-blur-sm"
-            onClick={() => setIsScreenshotModalOpen(false)}
+            onClick={() => !isSavingItem && !isUploading && setIsScreenshotModalOpen(false)}
           />
 
           <div className="relative w-full max-w-lg bg-card border border-border rounded-2xl shadow-2xl overflow-hidden z-10 my-8 animate-in fade-in zoom-in-95">
@@ -2102,14 +2352,23 @@ export default function AdminDashboardPage() {
                 </p>
               </div>
               <button
+                type="button"
                 onClick={() => setIsScreenshotModalOpen(false)}
-                className="p-1.5 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground"
+                disabled={isSavingItem || isUploading}
+                className="p-1.5 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground disabled:opacity-50"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <form onSubmit={handleAddScreenshot} className="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+              {isUploading && (
+                <div className="p-3 rounded-xl bg-primary/10 border border-primary/20 text-primary text-xs font-medium flex items-center gap-2 animate-pulse">
+                  <Clock className="w-4 h-4 animate-spin shrink-0" />
+                  <span>{uploadProgressText || "Uploading screenshot to server..."}</span>
+                </div>
+              )}
+
               {/* File upload from Device or URL */}
               <div className="space-y-2 border border-border p-3.5 rounded-xl bg-muted/20">
                 <div className="flex items-center justify-between">
@@ -2124,7 +2383,9 @@ export default function AdminDashboardPage() {
                 <div>
                   <label
                     htmlFor="feedback-screenshot-upload"
-                    className="w-full px-3 py-2.5 rounded-lg border border-dashed border-border hover:border-primary bg-background hover:bg-muted/40 cursor-pointer flex items-center justify-center gap-2 text-xs font-medium text-foreground transition-colors"
+                    className={`w-full px-3 py-2.5 rounded-lg border border-dashed border-border hover:border-primary bg-background hover:bg-muted/40 cursor-pointer flex items-center justify-center gap-2 text-xs font-medium text-foreground transition-colors ${
+                      isUploading ? "opacity-50 pointer-events-none" : ""
+                    }`}
                   >
                     <Upload className="w-4 h-4 text-primary" />
                     <span>Choose Screenshot from Device / Phone</span>
@@ -2135,15 +2396,16 @@ export default function AdminDashboardPage() {
                     accept="image/*"
                     onChange={handleScreenshotFileUpload}
                     className="hidden"
+                    disabled={isUploading || isSavingItem}
                   />
                 </div>
 
                 <div className="space-y-1">
                   <label className="text-[11px] text-muted-foreground">Or paste public Image URL:</label>
                   <input
-                    type="url"
-                    placeholder="https://... or image link"
-                    value={screenshotForm.imageUrl.startsWith("data:") ? "" : screenshotForm.imageUrl}
+                    type="text"
+                    placeholder="https://... or /uploads/screenshots/..."
+                    value={screenshotForm.imageUrl}
                     onChange={(e) => setScreenshotForm({ ...screenshotForm, imageUrl: e.target.value })}
                     className="w-full px-3 py-1.5 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none font-mono"
                   />
@@ -2156,9 +2418,7 @@ export default function AdminDashboardPage() {
                       <img src={screenshotForm.imageUrl} alt="Preview" className="w-full h-full object-cover" />
                     </div>
                     <div className="text-xs space-y-1">
-                      <p className="font-medium text-emerald-600">
-                        {screenshotForm.imageUrl.startsWith("data:") ? "Screenshot Loaded from Device ✓" : "Image URL Linked ✓"}
-                      </p>
+                      <p className="font-medium text-emerald-600">Screenshot Ready ✓</p>
                       <button
                         type="button"
                         onClick={() => setScreenshotForm({ ...screenshotForm, imageUrl: "" })}
@@ -2235,15 +2495,18 @@ export default function AdminDashboardPage() {
                 <button
                   type="button"
                   onClick={() => setIsScreenshotModalOpen(false)}
-                  className="px-4 py-2 rounded-xl border border-border text-xs font-semibold hover:bg-muted"
+                  disabled={isSavingItem || isUploading}
+                  className="px-4 py-2 rounded-xl border border-border text-xs font-semibold hover:bg-muted disabled:opacity-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/90 shadow-md"
+                  disabled={isSavingItem || isUploading}
+                  className="px-6 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/90 shadow-md disabled:opacity-50 flex items-center gap-1.5"
                 >
-                  Publish Screenshot
+                  {isSavingItem && <Clock className="w-3.5 h-3.5 animate-spin" />}
+                  <span>{isSavingItem ? "Publishing..." : "Publish Screenshot"}</span>
                 </button>
               </div>
             </form>
@@ -2256,7 +2519,7 @@ export default function AdminDashboardPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
           <div
             className="fixed inset-0 bg-black/60 backdrop-blur-sm"
-            onClick={() => setIsInstaVideoModalOpen(false)}
+            onClick={() => !isSavingItem && !isUploading && setIsInstaVideoModalOpen(false)}
           />
 
           <div className="relative w-full max-w-lg bg-card border border-border rounded-2xl shadow-2xl overflow-hidden z-10 my-8 animate-in fade-in zoom-in-95">
@@ -2264,31 +2527,136 @@ export default function AdminDashboardPage() {
               <div>
                 <h3 className="text-base font-bold text-foreground">Add Instagram Video</h3>
                 <p className="text-xs text-muted-foreground">
-                  Feature an Instagram reel or styling video in &ldquo;Follow The House&rdquo;
+                  Paste Instagram reel link OR upload styling video from device
                 </p>
               </div>
               <button
+                type="button"
                 onClick={() => setIsInstaVideoModalOpen(false)}
-                className="p-1.5 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground"
+                disabled={isSavingItem || isUploading}
+                className="p-1.5 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground disabled:opacity-50"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <form onSubmit={handleAddInstaVideo} className="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
-              <div className="space-y-1">
-                <label className="text-xs font-semibold text-foreground">Instagram Reel URL or Video Link *</label>
+              {isUploading && (
+                <div className="p-3 rounded-xl bg-primary/10 border border-primary/20 text-primary text-xs font-medium flex items-center gap-2 animate-pulse">
+                  <Clock className="w-4 h-4 animate-spin shrink-0" />
+                  <span>{uploadProgressText || "Uploading video to server..."}</span>
+                </div>
+              )}
+
+              {/* Instagram Video Link OR Upload Video */}
+              <div className="space-y-2 border border-border p-3.5 rounded-xl bg-muted/20">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                    <Instagram className="w-3.5 h-3.5 text-pink-600" />
+                    <span>Instagram Reel Link or Upload Video *</span>
+                  </label>
+                  <span className="text-[11px] text-muted-foreground">Reel URL or MP4</span>
+                </div>
+
+                {/* Upload Reel Video from device */}
+                <div>
+                  <label
+                    htmlFor="insta-video-file-upload"
+                    className={`w-full px-3 py-2 rounded-lg border border-dashed border-border hover:border-primary bg-background hover:bg-muted/40 cursor-pointer flex items-center justify-center gap-2 text-xs font-medium text-foreground transition-colors ${
+                      isUploading ? "opacity-50 pointer-events-none" : ""
+                    }`}
+                  >
+                    <Upload className="w-3.5 h-3.5 text-primary" />
+                    <span>Upload Video File from Device / Phone (MP4)</span>
+                  </label>
+                  <input
+                    id="insta-video-file-upload"
+                    type="file"
+                    accept="video/*"
+                    onChange={handleInstaVideoFileUpload}
+                    className="hidden"
+                    disabled={isUploading || isSavingItem}
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[11px] text-muted-foreground">Or paste Instagram Reel link / Video URL:</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. instagram.com/reel/C-xyz... or https://..."
+                    value={instaVideoForm.videoUrl}
+                    onChange={(e) => setInstaVideoForm({ ...instaVideoForm, videoUrl: e.target.value })}
+                    className="w-full px-3 py-1.5 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none font-mono"
+                  />
+                </div>
+
+                {instaVideoForm.videoUrl && (
+                  <div className="pt-2 flex items-center justify-between text-xs border-t border-border/60">
+                    <span className="text-emerald-600 font-semibold truncate max-w-[280px]">
+                      ✓ Video Linked ({instaVideoForm.videoUrl.slice(-25)})
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setInstaVideoForm({ ...instaVideoForm, videoUrl: "" })}
+                      className="text-[11px] text-red-600 hover:underline"
+                    >
+                      Clear
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Poster Thumbnail Upload or URL */}
+              <div className="space-y-2 border border-border p-3.5 rounded-xl bg-muted/20">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                    <Camera className="w-3.5 h-3.5 text-primary" />
+                    <span>Poster Thumbnail Image (Optional)</span>
+                  </label>
+                  <span className="text-[11px] text-muted-foreground">Preview image</span>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="insta-poster-file-upload"
+                    className={`w-full px-3 py-2 rounded-lg border border-dashed border-border hover:border-primary bg-background hover:bg-muted/40 cursor-pointer flex items-center justify-center gap-2 text-xs font-medium text-foreground transition-colors ${
+                      isUploading ? "opacity-50 pointer-events-none" : ""
+                    }`}
+                  >
+                    <Upload className="w-3.5 h-3.5 text-primary" />
+                    <span>Upload Thumbnail from Device</span>
+                  </label>
+                  <input
+                    id="insta-poster-file-upload"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleInstaPosterUpload}
+                    className="hidden"
+                    disabled={isUploading || isSavingItem}
+                  />
+                </div>
+
                 <input
-                  type="url"
-                  required
-                  placeholder="https://www.instagram.com/reel/... or https://...mp4"
-                  value={instaVideoForm.videoUrl}
-                  onChange={(e) => setInstaVideoForm({ ...instaVideoForm, videoUrl: e.target.value })}
-                  className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none font-mono"
+                  type="text"
+                  placeholder="Or paste thumbnail image URL: https://..."
+                  value={instaVideoForm.poster}
+                  onChange={(e) => setInstaVideoForm({ ...instaVideoForm, poster: e.target.value })}
+                  className="w-full px-3 py-1.5 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none font-mono"
                 />
-                <p className="text-[10px] text-muted-foreground">
-                  Paste any Instagram reel link or public MP4 video link.
-                </p>
+
+                {instaVideoForm.poster && (
+                  <div className="pt-1 flex items-center gap-2">
+                    <img src={instaVideoForm.poster} alt="Poster preview" className="w-12 h-14 object-cover rounded border border-border" />
+                    <button
+                      type="button"
+                      onClick={() => setInstaVideoForm({ ...instaVideoForm, poster: "" })}
+                      className="text-[11px] text-red-600 hover:underline"
+                    >
+                      Remove Thumbnail
+                    </button>
+                  </div>
+                )}
               </div>
 
               <div className="grid grid-cols-2 gap-3">
@@ -2318,17 +2686,6 @@ export default function AdminDashboardPage() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-foreground">Poster Thumbnail URL (Optional)</label>
-                  <input
-                    type="url"
-                    placeholder="https://images.unsplash.com/..."
-                    value={instaVideoForm.poster}
-                    onChange={(e) => setInstaVideoForm({ ...instaVideoForm, poster: e.target.value })}
-                    className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none font-mono"
-                  />
-                </div>
-
-                <div className="space-y-1">
                   <label className="text-xs font-semibold text-foreground">Views Badge</label>
                   <input
                     type="text"
@@ -2336,6 +2693,17 @@ export default function AdminDashboardPage() {
                     value={instaVideoForm.views}
                     onChange={(e) => setInstaVideoForm({ ...instaVideoForm, views: e.target.value })}
                     className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-foreground">Instagram Profile / Reel Link</label>
+                  <input
+                    type="text"
+                    placeholder="https://www.instagram.com/reel/..."
+                    value={instaVideoForm.instagramLink}
+                    onChange={(e) => setInstaVideoForm({ ...instaVideoForm, instagramLink: e.target.value })}
+                    className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none font-mono"
                   />
                 </div>
               </div>
@@ -2355,15 +2723,18 @@ export default function AdminDashboardPage() {
                 <button
                   type="button"
                   onClick={() => setIsInstaVideoModalOpen(false)}
-                  className="px-4 py-2 rounded-xl border border-border text-xs font-semibold hover:bg-muted"
+                  disabled={isSavingItem || isUploading}
+                  className="px-4 py-2 rounded-xl border border-border text-xs font-semibold hover:bg-muted disabled:opacity-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/90 shadow-md"
+                  disabled={isSavingItem || isUploading}
+                  className="px-6 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/90 shadow-md disabled:opacity-50 flex items-center gap-1.5"
                 >
-                  Save Instagram Video
+                  {isSavingItem && <Clock className="w-3.5 h-3.5 animate-spin" />}
+                  <span>{isSavingItem ? "Saving..." : "Save Instagram Video"}</span>
                 </button>
               </div>
             </form>

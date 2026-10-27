@@ -34,10 +34,10 @@ export function ClientFeedbackScreenshots({ className = "" }: ClientFeedbackScre
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const fetchScreenshots = () => {
-    fetch("/api/reviews")
+    fetch(`/api/reviews?t=${Date.now()}`, { cache: "no-store" })
       .then((res) => res.json())
       .then((data) => {
-        if (data.feedbackScreenshots && data.feedbackScreenshots.length > 0) {
+        if (Array.isArray(data.feedbackScreenshots)) {
           setScreenshots(data.feedbackScreenshots);
         }
       })

@@ -94,18 +94,19 @@ export function CustomerReviewsWithVideos() {
   const [selectedVideo, setSelectedVideo] = useState<VideoReel | null>(null);
 
   useEffect(() => {
-    fetch("/api/reviews")
+    fetch(`/api/reviews?t=${Date.now()}`, { cache: "no-store" })
       .then((res) => res.json())
       .then((data) => {
-        if (data.reviews && data.reviews.length > 0) {
+        if (Array.isArray(data.reviews)) {
           setReviews(data.reviews);
         }
-        if (data.videoReels && data.videoReels.length > 0) {
+        if (Array.isArray(data.videoReels)) {
           setVideoReels(data.videoReels);
         }
       })
       .catch((e) => console.error("Could not fetch reviews:", e));
   }, []);
+
 
   const nextReview = () => {
     if (reviews.length === 0) return;
