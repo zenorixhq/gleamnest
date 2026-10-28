@@ -223,6 +223,10 @@ export function CustomerReviewsWithVideos() {
   const [isLeftDisabled, setIsLeftDisabled] = useState(true);
   const [isRightDisabled, setIsRightDisabled] = useState(false);
 
+  const reelsScrollRef = useRef<HTMLDivElement>(null);
+  const [isReelsLeftDisabled, setIsReelsLeftDisabled] = useState(true);
+  const [isReelsRightDisabled, setIsReelsRightDisabled] = useState(false);
+
   const quotesScrollRef = useRef<HTMLDivElement>(null);
   const [isQuotesLeftDisabled, setIsQuotesLeftDisabled] = useState(true);
   const [isQuotesRightDisabled, setIsQuotesRightDisabled] = useState(false);
@@ -289,6 +293,45 @@ export function CustomerReviewsWithVideos() {
 
   const scrollNext = () => {
     const el = scrollContainerRef.current;
+    if (!el) return;
+    el.scrollBy({ left: el.clientWidth, behavior: "smooth" });
+  };
+
+  // Update Left / Right Arrow states based on scroll position for Client Reels
+  const updateReelsScrollButtons = () => {
+    const el = reelsScrollRef.current;
+    if (!el) return;
+    const { scrollLeft, scrollWidth, clientWidth } = el;
+    setIsReelsLeftDisabled(scrollLeft <= 6);
+    setIsReelsRightDisabled(scrollLeft + clientWidth >= scrollWidth - 6);
+  };
+
+  useEffect(() => {
+    updateReelsScrollButtons();
+    const el = reelsScrollRef.current;
+    if (!el) return;
+
+    el.addEventListener("scroll", updateReelsScrollButtons, { passive: true });
+    window.addEventListener("resize", updateReelsScrollButtons);
+
+    const timer = setTimeout(updateReelsScrollButtons, 100);
+
+    return () => {
+      el.removeEventListener("scroll", updateReelsScrollButtons);
+      window.removeEventListener("resize", updateReelsScrollButtons);
+      clearTimeout(timer);
+    };
+  }, [videoReels]);
+
+  // Scroll Client Reels 2 cards at a time (scrolls by container clientWidth)
+  const scrollReelsPrev = () => {
+    const el = reelsScrollRef.current;
+    if (!el) return;
+    el.scrollBy({ left: -el.clientWidth, behavior: "smooth" });
+  };
+
+  const scrollReelsNext = () => {
+    const el = reelsScrollRef.current;
     if (!el) return;
     el.scrollBy({ left: el.clientWidth, behavior: "smooth" });
   };
@@ -371,8 +414,8 @@ export function CustomerReviewsWithVideos() {
 
         {/* Dual Showcase: Video Reels on Left + Verified Customer Feedback Screenshots on Right */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
-          {/* Left Side: Client Reels */}
-          <div className="lg:col-span-5 space-y-4">
+          {/* Left Side: Client Reels (Scrollable 2 cards at a time carousel) */}
+          <div className="lg:col-span-5 flex flex-col justify-between space-y-4 sm:space-y-6">
             <div className="flex items-center justify-between pb-2 border-b border-stone-300/60">
               <span className="text-xs uppercase tracking-widest font-semibold text-stone-700 flex items-center gap-1.5">
                 <Sparkles className="w-3.5 h-3.5 text-amber-600" />
@@ -381,14 +424,60 @@ export function CustomerReviewsWithVideos() {
               <span className="text-[11px] text-stone-500">Real wear tests</span>
             </div>
 
-            <div className="grid grid-cols-2 gap-3 sm:gap-4">
+            {/* Scrollable Container (Shows 2 reels at a time) */}
+            <div
+              ref={reelsScrollRef}
+              className="flex gap-3 sm:gap-4 overflow-x-auto pb-2 no-scrollbar scroll-smooth snap-x snap-mandatory"
+            >
               {videoReels.map((reel) => (
-                <AutoPlayingReelCard
+                <div
                   key={reel.id}
-                  reel={reel}
-                  onClick={() => setSelectedVideo(reel)}
-                />
+                  className="w-[calc(50%-6px)] sm:w-[calc(50%-8px)] min-w-[calc(50%-6px)] sm:min-w-[calc(50%-8px)] flex-shrink-0 snap-start"
+                >
+                  <AutoPlayingReelCard
+                    reel={reel}
+                    onClick={() => setSelectedVideo(reel)}
+                  />
+                </div>
               ))}
+            </div>
+
+            {/* Navigation Controls: Left and Right Arrows for Client Reels */}
+            <div className="flex items-center justify-between pt-1">
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={scrollReelsPrev}
+                  disabled={isReelsLeftDisabled}
+                  className={`w-9 h-9 rounded-full border flex items-center justify-center transition-all ${
+                    isReelsLeftDisabled
+                      ? "border-stone-200 text-stone-300 bg-stone-100 cursor-not-allowed opacity-35"
+                      : "border-stone-300 hover:border-stone-900 text-stone-700 hover:text-stone-900 bg-white hover:bg-stone-50 active:scale-95 shadow-sm cursor-pointer"
+                  }`}
+                  aria-label="Previous reels"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={scrollReelsNext}
+                  disabled={isReelsRightDisabled}
+                  className={`w-9 h-9 rounded-full border flex items-center justify-center transition-all ${
+                    isReelsRightDisabled
+                      ? "border-stone-200 text-stone-300 bg-stone-100 cursor-not-allowed opacity-35"
+                      : "border-stone-300 hover:border-stone-900 text-stone-700 hover:text-stone-900 bg-white hover:bg-stone-50 active:scale-95 shadow-sm cursor-pointer"
+                  }`}
+                  aria-label="Next reels"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+
+              <div className="flex items-center gap-1.5 text-xs text-stone-500">
+                <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+                <span className="hidden sm:inline">Tap to Play Reel</span>
+                <span className="sm:hidden">Tap to Play</span>
+              </div>
             </div>
           </div>
 

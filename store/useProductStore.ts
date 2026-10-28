@@ -2,10 +2,12 @@ import { create } from "zustand";
 import { Product } from "@/types/store";
 import { products as fallbackProducts } from "@/data/mockData";
 
+const STORAGE_KEY = "gleamnest_products_catalog_v3";
+
 function getInitialProducts(): Product[] {
   if (typeof window !== "undefined") {
     try {
-      const cached = sessionStorage.getItem("gleamnest_products_catalog");
+      const cached = localStorage.getItem(STORAGE_KEY) || sessionStorage.getItem(STORAGE_KEY);
       if (cached) {
         const parsed = JSON.parse(cached);
         if (Array.isArray(parsed) && parsed.length > 0) {
@@ -13,10 +15,20 @@ function getInitialProducts(): Product[] {
         }
       }
     } catch (e) {
-      // Ignore if sessionStorage error
+      // Ignore if storage error
     }
   }
   return fallbackProducts;
+}
+
+function persistProducts(prods: Product[]) {
+  if (typeof window !== "undefined") {
+    try {
+      const dataStr = JSON.stringify(prods);
+      localStorage.setItem(STORAGE_KEY, dataStr);
+      sessionStorage.setItem(STORAGE_KEY, dataStr);
+    } catch (e) {}
+  }
 }
 
 interface ProductStore {
@@ -46,11 +58,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       const data = await res.json();
       if (Array.isArray(data) && data.length > 0) {
         set({ products: data, hasLoaded: true, isLoading: false });
-        if (typeof window !== "undefined") {
-          try {
-            sessionStorage.setItem("gleamnest_products_catalog", JSON.stringify(data));
-          } catch (e) {}
-        }
+        persistProducts(data);
       } else {
         set({ hasLoaded: true, isLoading: false });
       }
@@ -77,11 +85,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       const createdProduct = await res.json();
       const updatedProducts = [createdProduct, ...get().products.filter((p) => p.id !== createdProduct.id)];
       set({ products: updatedProducts, isLoading: false });
-      if (typeof window !== "undefined") {
-        try {
-          sessionStorage.setItem("gleamnest_products_catalog", JSON.stringify(updatedProducts));
-        } catch (e) {}
-      }
+      persistProducts(updatedProducts);
 
       return createdProduct;
     } catch (err: any) {
@@ -108,11 +112,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       const updated = await res.json();
       const updatedProducts = get().products.map((p) => (p.id === id ? { ...p, ...updated } : p));
       set({ products: updatedProducts, isLoading: false });
-      if (typeof window !== "undefined") {
-        try {
-          sessionStorage.setItem("gleamnest_products_catalog", JSON.stringify(updatedProducts));
-        } catch (e) {}
-      }
+      persistProducts(updatedProducts);
 
       return updated;
     } catch (err: any) {
@@ -133,11 +133,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
 
       const updatedProducts = get().products.filter((p) => p.id !== id);
       set({ products: updatedProducts, isLoading: false });
-      if (typeof window !== "undefined") {
-        try {
-          sessionStorage.setItem("gleamnest_products_catalog", JSON.stringify(updatedProducts));
-        } catch (e) {}
-      }
+      persistProducts(updatedProducts);
 
       return true;
     } catch (err: any) {

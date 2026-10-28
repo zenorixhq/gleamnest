@@ -70,6 +70,7 @@ export interface CartItem {
   priceQatar?: number; // Qatar price (QAR)
   image: string;
   quantity: number;
+  stockCount?: number;
   selectedVariant?: {
     id: string;
     name: string;

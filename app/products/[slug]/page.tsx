@@ -193,14 +193,14 @@ ${greetingMessage}
     }
   };
 
-  // 6 pieces total: same category first, followed by catalog favorites (2 rows x 3 cols)
+  // 4 pieces total: same category first, followed by catalog favorites (2 rows x 2 cols)
   const categoryProducts = products.filter(
     (p) => p.id !== product.id && p.category === product.category
   );
   const otherProducts = products.filter(
     (p) => p.id !== product.id && p.category !== product.category
   );
-  const relatedProducts = [...categoryProducts, ...otherProducts].slice(0, 6);
+  const relatedProducts = [...categoryProducts, ...otherProducts].slice(0, 4);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-12 space-y-12 sm:space-y-16 pb-24 sm:pb-12">
@@ -383,82 +383,112 @@ ${greetingMessage}
             ))}
 
           {/* Quantity & Stock Indicator */}
-          <div className="space-y-3 pt-2">
-            <div className="flex items-center justify-between text-xs">
-              <span className="font-bold text-foreground">Quantity</span>
-              {product.inStock ? (
-                <span className="text-emerald-600 font-semibold flex items-center gap-1">
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                  In Stock ({product.stockCount} units ready)
-                </span>
-              ) : (
-                <span className="text-destructive font-semibold">Out of Stock</span>
-              )}
-            </div>
+          {(() => {
+            const maxStock = product.inStock !== false ? Math.max(0, product.stockCount !== undefined ? product.stockCount : 10) : 0;
+            const isOutOfStock = maxStock <= 0;
 
-            <div className="flex items-center gap-4">
-              <div className="flex items-center border border-border rounded-xl bg-card">
-                <button
-                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="p-3 hover:bg-muted text-foreground transition-colors"
-                >
-                  <Minus className="w-4 h-4" />
-                </button>
-                <span className="px-4 text-sm font-bold text-foreground">{quantity}</span>
-                <button
-                  onClick={() => setQuantity(quantity + 1)}
-                  className="p-3 hover:bg-muted text-foreground transition-colors"
-                >
-                  <Plus className="w-4 h-4" />
-                </button>
+            return (
+              <div className="space-y-3 pt-2">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-bold text-foreground">Quantity</span>
+                  {isOutOfStock ? (
+                    <span className="text-destructive font-semibold">Out of Stock</span>
+                  ) : maxStock <= 3 ? (
+                    <span className="text-amber-600 font-semibold flex items-center gap-1">
+                      <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                      Very few left! ({maxStock} units remaining)
+                    </span>
+                  ) : (
+                    <span className="text-emerald-600 font-semibold flex items-center gap-1">
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      In Stock ({maxStock} units ready)
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center border border-border rounded-xl bg-card">
+                    <button
+                      type="button"
+                      disabled={isOutOfStock || quantity <= 1}
+                      onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                      className="p-3 hover:bg-muted text-foreground transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                      aria-label="Decrease quantity"
+                    >
+                      <Minus className="w-4 h-4" />
+                    </button>
+                    <span className="px-4 text-sm font-bold text-foreground">
+                      {isOutOfStock ? 0 : quantity}
+                    </span>
+                    <button
+                      type="button"
+                      disabled={isOutOfStock || quantity >= maxStock}
+                      onClick={() => setQuantity((q) => Math.min(maxStock, q + 1))}
+                      className="p-3 hover:bg-muted text-foreground transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                      aria-label="Increase quantity"
+                    >
+                      <Plus className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  {/* Wishlist toggle */}
+                  <button
+                    onClick={() => toggleWishlist(product.id)}
+                    className={`p-3 rounded-xl border transition-all ${
+                      isInWishlist
+                        ? "border-destructive bg-destructive/10 text-destructive"
+                        : "border-border bg-card text-foreground hover:bg-muted"
+                    }`}
+                    aria-label="Add to wishlist"
+                  >
+                    <Heart className={`w-5 h-5 ${isInWishlist ? "fill-current" : ""}`} />
+                  </button>
+                </div>
+
+                {!isOutOfStock && quantity >= maxStock && (
+                  <p className="text-[11px] text-amber-600 font-medium">
+                    Maximum available stock reached for this piece ({maxStock} units).
+                  </p>
+                )}
+
+                {/* CTA Buttons */}
+                <div className="space-y-3 pt-4">
+                  <button
+                    type="button"
+                    disabled={isOutOfStock}
+                    onClick={handleDirectWhatsAppOrder}
+                    className="w-full py-4 px-6 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 transition-all active:scale-[0.99] disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    <MessageCircle className="w-5 h-5 fill-current" />
+                    <span>{isOutOfStock ? "Sold Out / Unavailable" : "Instant Order on WhatsApp"}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    disabled={isOutOfStock}
+                    onClick={handleAddToCart}
+                    className={`w-full py-3.5 px-6 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.99] disabled:opacity-40 disabled:cursor-not-allowed ${
+                      isAdded
+                        ? "bg-emerald-600 text-white border-2 border-emerald-600 shadow-md"
+                        : "bg-card border-2 border-primary text-primary hover:bg-primary/5"
+                    }`}
+                  >
+                    {isAdded ? (
+                      <>
+                        <CheckCircle2 className="w-4 h-4" />
+                        <span>Added to Shopping Bag!</span>
+                      </>
+                    ) : (
+                      <>
+                        <ShoppingBag className="w-4 h-4" />
+                        <span>{isOutOfStock ? "Out of Stock" : "Add to Shopping Bag"}</span>
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
-
-              {/* Wishlist toggle */}
-              <button
-                onClick={() => toggleWishlist(product.id)}
-                className={`p-3 rounded-xl border transition-all ${
-                  isInWishlist
-                    ? "border-destructive bg-destructive/10 text-destructive"
-                    : "border-border bg-card text-foreground hover:bg-muted"
-                }`}
-                aria-label="Add to wishlist"
-              >
-                <Heart className={`w-5 h-5 ${isInWishlist ? "fill-current" : ""}`} />
-              </button>
-            </div>
-          </div>
-
-          {/* CTA Buttons */}
-          <div className="space-y-3 pt-4">
-            <button
-              onClick={handleDirectWhatsAppOrder}
-              className="w-full py-4 px-6 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 transition-all active:scale-[0.99]"
-            >
-              <MessageCircle className="w-5 h-5 fill-current" />
-              <span>Instant Order on WhatsApp</span>
-            </button>
-
-            <button
-              onClick={handleAddToCart}
-              className={`w-full py-3.5 px-6 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.99] ${
-                isAdded
-                  ? "bg-emerald-600 text-white border-2 border-emerald-600 shadow-md"
-                  : "bg-card border-2 border-primary text-primary hover:bg-primary/5"
-              }`}
-            >
-              {isAdded ? (
-                <>
-                  <CheckCircle2 className="w-4 h-4" />
-                  <span>Added to Shopping Bag!</span>
-                </>
-              ) : (
-                <>
-                  <ShoppingBag className="w-4 h-4" />
-                  <span>Add to Shopping Bag</span>
-                </>
-              )}
-            </button>
-          </div>
+            );
+          })()}
 
           {/* Jewelry Trust Value Badges with Direct Guide Triggers */}
           <div className="space-y-3 pt-6 border-t border-border">
@@ -577,7 +607,7 @@ ${greetingMessage}
         </div>
       </section>
 
-      {/* Related Products: 2 rows and 3 columns of cards on mobile & desktop with view more */}
+      {/* Related Products: 2 rows and 2 columns of cards (2*2) */}
       {relatedProducts.length > 0 && (
         <section className="border-t border-border pt-10 sm:pt-14 space-y-6">
           <div className="flex items-center justify-between">
@@ -596,8 +626,8 @@ ${greetingMessage}
             </Link>
           </div>
 
-          {/* 2 Rows x 3 Columns Grid */}
-          <div className="grid grid-cols-3 gap-2 sm:gap-4 md:gap-6">
+          {/* 2 Rows x 2 Columns Grid (2*2) */}
+          <div className="grid grid-cols-2 gap-3 sm:gap-5 md:gap-6">
             {relatedProducts.map((p) => (
               <ProductCard key={p.id} product={p} />
             ))}
@@ -623,24 +653,36 @@ ${greetingMessage}
             {formatPrice(product.salePrice || product.price, selectedCurrency)}
           </p>
         </div>
-        <button
-          onClick={handleAddToCart}
-          className={`py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all active:scale-95 ${
-            isAdded
-              ? "bg-emerald-600 text-white shadow-sm"
-              : "bg-card border-2 border-primary text-primary"
-          }`}
-        >
-          {isAdded ? <CheckCircle2 className="w-4 h-4" /> : <ShoppingBag className="w-4 h-4" />}
-          <span>{isAdded ? "Added!" : "Bag"}</span>
-        </button>
-        <button
-          onClick={handleDirectWhatsAppOrder}
-          className="py-2.5 px-3.5 rounded-xl bg-[#25D366] text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md active:scale-95"
-        >
-          <MessageCircle className="w-4 h-4 fill-current" />
-          <span>WhatsApp</span>
-        </button>
+        {(() => {
+          const maxStock = product.inStock !== false ? Math.max(0, product.stockCount !== undefined ? product.stockCount : 10) : 0;
+          const isOutOfStock = maxStock <= 0;
+          return (
+            <>
+              <button
+                type="button"
+                disabled={isOutOfStock}
+                onClick={handleAddToCart}
+                className={`py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed ${
+                  isAdded
+                    ? "bg-emerald-600 text-white shadow-sm"
+                    : "bg-card border-2 border-primary text-primary"
+                }`}
+              >
+                {isAdded ? <CheckCircle2 className="w-4 h-4" /> : <ShoppingBag className="w-4 h-4" />}
+                <span>{isAdded ? "Added!" : isOutOfStock ? "Out of Stock" : "Bag"}</span>
+              </button>
+              <button
+                type="button"
+                disabled={isOutOfStock}
+                onClick={handleDirectWhatsAppOrder}
+                className="py-2.5 px-3.5 rounded-xl bg-[#25D366] text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                <MessageCircle className="w-4 h-4 fill-current" />
+                <span>{isOutOfStock ? "Sold Out" : "WhatsApp"}</span>
+              </button>
+            </>
+          );
+        })()}
       </div>
 
       {/* Interactive Policy & Size Guide Modal */}

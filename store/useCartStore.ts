@@ -74,9 +74,15 @@ export const useCartStore = create<CartStore>()(
             ? product.priceQatar
             : Math.max(10, Math.round(indiaPrice / 20));
 
+        const availableStock = product.inStock !== false ? (product.stockCount !== undefined ? product.stockCount : 10) : 0;
+        if (availableStock <= 0) {
+          return; // Cannot add out of stock product
+        }
+
         if (existingIndex > -1) {
           const updated = [...currentItems];
-          updated[existingIndex].quantity += quantity;
+          updated[existingIndex].quantity = Math.min(availableStock, updated[existingIndex].quantity + quantity);
+          updated[existingIndex].stockCount = availableStock;
           set({ items: updated, isCartOpen: true });
         } else {
           const newItem: CartItem = {
@@ -87,7 +93,8 @@ export const useCartStore = create<CartStore>()(
             price: indiaPrice,
             priceQatar: qatarPrice,
             image: product.images[0],
-            quantity,
+            quantity: Math.min(availableStock, quantity),
+            stockCount: availableStock,
             selectedVariant: normalizedVariant,
           };
           set({ items: [...currentItems, newItem], isCartOpen: true });
@@ -104,9 +111,11 @@ export const useCartStore = create<CartStore>()(
           return;
         }
         set({
-          items: get().items.map((item) =>
-            item.id === itemId ? { ...item, quantity } : item
-          ),
+          items: get().items.map((item) => {
+            if (item.id !== itemId) return item;
+            const maxStock = item.stockCount !== undefined ? item.stockCount : 99;
+            return { ...item, quantity: Math.min(maxStock, quantity) };
+          }),
         });
       },
 

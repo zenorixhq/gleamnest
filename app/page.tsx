@@ -9,92 +9,124 @@ import { AboutUsSection } from "@/components/storefront/AboutUsSection";
 import { BrandValueBadges } from "@/components/storefront/BrandValueBadges";
 import { CustomerReviewsWithVideos } from "@/components/storefront/CustomerReviewsWithVideos";
 import { InstagramReelSection } from "@/components/storefront/InstagramReelSection";
+import { ScrollReveal } from "@/components/common/ScrollReveal";
 import { ArrowRight, Sparkles } from "lucide-react";
 
 export default function HomePage() {
-  const [categoryItems, setCategoryItems] = useState<Category[]>(initialCategories);
+  const [categoryItems, setCategoryItems] = useState<Category[]>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const cached = sessionStorage.getItem("gleamnest_categories");
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch (e) {}
+    }
+    return initialCategories;
+  });
 
   useEffect(() => {
-    fetch(`/api/categories?t=${Date.now()}`, { cache: "no-store" })
+    fetch("/api/categories")
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data) && data.length > 0) {
           setCategoryItems(data);
+          try {
+            sessionStorage.setItem("gleamnest_categories", JSON.stringify(data));
+          } catch (e) {}
         }
       })
       .catch((err) => console.error("Error fetching dynamic categories:", err));
   }, []);
+
   return (
     <div className="w-full bg-[#FAF7F2] overflow-x-hidden">
       {/* 1. Hero Section (Enclosed within entire screen window, full scroll) */}
       <HeroEditorial />
 
-      {/* 2. About Us Section (Enclosed within entire screen window, full scroll) */}
-      <AboutUsSection />
+      {/* 2. About Us Section with smooth luxury fade-in */}
+      <ScrollReveal variant="fade-up">
+        <AboutUsSection />
+      </ScrollReveal>
 
       {/* 3. Five Signature Brand Badges & WhatsApp Direct Contact Banner */}
-      <BrandValueBadges />
+      <ScrollReveal variant="fade-up">
+        <BrandValueBadges />
+      </ScrollReveal>
 
-      {/* 4. Curated Catalog / Shop by Category Grid (New Arrivals First) */}
+      {/* 4. Curated Catalog / Shop by Category Grid */}
       <section className="w-full py-10 sm:py-12 md:py-14 border-t border-[#EADBBE]/60 bg-[#FAF7F2]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 sm:space-y-8">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-            <div>
-              <div className="flex items-center gap-1.5 text-xs font-bold text-[#C5A059] uppercase tracking-widest">
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>Curated Collections</span>
+          <ScrollReveal variant="fade-up">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+              <div>
+                <div className="flex items-center gap-1.5 text-xs font-bold text-[#C5A059] uppercase tracking-widest">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>Curated Collections</span>
+                </div>
+                <h2 className="font-editorial text-3xl sm:text-4xl font-normal text-[#1C1917] mt-1 tracking-wide">
+                  Shop by Category
+                </h2>
               </div>
-              <h2 className="font-editorial text-3xl sm:text-4xl font-normal text-[#1C1917] mt-1 tracking-wide">
-                Shop by Category
-              </h2>
+              <Link
+                href="/products"
+                className="text-xs sm:text-sm font-semibold text-[#8F7234] hover:text-[#1C1917] flex items-center gap-1 group transition-colors"
+              >
+                <span>View All Categories</span>
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </Link>
             </div>
-            <Link
-              href="/products"
-              className="text-xs sm:text-sm font-semibold text-[#8F7234] hover:text-[#1C1917] flex items-center gap-1 group transition-colors"
-            >
-              <span>View All Categories</span>
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </Link>
-          </div>
+          </ScrollReveal>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-5">
             {categoryItems.map((cat, idx) => (
-              <Link
+              <ScrollReveal
                 key={cat.id}
-                href={`/products?category=${cat.slug}`}
-                className="group relative aspect-[4/5] rounded-2xl overflow-hidden border border-[#EADBBE] shadow-sm bg-[#FFFDF9] hover:-translate-y-1.5 hover:shadow-[0_16px_36px_rgba(197,160,89,0.18)] transition-all duration-500 ease-out"
+                delay={idx * 45}
+                variant="fade-up"
+                className="h-full"
               >
-                <img
-                  src={cat.image}
-                  alt={cat.name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent flex flex-col justify-end p-3.5 sm:p-4 text-white transition-opacity duration-300">
-                  {idx === 0 && (
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-[10px] text-[#EADBBE] font-medium tracking-wider uppercase">
-                        🔥 Latest Drop
-                      </span>
-                      <span className="text-[9px] font-bold bg-[#C5A059] text-white px-2 py-0.5 rounded-full uppercase tracking-wider">
-                        New
-                      </span>
-                    </div>
-                  )}
-                  <h3 className="font-editorial text-sm sm:text-base font-semibold tracking-wide text-white group-hover:text-[#F3DFB0] transition-colors leading-snug mt-0.5">
-                    {cat.name.replace(/\s*Collection/gi, "").trim()}
-                  </h3>
-                </div>
-              </Link>
+                <Link
+                  href={`/products?category=${cat.slug}`}
+                  className="group relative block aspect-[4/5] rounded-2xl overflow-hidden border border-[#EADBBE] shadow-sm bg-[#FFFDF9] hover:-translate-y-1.5 hover:shadow-[0_16px_36px_rgba(197,160,89,0.18)] transition-all duration-500 ease-out"
+                >
+                  <img
+                    src={cat.image}
+                    alt={cat.name}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent flex flex-col justify-end p-3.5 sm:p-4 text-white transition-opacity duration-300">
+                    {idx === 0 && (
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-[10px] text-[#EADBBE] font-medium tracking-wider uppercase">
+                          🔥 Latest Drop
+                        </span>
+                        <span className="text-[9px] font-bold bg-[#C5A059] text-white px-2 py-0.5 rounded-full uppercase tracking-wider">
+                          New
+                        </span>
+                      </div>
+                    )}
+                    <h3 className="font-editorial text-sm sm:text-base font-semibold tracking-wide text-white group-hover:text-[#F3DFB0] transition-colors leading-snug mt-0.5">
+                      {cat.name.replace(/\s*Collection/gi, "").trim()}
+                    </h3>
+                  </div>
+                </Link>
+              </ScrollReveal>
             ))}
           </div>
         </div>
       </section>
 
-      {/* 5. In Their Words: Customer Feedback Screenshots & Influencer Video Reels */}
-      <CustomerReviewsWithVideos />
+      {/* 5. In Their Words: Customer Feedback Screenshots & Video Reels */}
+      <ScrollReveal variant="fade-up">
+        <CustomerReviewsWithVideos />
+      </ScrollReveal>
 
       {/* 6. Follow The House (Instagram Video Reels) */}
-      <InstagramReelSection />
+      <ScrollReveal variant="fade-up">
+        <InstagramReelSection />
+      </ScrollReveal>
     </div>
   );
 }

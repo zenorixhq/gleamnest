@@ -93,6 +93,36 @@ export const categories: Category[] = [
 
 export const products: Product[] = [
   {
+    "id": "alnaya-prod-000",
+    "slug": "imperial-emerald-cuban-pendant",
+    "title": "Imperial Emerald & Gold Cuban Pendant",
+    "shortDescription": "Signature 18K gold Cuban link chain featuring an emerald-cut radiant green stone in a double micro-pavé halo.",
+    "description": "The crown jewel of the GleamNest Atelier. This masterpiece features a bold, fluid 18K PVD gold-finish Cuban link chain holding an exquisite emerald-cut radiant green stone, wrapped in a double halo of light-catching micro-pavé crystals. 100% anti-tarnish, waterproof, hypoallergenic, and crafted for everyday luxury and statement evenings.",
+    "price": 2499,
+    "salePrice": 1899,
+    "priceQatar": 120,
+    "category": "necklaces-and-chains",
+    "tags": [
+      "Necklaces",
+      "Minimal Chains",
+      "Hanging Chains",
+      "Offer Products",
+      "Bestseller"
+    ],
+    "images": [
+      "/images/emerald-necklace-product.jpg",
+      "/images/hero-necklace.png",
+      "/videos/hero-poster.webp"
+    ],
+    "rating": 5.0,
+    "reviewCount": 128,
+    "inStock": true,
+    "stockCount": 15,
+    "featured": true,
+    "isNewArrival": true,
+    "isBestSeller": true
+  },
+  {
     "id": "gn-prod-001",
     "slug": "statement-ring",
     "title": "Statement Ring",
