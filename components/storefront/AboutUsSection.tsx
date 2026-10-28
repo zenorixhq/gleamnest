@@ -6,7 +6,7 @@ export function AboutUsSection() {
   return (
     <section
       id="about-us"
-      className="relative w-full min-h-[560px] md:h-[calc(100vh-4.5rem)] lg:h-[calc(100vh-5rem)] md:max-h-[calc(100vh-4.5rem)] lg:max-h-[calc(100vh-5rem)] flex flex-col justify-between py-6 sm:py-8 md:py-2 lg:py-3 bg-[#FAF6EF] text-[#1C1917] overflow-hidden border-b border-[#EADBBE]/80 select-none scroll-mt-20"
+      className="relative w-full py-10 sm:py-12 md:py-12 lg:py-14 bg-[#FAF6EF] text-[#1C1917] overflow-hidden border-b border-[#EADBBE]/80 select-none scroll-mt-20"
     >
       {/* Background Topographic Wave Contours (Whisper-Light Ambient Motif, Non-Intrusive) */}
       <svg
@@ -25,10 +25,10 @@ export function AboutUsSection() {
         <path d="M-100,680 Q300,540 600,740 T1200,600" fill="none" stroke="#C5A059" strokeWidth="1" />
       </svg>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full h-full flex flex-col justify-between relative z-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex flex-col justify-center relative z-10 space-y-6 sm:space-y-8">
         
         {/* 1. Header: ABOUT US + Elegant Manifesto Paragraph */}
-        <div className="text-center shrink-0 pt-1 pb-1 sm:pb-2 max-w-xl mx-auto space-y-1">
+        <div className="text-center shrink-0 max-w-xl mx-auto space-y-1.5">
           <div className="relative inline-block">
             <span className="absolute -top-2.5 -left-5 text-[#C5A059] text-[10px] sm:text-xs animate-float-gentle">✦</span>
             <span className="absolute -bottom-1 -right-5 text-[#C5A059] text-[10px] sm:text-xs animate-float-gentle">✦</span>
@@ -37,21 +37,21 @@ export function AboutUsSection() {
             </h2>
           </div>
 
-          <p className="text-[11px] sm:text-xs text-[#5C5346] leading-relaxed font-light max-w-lg mx-auto px-2">
+          <p className="text-xs sm:text-sm text-[#5C5346] leading-relaxed font-light max-w-lg mx-auto px-2">
             GleamNest designs modern, everyday luxury jewellery pieces handcrafted from premium 304 & 306 grade stainless steel. We believe in timeless daily elegance.
           </p>
         </div>
 
-        {/* 2. Main Two-Column Editorial Spread (Fills Single Desktop Window Cleanly with ZERO Overflow) */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 lg:gap-10 xl:gap-14 items-center flex-1 min-h-0 py-1 sm:py-2">
+        {/* 2. Main Two-Column Editorial Spread (Fits Single Desktop Window Cleanly with ZERO Overflow & No Mobile Voids) */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12 xl:gap-16 items-center">
           
           {/* Left Column: Number 03 + Enlarged Landscape Photo on Desktop + Story + Oval Pill Button */}
-          <div className="md:col-span-6 flex flex-col justify-center h-full space-y-2.5 sm:space-y-3 md:space-y-3.5">
+          <div className="md:col-span-6 flex flex-col justify-center space-y-3.5 sm:space-y-4">
             <div>
-              <span className="font-editorial text-xs italic text-[#8F7842] block mb-1 tracking-wider">
+              <span className="font-editorial text-xs italic text-[#8F7842] block mb-1.5 tracking-wider">
                 03
               </span>
-              <div className="w-full max-w-[300px] sm:max-w-[330px] md:max-w-[480px] lg:max-w-[540px] xl:max-w-[580px] aspect-[16/9] md:aspect-[16/10] max-h-[22vh] md:max-h-[32vh] lg:max-h-[34vh] rounded-sm overflow-hidden shadow-sm md:shadow-md border border-[#E2D5BE] bg-[#F0E6D2]">
+              <div className="w-full max-w-[340px] sm:max-w-[400px] md:max-w-[480px] lg:max-w-[540px] aspect-[16/10] rounded-sm overflow-hidden shadow-sm md:shadow-md border border-[#E2D5BE] bg-[#F0E6D2]">
                 <img
                   src="/images/about-model-landscape.jpg"
                   alt="GleamNest Waterproof Necklace & Ring Lifestyle Landscape"
@@ -60,15 +60,15 @@ export function AboutUsSection() {
               </div>
             </div>
 
-            <div className="space-y-1.5 sm:space-y-2 max-w-xs md:max-w-md lg:max-w-lg pt-0.5">
-              <p className="text-[11px] sm:text-xs md:text-sm text-[#5C5346] leading-relaxed font-light">
+            <div className="space-y-2 sm:space-y-3 max-w-md lg:max-w-lg">
+              <p className="text-xs sm:text-sm text-[#5C5346] leading-relaxed font-light">
                 Our goal is to create products that are made for life. We encourage people to think about jewellery as part of their identity and legacy.
               </p>
 
               <div>
                 <Link
                   href="/products"
-                  className="inline-flex items-center gap-2 px-5 py-1.5 md:py-2 md:px-6 rounded-full border border-[#1C1917] text-[#1C1917] hover:bg-[#1C1917] hover:text-white text-xs md:text-sm font-medium tracking-wide transition-all shadow-sm active:scale-95 group"
+                  className="inline-flex items-center gap-2 px-5 py-2 md:px-6 rounded-full border border-[#1C1917] text-[#1C1917] hover:bg-[#1C1917] hover:text-white text-xs md:text-sm font-medium tracking-wide transition-all shadow-sm active:scale-95 group"
                 >
                   <span>More Information</span>
                   <span className="group-hover:translate-x-1 transition-transform">→</span>
@@ -78,12 +78,12 @@ export function AboutUsSection() {
           </div>
 
           {/* Right Column: Number 04 + Enlarged Portrait Photo on Desktop */}
-          <div className="md:col-span-6 flex flex-col justify-center items-end h-full">
-            <div className="flex flex-col items-start max-h-[48vh] sm:max-h-[52vh] md:max-h-[62vh] lg:max-h-[66vh] xl:max-h-[68vh] aspect-[2/3] w-auto ml-auto mr-1 sm:mr-4 md:mr-0">
-              <span className="font-editorial text-xs italic text-[#8F7842] block mb-1 tracking-wider">
+          <div className="md:col-span-6 flex flex-col justify-center items-start md:items-end">
+            <div className="flex flex-col items-start w-full max-w-[260px] sm:max-w-[300px] md:max-w-[360px] lg:max-w-[400px] md:ml-auto">
+              <span className="font-editorial text-xs italic text-[#8F7842] block mb-1.5 tracking-wider">
                 04
               </span>
-              <div className="w-full flex-1 aspect-[2/3] rounded-sm overflow-hidden shadow-md md:shadow-xl border border-[#E2D5BE] bg-[#F0E6D2]">
+              <div className="w-full aspect-[2/3] rounded-sm overflow-hidden shadow-md md:shadow-xl border border-[#E2D5BE] bg-[#F0E6D2]">
                 <img
                   src="/images/about-model-portrait.jpg"
                   alt="GleamNest Fine Jewelry Portrait"
@@ -95,7 +95,7 @@ export function AboutUsSection() {
         </div>
 
         {/* 3. Bottom Subtle Accent Line */}
-        <div className="shrink-0 pb-1 pt-0.5 flex justify-center">
+        <div className="shrink-0 pt-2 flex justify-center">
           <div className="w-12 h-[1px] bg-[#C5A059]/40" />
         </div>
       </div>

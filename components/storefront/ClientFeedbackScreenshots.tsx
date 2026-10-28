@@ -88,8 +88,8 @@ export function ClientFeedbackScreenshots({ className = "" }: ClientFeedbackScre
   }
 
   return (
-    <section className={`w-full bg-[#FAF7F2] py-16 sm:py-24 border-t border-[#EADBBE]/70 ${className}`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 sm:space-y-12">
+    <section className={`w-full bg-[#FAF7F2] py-10 sm:py-12 md:py-14 border-t border-[#EADBBE]/70 ${className}`}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 sm:space-y-8">
         {/* Section Header */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div className="space-y-1.5">

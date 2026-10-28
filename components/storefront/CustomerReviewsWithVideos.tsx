@@ -241,8 +241,8 @@ export function CustomerReviewsWithVideos() {
   };
 
   return (
-    <section className="w-full bg-[#FAF7F2] py-16 sm:py-24 border-t border-[#EADBBE]/80 text-[#1C1917]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12 sm:space-y-16">
+    <section className="w-full bg-[#FAF7F2] py-10 sm:py-12 md:py-14 border-t border-[#EADBBE]/80 text-[#1C1917]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 sm:space-y-8">
         {/* Header */}
         <div className="text-center space-y-2">
           <span className="text-[10px] sm:text-xs uppercase tracking-[0.25em] text-[#8F7234] font-medium block">

@@ -69,7 +69,7 @@ async function readData() {
     if (rows && rows.length > 0 && rows[0]?.value) {
       const parsed = JSON.parse(rows[0].value);
       const sanitized = sanitizeData(parsed);
-      if (!sanitized.instagramVideos || sanitized.instagramVideos.length === 0) {
+      if (!Array.isArray(sanitized.instagramVideos)) {
         sanitized.instagramVideos = fileData.instagramVideos || [];
       }
       return sanitized;

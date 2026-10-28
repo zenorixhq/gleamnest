@@ -119,7 +119,7 @@ export function BrandValueBadges() {
   };
 
   return (
-    <section id="brand-values" className="w-full py-12 sm:py-16 lg:py-20 bg-[#FAF7F2] border-b border-[#EADBBE]/80">
+    <section id="brand-values" className="w-full py-8 sm:py-10 md:py-12 bg-[#FAF7F2] border-b border-[#EADBBE]/80">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Container with warm champagne luxury card styling */}
         <div className="rounded-3xl bg-[#FFFDF9] border border-[#EADBBE] shadow-[0_8px_30px_rgb(197,160,89,0.08)] p-5 sm:p-8 lg:p-10 space-y-6 sm:space-y-8">

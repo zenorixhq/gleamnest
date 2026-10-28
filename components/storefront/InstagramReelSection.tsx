@@ -9,6 +9,8 @@ import {
   X,
   ExternalLink,
   Sparkles,
+  ChevronLeft,
+  ChevronRight,
   Maximize2,
 } from "lucide-react";
 
@@ -122,7 +124,7 @@ function AutoPlayingInstaCard({
   return (
     <div
       onClick={onClick}
-      className="group relative aspect-[9/15] rounded-2xl overflow-hidden bg-stone-900 shadow-md hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-500 ease-out cursor-pointer border border-[#EADBBE]"
+      className="group relative w-[240px] sm:w-[270px] md:w-[290px] shrink-0 snap-start aspect-[9/15] rounded-2xl overflow-hidden bg-stone-900 shadow-md hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-500 ease-out cursor-pointer border border-[#EADBBE]"
     >
       {/* Active playing video directly in card */}
       {isDirectVideo ? (
@@ -197,21 +199,54 @@ function AutoPlayingInstaCard({
 }
 
 export function InstagramReelSection() {
-  const [videos, setVideos] = useState<InstagramVideoItem[]>(defaultInstagramVideos);
+  const [videos, setVideos] = useState<InstagramVideoItem[]>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const cached = localStorage.getItem("gleamnest_instagram_reels");
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch (e) {}
+    }
+    return defaultInstagramVideos;
+  });
   const [activeVideo, setActiveVideo] = useState<InstagramVideoItem | null>(null);
   const [isMuted, setIsMuted] = useState(false);
   const videoPlayerRef = useRef<HTMLVideoElement>(null);
+  const carouselRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
 
   useEffect(() => {
     fetch(`/api/reviews?t=${Date.now()}`, { cache: "no-store" })
       .then((res) => res.json())
       .then((data) => {
-        if (Array.isArray(data.instagramVideos) && data.instagramVideos.length > 0) {
+        if (Array.isArray(data.instagramVideos)) {
           setVideos(data.instagramVideos);
+          try {
+            localStorage.setItem("gleamnest_instagram_reels", JSON.stringify(data.instagramVideos));
+          } catch (e) {}
         }
       })
       .catch((e) => console.error("Error fetching Instagram videos:", e));
   }, []);
+
+  const handleScroll = () => {
+    if (!carouselRef.current) return;
+    const { scrollLeft, scrollWidth, clientWidth } = carouselRef.current;
+    setCanScrollLeft(scrollLeft > 10);
+    setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10);
+  };
+
+  const scroll = (direction: "left" | "right") => {
+    if (!carouselRef.current) return;
+    const scrollAmount = 320;
+    carouselRef.current.scrollBy({
+      left: direction === "left" ? -scrollAmount : scrollAmount,
+      behavior: "smooth",
+    });
+  };
 
   // Handle escape key
   useEffect(() => {
@@ -229,8 +264,8 @@ export function InstagramReelSection() {
   }
 
   return (
-    <section className="w-full bg-[#FAF7F2] py-16 sm:py-24 border-t border-[#EADBBE]/80 text-[#1C1917]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 sm:space-y-12">
+    <section className="w-full bg-[#FAF7F2] py-10 sm:py-14 md:py-16 border-t border-[#EADBBE]/80 text-[#1C1917]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 sm:space-y-10">
         {/* Section Header */}
         <div className="text-center space-y-2">
           <div className="flex items-center justify-center gap-2">
@@ -250,19 +285,50 @@ export function InstagramReelSection() {
             <Instagram className="w-6 h-6 sm:w-8 sm:h-8 text-[#C5A059]" />
           </a>
           <p className="text-xs sm:text-sm text-stone-600 font-light max-w-md mx-auto">
-            Watch our latest styling reels, water tests, and styling inspiration directly on site.
+            Swipe through our latest styling reels, water tests, and styling inspiration.
           </p>
         </div>
 
-        {/* Video Reels Grid (Continuous Autoplay on Site) */}
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
-          {videos.map((vid) => (
-            <AutoPlayingInstaCard
-              key={vid.id}
-              vid={vid}
-              onClick={() => setActiveVideo(vid)}
-            />
-          ))}
+        {/* Video Reels Horizontal Carousel */}
+        <div className="relative group/carousel">
+          {/* Left Arrow Button */}
+          {canScrollLeft && (
+            <button
+              type="button"
+              onClick={() => scroll("left")}
+              className="absolute -left-2 sm:-left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white/95 text-[#1C1917] shadow-xl border border-[#EADBBE] flex items-center justify-center hover:bg-[#1C1917] hover:text-white transition-all active:scale-95"
+              aria-label="Previous reels"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+          )}
+
+          {/* Right Arrow Button */}
+          {canScrollRight && (
+            <button
+              type="button"
+              onClick={() => scroll("right")}
+              className="absolute -right-2 sm:-right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white/95 text-[#1C1917] shadow-xl border border-[#EADBBE] flex items-center justify-center hover:bg-[#1C1917] hover:text-white transition-all active:scale-95"
+              aria-label="Next reels"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          )}
+
+          {/* Carousel Track */}
+          <div
+            ref={carouselRef}
+            onScroll={handleScroll}
+            className="flex gap-4 sm:gap-6 overflow-x-auto scrollbar-none snap-x snap-mandatory py-2 px-1 scroll-smooth"
+          >
+            {videos.map((vid) => (
+              <AutoPlayingInstaCard
+                key={vid.id}
+                vid={vid}
+                onClick={() => setActiveVideo(vid)}
+              />
+            ))}
+          </div>
         </div>
 
         {/* Bottom CTA to Instagram Profile */}
