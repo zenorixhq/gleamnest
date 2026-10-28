@@ -69,7 +69,7 @@ export function Header() {
     { label: "Necklaces", href: "/products?category=necklaces-and-chains" },
     { label: "Rings", href: "/products?category=rings" },
     { label: "Earrings", href: "/products?category=earrings" },
-    { label: "Bangles & Bracelets", href: "/products?category=bangles-kada" },
+    { label: "Bangles & Kada", href: "/products?category=bangles-kada" },
   ];
 
   const moreCategoryLinks = [

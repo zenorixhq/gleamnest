@@ -20,6 +20,29 @@ const ITEMS_PER_ROW = 4;
 const ROWS_PER_BATCH = 3;
 const BATCH_SIZE = ITEMS_PER_ROW * ROWS_PER_BATCH; // 12 items (3 rows of 4 items)
 
+function matchesCategory(
+  product: { category: string; isNewArrival?: boolean },
+  targetSlug: string
+): boolean {
+  if (targetSlug === "all") return true;
+  if (targetSlug === "new-arrivals") {
+    return Boolean(product.isNewArrival || product.category === "new-arrivals");
+  }
+  const pCat = (product.category || "").trim().toLowerCase();
+  const tSlug = (targetSlug || "").trim().toLowerCase();
+
+  if (tSlug === "necklaces-and-chains" || tSlug === "necklaces") {
+    return pCat === "necklaces-and-chains" || pCat === "necklaces";
+  }
+  if (tSlug === "bangles-kada" || tSlug === "bangles") {
+    return pCat === "bangles-kada" || pCat === "bangles";
+  }
+  if (tSlug === "kids-collection" || tSlug === "kids") {
+    return pCat === "kids-collection" || pCat === "kids";
+  }
+  return pCat === tSlug;
+}
+
 function ProductCatalogContent() {
   const searchParams = useSearchParams();
   const initialCategory = searchParams.get("category") || "all";
@@ -84,41 +107,9 @@ function ProductCatalogContent() {
   const filteredProducts = useMemo(() => {
     return products
       .filter((p) => {
-        // Category filter
+        // Category filter - strict 1-to-1 mapping
         if (selectedCategory !== "all") {
-          if (selectedCategory === "new-arrivals") {
-            if (!p.isNewArrival && p.category !== "new-arrivals") return false;
-          } else if (selectedCategory === "necklaces-and-chains" || selectedCategory === "necklaces") {
-            const isMatch = p.category === "necklaces-and-chains" || p.category === "necklaces" || /necklace|chain|pendant/i.test(p.title);
-            if (!isMatch) return false;
-          } else if (selectedCategory === "bangles-kada") {
-            const isMatch = p.category === "bangles-kada" || p.category === "bangles" || /bangle|kada|cuff/i.test(p.title);
-            if (!isMatch) return false;
-          } else if (selectedCategory === "bracelets") {
-            const isMatch = (p.category === "bracelets" && !/bangle|kada|cuff/i.test(p.title)) || /bracelet/i.test(p.title);
-            if (!isMatch) return false;
-          } else if (selectedCategory === "watches") {
-            const isMatch = p.category === "watches" || /watch/i.test(p.title);
-            if (!isMatch) return false;
-          } else if (selectedCategory === "charms") {
-            const isMatch = p.category === "charms" || /charm/i.test(p.title);
-            if (!isMatch) return false;
-          } else if (selectedCategory === "hip-chains") {
-            const isMatch = p.category === "hip-chains" || /hip chain|waist/i.test(p.title);
-            if (!isMatch) return false;
-          } else if (selectedCategory === "kids-collection") {
-            const isMatch = p.category === "kids-collection" || p.category === "kids" || /kid|child/i.test(p.title);
-            if (!isMatch) return false;
-          } else if (selectedCategory === "anklets") {
-            const isMatch = p.category === "anklets" || /anklet/i.test(p.title);
-            if (!isMatch) return false;
-          } else if (selectedCategory === "rings") {
-            const isMatch = p.category === "rings" || /ring/i.test(p.title);
-            if (!isMatch) return false;
-          } else if (selectedCategory === "earrings") {
-            const isMatch = p.category === "earrings" || /earring|stud|hoop/i.test(p.title);
-            if (!isMatch) return false;
-          } else if (p.category !== selectedCategory) {
+          if (!matchesCategory(p, selectedCategory)) {
             return false;
           }
         }
@@ -253,20 +244,7 @@ function ProductCatalogContent() {
         </button>
 
         {categoryList.map((cat) => {
-          const count = products.filter((p) => {
-            if (cat.slug === "new-arrivals") return p.isNewArrival || p.category === "new-arrivals";
-            if (cat.slug === "necklaces-and-chains" || cat.slug === "necklaces") return p.category === "necklaces-and-chains" || p.category === "necklaces" || /necklace|chain|pendant/i.test(p.title);
-            if (cat.slug === "bangles-kada") return p.category === "bangles-kada" || p.category === "bangles" || /bangle|kada|cuff/i.test(p.title);
-            if (cat.slug === "bracelets") return (p.category === "bracelets" && !/bangle|kada|cuff/i.test(p.title)) || /bracelet/i.test(p.title);
-            if (cat.slug === "watches") return p.category === "watches" || /watch/i.test(p.title);
-            if (cat.slug === "charms") return p.category === "charms" || /charm/i.test(p.title);
-            if (cat.slug === "hip-chains") return p.category === "hip-chains" || /hip chain|waist/i.test(p.title);
-            if (cat.slug === "kids-collection") return p.category === "kids-collection" || p.category === "kids" || /kid|child/i.test(p.title);
-            if (cat.slug === "anklets") return p.category === "anklets" || /anklet/i.test(p.title);
-            if (cat.slug === "rings") return p.category === "rings" || /ring/i.test(p.title);
-            if (cat.slug === "earrings") return p.category === "earrings" || /earring|stud|hoop/i.test(p.title);
-            return p.category === cat.slug;
-          }).length;
+          const count = products.filter((p) => matchesCategory(p, cat.slug)).length;
 
           return (
             <button
