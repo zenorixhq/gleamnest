@@ -9,8 +9,12 @@ import { MessageCircle, ArrowRight, Copy, Check, ExternalLink, Globe } from "luc
 function SuccessContent() {
   const searchParams = useSearchParams();
   const orderNumber = searchParams.get("orderNumber") || "GN-8841";
-  const total = searchParams.get("total") || "799";
+  const rawTotal = searchParams.get("total") || "799";
   const phone = searchParams.get("phone") || "";
+
+  // Strip any leading currency symbol or extra spaces to ensure exactly one currency symbol
+  const cleanedTotal = rawTotal.replace(/^[₹\s]+/, "");
+  const displayTotal = rawTotal.startsWith("QAR") ? rawTotal : `₹${cleanedTotal}`;
 
   const [orderMessage, setOrderMessage] = useState<string>("");
   const [copied, setCopied] = useState(false);
@@ -25,14 +29,14 @@ function SuccessContent() {
       setOrderMessage(savedMsg);
     } else {
       setOrderMessage(
-        `Hi GleamNest! ✨ I just completed my order #${orderNumber} on your website for ₹${total}. Please share your official UPI QR code so I can complete payment and confirm shipping! 💖`
+        `Hi GleamNest! ✨ I just completed my order #${orderNumber} on your website for ${displayTotal}. Please share your official UPI QR code so I can complete payment and confirm shipping! 💖`
       );
     }
-  }, [orderNumber, total]);
+  }, [orderNumber, displayTotal]);
 
   const encodedMessage = encodeURIComponent(
     orderMessage ||
-      `Hi GleamNest! ✨ I just completed my order #${orderNumber} on your website for ₹${total}. Please share your official UPI QR code so I can complete payment and confirm shipping! 💖`
+      `Hi GleamNest! ✨ I just completed my order #${orderNumber} on your website for ${displayTotal}. Please share your official UPI QR code so I can complete payment and confirm shipping! 💖`
   );
 
   const waWebAppUrl = `https://web.whatsapp.com/send?phone=${whatsappPhone}&text=${encodedMessage}`;
@@ -76,7 +80,7 @@ function SuccessContent() {
           </div>
           <div>
             <span className="text-xs text-muted-foreground">Total Payable</span>
-            <p className="text-lg font-black text-foreground">₹{total}</p>
+            <p className="text-lg font-black text-foreground">{displayTotal}</p>
           </div>
           <div>
             <span className="text-xs text-muted-foreground">Order Channel</span>

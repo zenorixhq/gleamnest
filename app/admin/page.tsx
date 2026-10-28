@@ -51,7 +51,18 @@ export default function AdminDashboardPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState("");
 
-  const [orders, setOrders] = useState<Order[]>(sampleOrders);
+  const [orders, setOrders] = useState<Order[]>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const cached = sessionStorage.getItem("gleamnest_admin_orders");
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch (e) {}
+    }
+    return sampleOrders;
+  });
   const products = useProductStore((s) => s.products);
   const fetchProducts = useProductStore((s) => s.fetchProducts);
   const addProduct = useProductStore((s) => s.addProduct);
@@ -62,7 +73,18 @@ export default function AdminDashboardPage() {
   const [searchQuery, setSearchQuery] = useState("");
 
   // Curated Collections (Category Cards) State
-  const [categoriesList, setCategoriesList] = useState<Category[]>(defaultCategories);
+  const [categoriesList, setCategoriesList] = useState<Category[]>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const cached = sessionStorage.getItem("gleamnest_categories");
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch (e) {}
+    }
+    return defaultCategories;
+  });
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [categoryForm, setCategoryForm] = useState({
@@ -75,10 +97,42 @@ export default function AdminDashboardPage() {
   const [updatingCatId, setUpdatingCatId] = useState<string | null>(null);
 
   // Reviews, Video Reels, Screenshots & Instagram Videos State
-  const [reviewsList, setReviewsList] = useState<any[]>([]);
-  const [videosList, setVideosList] = useState<any[]>([]);
-  const [feedbackScreenshotsList, setFeedbackScreenshotsList] = useState<any[]>([]);
-  const [instagramVideosList, setInstagramVideosList] = useState<any[]>([]);
+  const [reviewsList, setReviewsList] = useState<any[]>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const cached = sessionStorage.getItem("gleamnest_admin_reviews");
+        if (cached) return JSON.parse(cached);
+      } catch (e) {}
+    }
+    return [];
+  });
+  const [videosList, setVideosList] = useState<any[]>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const cached = sessionStorage.getItem("gleamnest_admin_videos");
+        if (cached) return JSON.parse(cached);
+      } catch (e) {}
+    }
+    return [];
+  });
+  const [feedbackScreenshotsList, setFeedbackScreenshotsList] = useState<any[]>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const cached = sessionStorage.getItem("gleamnest_admin_screenshots");
+        if (cached) return JSON.parse(cached);
+      } catch (e) {}
+    }
+    return [];
+  });
+  const [instagramVideosList, setInstagramVideosList] = useState<any[]>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const cached = sessionStorage.getItem("gleamnest_admin_instavideos");
+        if (cached) return JSON.parse(cached);
+      } catch (e) {}
+    }
+    return [];
+  });
   const [editingInstaVideo, setEditingInstaVideo] = useState<any | null>(null);
   const [updatingInstaVideoId, setUpdatingInstaVideoId] = useState<string | null>(null);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
@@ -147,23 +201,36 @@ export default function AdminDashboardPage() {
   });
 
   const fetchReviewsAndVideos = () => {
-    fetch(`/api/reviews?t=${Date.now()}`, { cache: "no-store" })
+    fetch("/api/reviews")
       .then((res) => res.json())
       .then((data) => {
-        if (Array.isArray(data.reviews)) setReviewsList(data.reviews);
-        if (Array.isArray(data.videoReels)) setVideosList(data.videoReels);
-        if (Array.isArray(data.feedbackScreenshots)) setFeedbackScreenshotsList(data.feedbackScreenshots);
-        if (Array.isArray(data.instagramVideos)) setInstagramVideosList(data.instagramVideos);
+        if (Array.isArray(data.reviews)) {
+          setReviewsList(data.reviews);
+          try { sessionStorage.setItem("gleamnest_admin_reviews", JSON.stringify(data.reviews)); } catch (e) {}
+        }
+        if (Array.isArray(data.videoReels)) {
+          setVideosList(data.videoReels);
+          try { sessionStorage.setItem("gleamnest_admin_videos", JSON.stringify(data.videoReels)); } catch (e) {}
+        }
+        if (Array.isArray(data.feedbackScreenshots)) {
+          setFeedbackScreenshotsList(data.feedbackScreenshots);
+          try { sessionStorage.setItem("gleamnest_admin_screenshots", JSON.stringify(data.feedbackScreenshots)); } catch (e) {}
+        }
+        if (Array.isArray(data.instagramVideos)) {
+          setInstagramVideosList(data.instagramVideos);
+          try { sessionStorage.setItem("gleamnest_admin_instavideos", JSON.stringify(data.instagramVideos)); } catch (e) {}
+        }
       })
       .catch((err) => console.error("Error fetching reviews:", err));
   };
 
   const fetchCategories = () => {
-    fetch(`/api/categories?t=${Date.now()}`, { cache: "no-store" })
+    fetch("/api/categories")
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data) && data.length > 0) {
           setCategoriesList(data);
+          try { sessionStorage.setItem("gleamnest_categories", JSON.stringify(data)); } catch (e) {}
         }
       })
       .catch((err) => console.error("Error fetching categories:", err));
@@ -208,10 +275,6 @@ export default function AdminDashboardPage() {
   };
 
   useEffect(() => {
-    try {
-      localStorage.removeItem("gleamnest_products_catalog");
-    } catch (e) {}
-
     if (isAuthenticated) {
       fetchProducts();
       fetchReviewsAndVideos();
@@ -220,7 +283,10 @@ export default function AdminDashboardPage() {
       fetch("/api/orders")
         .then((res) => res.json())
         .then((data) => {
-          if (Array.isArray(data) && data.length > 0) setOrders(data);
+          if (Array.isArray(data) && data.length > 0) {
+            setOrders(data);
+            try { sessionStorage.setItem("gleamnest_admin_orders", JSON.stringify(data)); } catch (e) {}
+          }
         })
         .catch((err) => console.error("Error fetching orders:", err));
     }

@@ -32,23 +32,6 @@ function sanitizeData(parsed: any) {
   return parsed;
 }
 
-let isTableInitialized = false;
-async function ensureTable() {
-  if (isTableInitialized) return;
-  try {
-    await prisma.$executeRawUnsafe(`
-      CREATE TABLE IF NOT EXISTS "SiteContent" (
-        "key" TEXT PRIMARY KEY,
-        "value" TEXT NOT NULL,
-        "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-      );
-    `);
-    isTableInitialized = true;
-  } catch (e) {
-    console.warn("Could not auto-ensure SiteContent table:", e);
-  }
-}
-
 async function readData() {
   let fileData = getInitialData();
   try {
@@ -62,12 +45,11 @@ async function readData() {
 
   // 1. Try reading from Neon PostgreSQL database
   try {
-    await ensureTable();
-    const rows: any = await prisma.$queryRawUnsafe(`
-      SELECT "value" FROM "SiteContent" WHERE "key" = 'client_reviews' LIMIT 1;
-    `);
-    if (rows && rows.length > 0 && rows[0]?.value) {
-      const parsed = JSON.parse(rows[0].value);
+    const row = await prisma.siteContent.findUnique({
+      where: { key: "client_reviews" },
+    });
+    if (row?.value) {
+      const parsed = JSON.parse(row.value);
       const sanitized = sanitizeData(parsed);
       if (!Array.isArray(sanitized.instagramVideos)) {
         sanitized.instagramVideos = fileData.instagramVideos || [];
@@ -87,14 +69,11 @@ async function writeData(data: any) {
 
   // 1. Save to Neon PostgreSQL
   try {
-    await ensureTable();
-    await prisma.$executeRawUnsafe(
-      `INSERT INTO "SiteContent" ("key", "value", "updatedAt")
-       VALUES ('client_reviews', $1, CURRENT_TIMESTAMP)
-       ON CONFLICT ("key")
-       DO UPDATE SET "value" = EXCLUDED."value", "updatedAt" = CURRENT_TIMESTAMP;`,
-      jsonStr
-    );
+    await prisma.siteContent.upsert({
+      where: { key: "client_reviews" },
+      update: { value: jsonStr },
+      create: { key: "client_reviews", value: jsonStr },
+    });
     dbSuccess = true;
   } catch (e) {
     console.error("Database write error for client_reviews:", e);
@@ -108,16 +87,19 @@ async function writeData(data: any) {
     }
     fs.writeFileSync(dataFilePath, JSON.stringify(data, null, 2), "utf8");
   } catch (e) {
-    // Expected on Vercel serverless where /var/task is read-only
     if (!dbSuccess) {
       console.warn("File write skipped on read-only filesystem and DB write was unsuccessful.");
     }
   }
 }
 
+const CACHE_HEADERS = {
+  "Cache-Control": "public, s-maxage=30, stale-while-revalidate=120",
+};
+
 export async function GET() {
   const data = await readData();
-  return NextResponse.json(data, { headers: NO_CACHE_HEADERS });
+  return NextResponse.json(data, { headers: CACHE_HEADERS });
 }
 
 export async function POST(req: Request) {
