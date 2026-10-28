@@ -101,11 +101,17 @@ export default function ProductDetailPage({
     selectedCurrency
   );
 
+  const maxStock = product.inStock !== false ? (product.stockCount !== undefined ? product.stockCount : 10) : 0;
+  const isOutOfStock = maxStock <= 0;
+
   const handleAddToCart = () => {
+    if (isOutOfStock) return;
+
     // Combine standard variant options with selected size
     const combinedOptions: { [key: string]: string } = { ...currentOptions };
-    if (sizeInfo && selectedSize) {
-      combinedOptions[sizeInfo.label] = selectedSize;
+    const effectiveSize = selectedSize || sizeInfo?.defaultSize;
+    if (sizeInfo && effectiveSize) {
+      combinedOptions[sizeInfo.label] = effectiveSize;
     }
 
     const hasVariants = Object.keys(combinedOptions).length > 0;
@@ -138,14 +144,17 @@ export default function ProductDetailPage({
   };
 
   const handleBuyNow = () => {
+    if (isOutOfStock) return;
     handleAddToCart();
     router.push("/checkout");
   };
 
   const handleDirectWhatsAppOrder = () => {
+    if (isOutOfStock) return;
     const combinedOptions: { [key: string]: string } = { ...currentOptions };
-    if (sizeInfo && selectedSize) {
-      combinedOptions[sizeInfo.label] = selectedSize;
+    const effectiveSize = selectedSize || sizeInfo?.defaultSize;
+    if (sizeInfo && effectiveSize) {
+      combinedOptions[sizeInfo.label] = effectiveSize;
     }
 
     const selectedVariantSummary = Object.entries(combinedOptions)
@@ -241,13 +250,19 @@ ${greetingMessage}
             <img
               src={product.images[activeImageIndex] || product.images[0]}
               alt={product.title}
-              className="w-full h-full object-contain object-center drop-shadow-md"
+              className={`w-full h-full object-contain object-center drop-shadow-md ${
+                isOutOfStock ? "opacity-75 grayscale-[20%]" : ""
+              }`}
             />
-            {discountPercent > 0 && (
+            {isOutOfStock ? (
+              <span className="absolute top-4 left-4 bg-stone-900/90 text-white text-xs font-black px-3 py-1.5 rounded-full shadow-lg tracking-wider uppercase border border-stone-700/60 backdrop-blur-sm">
+                OUT OF STOCK
+              </span>
+            ) : discountPercent > 0 ? (
               <span className="absolute top-4 left-4 bg-destructive text-destructive-foreground text-xs font-bold px-2.5 py-1 rounded-full shadow-md">
                 Save {discountPercent}%
               </span>
-            )}
+            ) : null}
           </div>
         </div>
 
@@ -307,48 +322,66 @@ ${greetingMessage}
             {product.description}
           </p>
 
-          {/* Ring / Bangle Dedicated Size Dropdown */}
+          {/* Ring / Bangle Dedicated Sizing (Adjustable vs Specific Sizes) */}
           {sizeInfo && (
             <div className="space-y-2 p-3 sm:p-3.5 rounded-xl bg-card border border-border/80 shadow-sm">
               <div className="flex justify-between items-center text-xs">
-                <label htmlFor="product-size-select" className="font-bold text-foreground flex items-center gap-1.5">
+                <div className="font-bold text-foreground flex items-center gap-1.5">
                   <span>{sizeInfo.label}:</span>
-                  <span className="font-semibold text-primary">{selectedSize}</span>
-                </label>
-                <button
-                  type="button"
-                  onClick={() => setPolicyModalTab("size-guide")}
-                  className="text-primary hover:underline font-semibold flex items-center gap-1"
-                >
-                  <Ruler className="w-3.5 h-3.5" />
-                  <span>Size Guide</span>
-                </button>
+                  <span className="font-semibold text-primary">{selectedSize || sizeInfo.defaultSize}</span>
+                </div>
+                {!sizeInfo.isAdjustableOnly && (
+                  <button
+                    type="button"
+                    onClick={() => setPolicyModalTab("size-guide")}
+                    className="text-primary hover:underline font-semibold flex items-center gap-1"
+                  >
+                    <Ruler className="w-3.5 h-3.5" />
+                    <span>Size Guide</span>
+                  </button>
+                )}
               </div>
 
-              <div className="relative">
-                <select
-                  id="product-size-select"
-                  value={selectedSize}
-                  onChange={(e) => setSelectedSize(e.target.value)}
-                  className="w-full appearance-none px-3.5 py-2.5 text-xs sm:text-sm font-semibold rounded-xl border border-border bg-background text-foreground focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all pr-10 cursor-pointer shadow-sm hover:border-primary/60"
-                >
-                  {sizeInfo.options.map((opt) => (
-                    <option key={opt} value={opt}>
-                      {opt}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown className="w-4 h-4 text-muted-foreground absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-              </div>
+              {sizeInfo.isAdjustableOnly ? (
+                <div className="p-3 rounded-lg bg-primary/5 border border-primary/20 text-xs space-y-1">
+                  <div className="flex items-center gap-1.5 font-bold text-foreground">
+                    <Sparkles className="w-3.5 h-3.5 text-primary" />
+                    <span>{sizeInfo.defaultSize}</span>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground leading-relaxed">
+                    {sizeInfo.type === "ring"
+                      ? "Crafted with an adjustable flex-band. Effortlessly expands or tightens to fit any finger size comfortably."
+                      : "Crafted with an adjustable open-cuff design. Fits seamlessly across all wrist sizes."}
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <div className="relative">
+                    <select
+                      id="product-size-select"
+                      value={selectedSize}
+                      onChange={(e) => setSelectedSize(e.target.value)}
+                      className="w-full appearance-none px-3.5 py-2.5 text-xs sm:text-sm font-semibold rounded-xl border border-border bg-background text-foreground focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all pr-10 cursor-pointer shadow-sm hover:border-primary/60"
+                    >
+                      {sizeInfo.options.map((opt) => (
+                        <option key={opt} value={opt}>
+                          {opt}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown className="w-4 h-4 text-muted-foreground absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  </div>
 
-              <p className="text-[11px] text-muted-foreground flex items-center gap-1 pt-0.5">
-                <Sparkles className="w-3 h-3 text-primary flex-shrink-0" />
-                <span>
-                  {sizeInfo.type === "ring"
-                    ? "Standard Indian Ring sizing. Need help? Open our interactive Size Guide."
-                    : "Standard Indian Bangle sizing (2-2 to 2-10). Check inner diameter in Size Guide."}
-                </span>
-              </p>
+                  <p className="text-[11px] text-muted-foreground flex items-center gap-1 pt-0.5">
+                    <Sparkles className="w-3 h-3 text-primary flex-shrink-0" />
+                    <span>
+                      {sizeInfo.type === "ring"
+                        ? "Standard Indian Ring sizing. Need help? Open our interactive Size Guide."
+                        : "Standard Indian Bangle sizing (2-2 to 2-10). Check inner diameter in Size Guide."}
+                    </span>
+                  </p>
+                </>
+              )}
             </div>
           )}
 

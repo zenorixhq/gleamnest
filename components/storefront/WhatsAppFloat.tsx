@@ -1,13 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import { storeConfig } from "@/config/store.config";
 import { MessageCircle, X, Sparkles } from "lucide-react";
 
 export function WhatsAppFloat() {
+  const pathname = usePathname();
   const [showTooltip, setShowTooltip] = useState(true);
 
-  if (!storeConfig.features.enableWhatsAppFloat) return null;
+  if (pathname?.startsWith("/admin") || !storeConfig.features.enableWhatsAppFloat) return null;
 
   const phone = storeConfig.brand.contact.whatsappNumber;
   const message = encodeURIComponent(

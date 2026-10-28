@@ -100,6 +100,7 @@ export async function PUT(
         isBestSeller: !!body.isBestSeller,
         isNewArrival: !!body.isNewArrival,
         images: imageUrls ? JSON.stringify(imageUrls) : undefined,
+        variantJson: body.variantAttributes !== undefined ? JSON.stringify(body.variantAttributes) : undefined,
       },
     });
 

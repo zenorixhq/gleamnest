@@ -21,6 +21,12 @@ import { BrandLogo } from "@/components/storefront/BrandLogo";
 
 export function Header() {
   const pathname = usePathname();
+
+  // Hide storefront header completely on admin dashboard
+  if (pathname?.startsWith("/admin")) {
+    return null;
+  }
+
   const [mounted, setMounted] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);

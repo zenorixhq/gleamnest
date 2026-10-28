@@ -1,15 +1,17 @@
 "use client";
 
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import { storeConfig } from "@/config/store.config";
 import { X, Sparkles } from "lucide-react";
 import { useCartStore } from "@/store/useCartStore";
 
 export function AnnouncementBar() {
+  const pathname = usePathname();
   const [visible, setVisible] = useState(true);
   const selectedCurrency = useCartStore((s) => s.selectedCurrency);
 
-  if (!storeConfig.features.enableAnnouncementBar || !visible) {
+  if (pathname?.startsWith("/admin") || !storeConfig.features.enableAnnouncementBar || !visible) {
     return null;
   }
 

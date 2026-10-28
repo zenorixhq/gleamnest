@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { storeConfig } from "@/config/store.config";
 import {
   MessageCircle,
@@ -14,9 +15,14 @@ import { BrandLogo } from "@/components/storefront/BrandLogo";
 import { PolicyModal, PolicyTab } from "@/components/storefront/PolicyModal";
 
 export function Footer() {
+  const pathname = usePathname();
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
   const [policyModalTab, setPolicyModalTab] = useState<PolicyTab | null>(null);
+
+  if (pathname?.startsWith("/admin")) {
+    return null;
+  }
 
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();

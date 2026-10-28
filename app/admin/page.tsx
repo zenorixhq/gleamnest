@@ -184,7 +184,22 @@ export default function AdminDashboardPage() {
   const [isSaving, setIsSaving] = useState(false);
 
   // Form fields
-  const [formState, setFormState] = useState({
+  const [formState, setFormState] = useState<{
+    title: string;
+    category: string;
+    price: string;
+    salePrice: string;
+    priceQatar: string;
+    salePriceQatar: string;
+    stockCount: string;
+    shortDescription: string;
+    description: string;
+    imageUrl: string;
+    featured: boolean;
+    isBestSeller: boolean;
+    isNewArrival: boolean;
+    sizingType: "adjustable" | "sizes";
+  }>({
     title: "",
     category: "necklaces-and-chains",
     price: "",
@@ -198,6 +213,7 @@ export default function AdminDashboardPage() {
     featured: false,
     isBestSeller: false,
     isNewArrival: true,
+    sizingType: "adjustable",
   });
 
   const fetchReviewsAndVideos = () => {
@@ -1376,6 +1392,7 @@ export default function AdminDashboardPage() {
       featured: false,
       isBestSeller: false,
       isNewArrival: true,
+      sizingType: "adjustable",
     });
     setIsModalOpen(true);
   };
@@ -1385,6 +1402,23 @@ export default function AdminDashboardPage() {
     const suggestedQar = product.priceQatar !== undefined && product.priceQatar !== null
       ? product.priceQatar.toString()
       : Math.max(10, Math.round(product.price / 20)).toString();
+
+    // Detect existing sizing configuration (adjustable vs specific sizes)
+    const explicitSizeAttr = product.variantAttributes?.find((a) => /size/i.test(a.name));
+    let detectedSizingType: "adjustable" | "sizes" = "adjustable";
+
+    if (explicitSizeAttr && explicitSizeAttr.options?.length > 0) {
+      const isAdj =
+        explicitSizeAttr.options.length === 1 &&
+        /adjustable|free size|cuff|openable/i.test(explicitSizeAttr.options[0]);
+      detectedSizingType = isAdj ? "adjustable" : "sizes";
+    } else {
+      const titleIndicatesAdjustable =
+        /\b(adjustable|free size|openable|cuff)\b/i.test(product.title) ||
+        /\b(adjustable|free size|openable|cuff)\b/i.test(product.description || "") ||
+        (product.tags && product.tags.some((t) => /\b(adjustable|free size)\b/i.test(t)));
+      detectedSizingType = titleIndicatesAdjustable ? "adjustable" : "sizes";
+    }
 
     setFormState({
       title: product.title,
@@ -1400,6 +1434,7 @@ export default function AdminDashboardPage() {
       featured: !!product.featured,
       isBestSeller: !!product.isBestSeller,
       isNewArrival: !!product.isNewArrival,
+      sizingType: detectedSizingType,
     });
     setIsModalOpen(true);
   };
@@ -1446,6 +1481,42 @@ export default function AdminDashboardPage() {
         : Math.max(10, Math.round(parsedPriceInr / 20));
       const parsedSalePriceQar = formState.salePriceQatar ? parseFloat(formState.salePriceQatar) : null;
 
+      // Construct sizing variants for rings or bangles
+      let variantAttributes = editingProduct?.variantAttributes
+        ? [...editingProduct.variantAttributes]
+        : [];
+
+      if (formState.category === "rings") {
+        variantAttributes = variantAttributes.filter((a) => !/size/i.test(a.name));
+        variantAttributes.push({
+          name: "Ring Size",
+          options: formState.sizingType === "adjustable"
+            ? ["Adjustable / Free Size"]
+            : [
+                "Size 10 (15.9 mm)",
+                "Size 12 (16.5 mm)",
+                "Size 14 (17.2 mm - Standard)",
+                "Size 16 (17.9 mm)",
+                "Size 18 (18.6 mm)",
+                "Size 20 (19.2 mm)",
+              ],
+        });
+      } else if (formState.category === "bangles-kada") {
+        variantAttributes = variantAttributes.filter((a) => !/size/i.test(a.name));
+        variantAttributes.push({
+          name: "Bangle Size",
+          options: formState.sizingType === "adjustable"
+            ? ["Adjustable / Openable Cuff"]
+            : [
+                "Size 2-2 (2.125\" - Petite)",
+                "Size 2-4 (2.25\" - Small)",
+                "Size 2-6 (2.375\" - Standard)",
+                "Size 2-8 (2.50\" - Medium-Large)",
+                "Size 2-10 (2.625\" - Extra Large)",
+              ],
+        });
+      }
+
       if (editingProduct) {
         // Update existing product in DB and Store
         await updateProduct(editingProduct.id, {
@@ -1463,6 +1534,7 @@ export default function AdminDashboardPage() {
           featured: formState.featured,
           isBestSeller: formState.isBestSeller,
           isNewArrival: formState.isNewArrival,
+          variantAttributes,
         });
       } else {
         // Create new product in DB and Store
@@ -1482,6 +1554,7 @@ export default function AdminDashboardPage() {
           featured: formState.featured,
           isBestSeller: formState.isBestSeller,
           isNewArrival: formState.isNewArrival,
+          variantAttributes,
         });
       }
       setIsModalOpen(false);
@@ -2980,6 +3053,69 @@ export default function AdminDashboardPage() {
                   />
                 </div>
               </div>
+
+              {/* Sizing Option Configuration for Rings & Bangles */}
+              {(formState.category === "rings" || formState.category === "bangles-kada") && (
+                <div className="p-3.5 rounded-xl border border-primary/20 bg-primary/5 space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-primary" />
+                      <span>{formState.category === "rings" ? "Ring Sizing Setup" : "Bangle / Kada Sizing Setup"}</span>
+                    </label>
+                    <span className="text-[10px] text-muted-foreground font-medium">Customer Selection Mode</span>
+                  </div>
+
+                  <p className="text-[11px] text-muted-foreground">
+                    Choose whether this piece is adjustable (one size fits all) or offered in specific Indian sizes:
+                  </p>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    <button
+                      type="button"
+                      onClick={() => setFormState({ ...formState, sizingType: "adjustable" })}
+                      className={`p-3 text-left rounded-xl border transition-all ${
+                        formState.sizingType === "adjustable"
+                          ? "border-primary bg-background shadow-sm text-foreground ring-1 ring-primary"
+                          : "border-border bg-card/60 text-muted-foreground hover:bg-background hover:text-foreground"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold text-foreground">✨ Adjustable / Free Size</span>
+                        {formState.sizingType === "adjustable" && (
+                          <span className="text-[10px] font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded">Selected</span>
+                        )}
+                      </div>
+                      <p className="text-[11px] text-muted-foreground mt-1 leading-snug">
+                        {formState.category === "rings"
+                          ? "One-size adjustable comfort band. No size dropdown shown to buyers."
+                          : "One-size open flex-cuff. No size dropdown shown to buyers."}
+                      </p>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setFormState({ ...formState, sizingType: "sizes" })}
+                      className={`p-3 text-left rounded-xl border transition-all ${
+                        formState.sizingType === "sizes"
+                          ? "border-primary bg-background shadow-sm text-foreground ring-1 ring-primary"
+                          : "border-border bg-card/60 text-muted-foreground hover:bg-background hover:text-foreground"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold text-foreground">📏 Specific Sizes Only</span>
+                        {formState.sizingType === "sizes" && (
+                          <span className="text-[10px] font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded">Selected</span>
+                        )}
+                      </div>
+                      <p className="text-[11px] text-muted-foreground mt-1 leading-snug">
+                        {formState.category === "rings"
+                          ? "Shows Indian ring sizes (Size 10 - 20). Adjustable option is not shown."
+                          : "Shows Indian bangle sizes (Size 2-2 to 2-10). Adjustable option is not shown."}
+                      </p>
+                    </button>
+                  </div>
+                </div>
+              )}
 
               {/* Dual Country Pricing (India & Qatar) */}
               <div className="p-4 rounded-xl border border-border bg-muted/20 space-y-4">

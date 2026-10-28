@@ -3,31 +3,42 @@ export interface ProductSizeInfo {
   label: string;
   defaultSize: string;
   options: string[];
+  isAdjustableOnly: boolean;
 }
 
-export const RING_SIZES = [
+export const RING_SPECIFIC_SIZES = [
   "Size 10 (15.9 mm)",
   "Size 12 (16.5 mm)",
   "Size 14 (17.2 mm - Standard)",
   "Size 16 (17.9 mm)",
   "Size 18 (18.6 mm)",
   "Size 20 (19.2 mm)",
-  "Adjustable / Free Size",
 ];
 
-export const BANGLE_SIZES = [
+export const RING_ADJUSTABLE_OPTION = "Adjustable / Free Size";
+
+// Backwards compatibility export
+export const RING_SIZES = RING_SPECIFIC_SIZES;
+
+export const BANGLE_SPECIFIC_SIZES = [
   "Size 2-2 (2.125\" - Petite)",
   "Size 2-4 (2.25\" - Small)",
   "Size 2-6 (2.375\" - Standard)",
   "Size 2-8 (2.50\" - Medium-Large)",
   "Size 2-10 (2.625\" - Extra Large)",
-  "Adjustable / Openable Cuff",
 ];
+
+export const BANGLE_ADJUSTABLE_OPTION = "Adjustable / Openable Cuff";
+
+// Backwards compatibility export
+export const BANGLE_SIZES = BANGLE_SPECIFIC_SIZES;
 
 export function getProductSizeInfo(product?: {
   category?: string;
   subcategory?: string;
   title?: string;
+  description?: string;
+  tags?: string[];
   variantAttributes?: { name: string; options: string[] }[];
 }): ProductSizeInfo | null {
   if (!product) return null;
@@ -39,6 +50,8 @@ export function getProductSizeInfo(product?: {
   const cat = (product.category || "").toLowerCase();
   const sub = (product.subcategory || "").toLowerCase();
   const title = (product.title || "").toLowerCase();
+  const desc = (product.description || "").toLowerCase();
+  const tagsStr = (product.tags || []).join(" ").toLowerCase();
 
   const isRing =
     cat === "rings" ||
@@ -57,29 +70,129 @@ export function getProductSizeInfo(product?: {
     /\b(bangle|bangles|kada|kadas|cuff|cuffs)\b/i.test(title);
 
   if (isRing) {
+    if (explicitSizeAttr && explicitSizeAttr.options?.length > 0) {
+      const isAdjustable =
+        explicitSizeAttr.options.length === 1 &&
+        /adjustable|free size/i.test(explicitSizeAttr.options[0]);
+
+      if (isAdjustable) {
+        return {
+          type: "ring",
+          label: explicitSizeAttr.name || "Ring Size",
+          defaultSize: explicitSizeAttr.options[0] || RING_ADJUSTABLE_OPTION,
+          options: [explicitSizeAttr.options[0] || RING_ADJUSTABLE_OPTION],
+          isAdjustableOnly: true,
+        };
+      } else {
+        // Admin chose Specific Sizes -> Omit any adjustable option
+        const cleanedSizes = explicitSizeAttr.options.filter(
+          (o) => !/adjustable|free size/i.test(o)
+        );
+        const sizesToUse = cleanedSizes.length > 0 ? cleanedSizes : RING_SPECIFIC_SIZES;
+        return {
+          type: "ring",
+          label: explicitSizeAttr.name || "Ring Size",
+          defaultSize: sizesToUse.includes("Size 14 (17.2 mm - Standard)")
+            ? "Size 14 (17.2 mm - Standard)"
+            : sizesToUse[0],
+          options: sizesToUse,
+          isAdjustableOnly: false,
+        };
+      }
+    }
+
+    // Heuristic if no explicit attribute: check if title, desc, or tags say adjustable
+    const isAdjustableByText =
+      /\b(adjustable|free size)\b/i.test(title) ||
+      /\b(adjustable|free size)\b/i.test(desc) ||
+      /\b(adjustable|free size)\b/i.test(tagsStr);
+
+    if (isAdjustableByText) {
+      return {
+        type: "ring",
+        label: "Ring Size",
+        defaultSize: RING_ADJUSTABLE_OPTION,
+        options: [RING_ADJUSTABLE_OPTION],
+        isAdjustableOnly: true,
+      };
+    }
+
     return {
       type: "ring",
-      label: explicitSizeAttr?.name || "Ring Size",
-      defaultSize: explicitSizeAttr?.options[0] || "Size 14 (17.2 mm - Standard)",
-      options: explicitSizeAttr?.options?.length ? explicitSizeAttr.options : RING_SIZES,
+      label: "Ring Size",
+      defaultSize: "Size 14 (17.2 mm - Standard)",
+      options: RING_SPECIFIC_SIZES,
+      isAdjustableOnly: false,
     };
   }
 
   if (isBangle) {
+    if (explicitSizeAttr && explicitSizeAttr.options?.length > 0) {
+      const isAdjustable =
+        explicitSizeAttr.options.length === 1 &&
+        /adjustable|openable|cuff|free size/i.test(explicitSizeAttr.options[0]);
+
+      if (isAdjustable) {
+        return {
+          type: "bangle",
+          label: explicitSizeAttr.name || "Bangle Size",
+          defaultSize: explicitSizeAttr.options[0] || BANGLE_ADJUSTABLE_OPTION,
+          options: [explicitSizeAttr.options[0] || BANGLE_ADJUSTABLE_OPTION],
+          isAdjustableOnly: true,
+        };
+      } else {
+        // Admin chose Specific Sizes -> Omit any adjustable option
+        const cleanedSizes = explicitSizeAttr.options.filter(
+          (o) => !/adjustable|openable|cuff|free size/i.test(o)
+        );
+        const sizesToUse = cleanedSizes.length > 0 ? cleanedSizes : BANGLE_SPECIFIC_SIZES;
+        return {
+          type: "bangle",
+          label: explicitSizeAttr.name || "Bangle Size",
+          defaultSize: sizesToUse.includes("Size 2-6 (2.375\" - Standard)")
+            ? "Size 2-6 (2.375\" - Standard)"
+            : sizesToUse[0],
+          options: sizesToUse,
+          isAdjustableOnly: false,
+        };
+      }
+    }
+
+    // Heuristic if no explicit attribute
+    const isAdjustableByText =
+      /\b(adjustable|openable|cuff|free size)\b/i.test(title) ||
+      /\b(adjustable|openable|cuff|free size)\b/i.test(desc) ||
+      /\b(adjustable|openable|cuff|free size)\b/i.test(tagsStr);
+
+    if (isAdjustableByText) {
+      return {
+        type: "bangle",
+        label: "Bangle Size",
+        defaultSize: BANGLE_ADJUSTABLE_OPTION,
+        options: [BANGLE_ADJUSTABLE_OPTION],
+        isAdjustableOnly: true,
+      };
+    }
+
     return {
       type: "bangle",
-      label: explicitSizeAttr?.name || "Bangle Size",
-      defaultSize: explicitSizeAttr?.options[0] || "Size 2-6 (2.375\" - Standard)",
-      options: explicitSizeAttr?.options?.length ? explicitSizeAttr.options : BANGLE_SIZES,
+      label: "Bangle Size",
+      defaultSize: "Size 2-6 (2.375\" - Standard)",
+      options: BANGLE_SPECIFIC_SIZES,
+      isAdjustableOnly: false,
     };
   }
 
   if (explicitSizeAttr) {
+    const isAdjustable =
+      explicitSizeAttr.options.length === 1 &&
+      /adjustable|free size/i.test(explicitSizeAttr.options[0]);
     return {
       type: "ring",
       label: explicitSizeAttr.name,
       defaultSize: explicitSizeAttr.options[0] || "",
       options: explicitSizeAttr.options,
+      isAdjustableOnly: isAdjustable,
     };
   }
 
