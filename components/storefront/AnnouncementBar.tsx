@@ -1,36 +1,32 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { storeConfig } from "@/config/store.config";
 import { X, Sparkles } from "lucide-react";
-import { useCartStore } from "@/store/useCartStore";
 
 export function AnnouncementBar() {
+  const pathname = usePathname();
   const [visible, setVisible] = useState(true);
-  const selectedCurrency = useCartStore((s) => s.selectedCurrency);
+  const [mounted, setMounted] = useState(false);
 
-  if (!storeConfig.features.enableAnnouncementBar || !visible) {
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // On the homepage, do not render announcement bar so the transparent navbar floats seamlessly over the full-bleed video hero
+  if (!mounted || !storeConfig.features.enableAnnouncementBar || !visible || pathname === "/") {
     return null;
   }
 
-  const isQatar = selectedCurrency === "QAR";
-
-  const tickerItems = isQatar
-    ? [
-        "100% Anti-Tarnish & Waterproof",
-        "Premium 304 & 306 Grade Stainless Steel",
-        "Free Delivery Across Qatar (Within 14 Days)",
-        "Hypoallergenic & Shower Safe",
-        "Order Directly on WhatsApp",
-      ]
-    : [
-        "100% Anti-Tarnish & Waterproof",
-        "Premium 304 & 306 Grade Stainless Steel",
-        `Free Pan-India Delivery Above ₹${storeConfig.commerce.freeShippingThreshold}`,
-        `Express Shipping Only ₹${storeConfig.commerce.flatShippingFee}`,
-        "Hypoallergenic & Shower Safe",
-        "Order Directly on WhatsApp",
-      ];
+  const tickerItems = [
+    "100% Anti-Tarnish & Waterproof",
+    "Handcrafted Ethnic & Daily Luxury",
+    `Free Pan-India Delivery Above ₹${storeConfig.commerce.freeShippingThreshold}`,
+    "Hypoallergenic & Shower Safe",
+    "Fast Dispatch Within 24-48 Hours",
+    "Secure UPI, Card & NetBanking Checkout",
+  ];
 
   return (
     <aside

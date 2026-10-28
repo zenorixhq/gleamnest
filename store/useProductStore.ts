@@ -24,20 +24,38 @@ interface ProductStore {
   getProductBySlug: (slug: string) => Product | undefined;
 }
 
+const getInitialCachedProducts = (): Product[] => {
+  if (typeof window !== "undefined") {
+    try {
+      const cached = sessionStorage.getItem("gleamnest_cached_products");
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {}
+  }
+  return [];
+};
+
+const initialCached = getInitialCachedProducts();
+
 export const useProductStore = create<ProductStore>((set, get) => ({
-  products: [],
+  products: initialCached,
   isLoading: false,
-  hasLoaded: false,
+  hasLoaded: initialCached.length > 0,
   error: null,
 
   fetchProducts: async () => {
     try {
       set({ isLoading: true, error: null });
-      const res = await fetch(`/api/products?t=${Date.now()}`, { cache: "no-store" });
+      const res = await fetch("/api/products", { cache: "no-store" });
       if (!res.ok) throw new Error("Failed to fetch products");
       const data = await res.json();
-      if (Array.isArray(data)) {
+      if (Array.isArray(data) && data.length > 0) {
         set({ products: data, hasLoaded: true, isLoading: false });
+        try {
+          sessionStorage.setItem("gleamnest_cached_products", JSON.stringify(data));
+        } catch (e) {}
       } else {
         set({ hasLoaded: true, isLoading: false });
       }
@@ -63,10 +81,13 @@ export const useProductStore = create<ProductStore>((set, get) => ({
 
       const createdProduct = await res.json();
       // Prepend newly created product to state
-      set((state) => ({
-        products: [createdProduct, ...state.products.filter((p) => p.id !== createdProduct.id)],
-        isLoading: false,
-      }));
+      set((state) => {
+        const nextProducts = [createdProduct, ...state.products.filter((p) => p.id !== createdProduct.id)];
+        try {
+          sessionStorage.setItem("gleamnest_cached_products", JSON.stringify(nextProducts));
+        } catch (e) {}
+        return { products: nextProducts, isLoading: false };
+      });
 
       return createdProduct;
     } catch (err: any) {
@@ -91,10 +112,13 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       }
 
       const updated = await res.json();
-      set((state) => ({
-        products: state.products.map((p) => (p.id === id ? { ...p, ...updated } : p)),
-        isLoading: false,
-      }));
+      set((state) => {
+        const nextProducts = state.products.map((p) => (p.id === id ? { ...p, ...updated } : p));
+        try {
+          sessionStorage.setItem("gleamnest_cached_products", JSON.stringify(nextProducts));
+        } catch (e) {}
+        return { products: nextProducts, isLoading: false };
+      });
 
       return updated;
     } catch (err: any) {
@@ -113,10 +137,13 @@ export const useProductStore = create<ProductStore>((set, get) => ({
 
       if (!res.ok) throw new Error("Failed to delete product");
 
-      set((state) => ({
-        products: state.products.filter((p) => p.id !== id),
-        isLoading: false,
-      }));
+      set((state) => {
+        const nextProducts = state.products.filter((p) => p.id !== id);
+        try {
+          sessionStorage.setItem("gleamnest_cached_products", JSON.stringify(nextProducts));
+        } catch (e) {}
+        return { products: nextProducts, isLoading: false };
+      });
 
       return true;
     } catch (err: any) {

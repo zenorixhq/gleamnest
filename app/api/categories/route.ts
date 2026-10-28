@@ -37,7 +37,7 @@ async function getStoredCategories(): Promise<Category[]> {
     `);
     if (rows && rows.length > 0 && rows[0]?.value) {
       const parsed = JSON.parse(rows[0].value);
-      if (Array.isArray(parsed) && parsed.length > 0) {
+      if (Array.isArray(parsed) && parsed.length > 0 && parsed.some((c: any) => c.slug === "minimal-chains")) {
         return parsed;
       }
     }

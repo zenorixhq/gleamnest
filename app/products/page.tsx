@@ -70,37 +70,41 @@ function ProductCatalogContent() {
       .filter((p) => {
         // Category filter
         if (selectedCategory !== "all") {
-          if (selectedCategory === "new-arrivals") {
-            if (!p.isNewArrival && p.category !== "new-arrivals") return false;
-          } else if (selectedCategory === "necklaces-and-chains" || selectedCategory === "necklaces") {
-            const isMatch = p.category === "necklaces-and-chains" || p.category === "necklaces" || /necklace|chain|pendant/i.test(p.title);
+          if (selectedCategory === "minimal-chains") {
+            const isMatch = p.category === "minimal-chains" || p.tags.some(t => /minimal/i.test(t)) || /chain|pendant/i.test(p.title);
             if (!isMatch) return false;
-          } else if (selectedCategory === "bangles-kada") {
-            const isMatch = p.category === "bangles-kada" || p.category === "bangles" || /bangle|kada|cuff/i.test(p.title);
+          } else if (selectedCategory === "hanging-chains") {
+            const isMatch = p.category === "hanging-chains" || p.tags.some(t => /hanging/i.test(t)) || /hanging|lariat|drop/i.test(p.title);
             if (!isMatch) return false;
-          } else if (selectedCategory === "bracelets") {
-            const isMatch = (p.category === "bracelets" && !/bangle|kada|cuff/i.test(p.title)) || /bracelet/i.test(p.title);
+          } else if (selectedCategory === "jhumkas") {
+            const isMatch = p.category === "jhumkas" || /jhumka|jhumki|temple/i.test(p.title);
             if (!isMatch) return false;
-          } else if (selectedCategory === "watches") {
-            const isMatch = p.category === "watches" || /watch/i.test(p.title);
+          } else if (selectedCategory === "stud-and-hoops") {
+            const isMatch = p.category === "stud-and-hoops" || /stud|hoop|huggie/i.test(p.title);
             if (!isMatch) return false;
-          } else if (selectedCategory === "charms") {
-            const isMatch = p.category === "charms" || /charm/i.test(p.title);
+          } else if (selectedCategory === "traditional-earrings") {
+            const isMatch = p.category === "traditional-earrings" || /chandbali|traditional|earring/i.test(p.title);
             if (!isMatch) return false;
-          } else if (selectedCategory === "hip-chains") {
-            const isMatch = p.category === "hip-chains" || /hip chain|waist/i.test(p.title);
+          } else if (selectedCategory === "traditional-sets") {
+            const isMatch = p.category === "traditional-sets" || /set|bridal|necklace set/i.test(p.title);
             if (!isMatch) return false;
-          } else if (selectedCategory === "kids-collection") {
-            const isMatch = p.category === "kids-collection" || p.category === "kids" || /kid|child/i.test(p.title);
+          } else if (selectedCategory === "offer-products") {
+            const isMatch = p.category === "offer-products" || p.tags.some(t => /offer/i.test(t)) || !!p.salePrice || p.isBestSeller;
             if (!isMatch) return false;
           } else if (selectedCategory === "anklets") {
-            const isMatch = p.category === "anklets" || /anklet/i.test(p.title);
+            const isMatch = p.category === "anklets" || /anklet|payal/i.test(p.title);
             if (!isMatch) return false;
-          } else if (selectedCategory === "rings") {
-            const isMatch = p.category === "rings" || /ring/i.test(p.title);
+          } else if (selectedCategory === "bangles") {
+            const isMatch = p.category === "bangles" || p.category === "bangles-kada" || /bangle|kada|chooda/i.test(p.title);
             if (!isMatch) return false;
-          } else if (selectedCategory === "earrings") {
-            const isMatch = p.category === "earrings" || /earring|stud|hoop/i.test(p.title);
+          } else if (selectedCategory === "bracelet") {
+            const isMatch = p.category === "bracelet" || p.category === "bracelets" || /bracelet/i.test(p.title);
+            if (!isMatch) return false;
+          } else if (selectedCategory === "ring") {
+            const isMatch = p.category === "ring" || p.category === "rings" || /ring|band/i.test(p.title);
+            if (!isMatch) return false;
+          } else if (selectedCategory === "nosepin") {
+            const isMatch = p.category === "nosepin" || p.category === "charms" || /nosepin|nath|nose/i.test(p.title);
             if (!isMatch) return false;
           } else if (p.category !== selectedCategory) {
             return false;
@@ -124,7 +128,7 @@ function ProductCatalogContent() {
         if (priceRange === "over350" && currentPrice <= 350) return false;
 
         // In Stock filter
-        if (inStockOnly && (!p.inStock || p.stockCount === 0)) return false;
+        if (inStockOnly && (!p.inStock || p.stockCount <= 0)) return false;
 
         return true;
       })
@@ -196,8 +200,15 @@ function ProductCatalogContent() {
               ? "All Jewelry Collection"
               : categoryList.find((c) => c.slug === selectedCategory)?.name || "Jewelry Collection"}
           </h1>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            Showing {displayedProducts.length} of {filteredProducts.length} pieces • 4 items per row
+          <p className="text-xs text-muted-foreground mt-0.5 min-h-[18px] flex items-center">
+            {!hasLoaded && products.length === 0 ? (
+              <span className="inline-flex items-center gap-1.5 text-primary font-medium animate-pulse">
+                <Sparkles className="w-3.5 h-3.5 text-[#C5A059] animate-spin" />
+                <span>Loading GleamNest luxury jewelry pieces...</span>
+              </span>
+            ) : (
+              <>Showing {displayedProducts.length} of {filteredProducts.length} pieces • 4 items per row</>
+            )}
           </p>
         </div>
 
@@ -233,7 +244,9 @@ function ProductCatalogContent() {
           }`}
         >
           <span>All Pieces</span>
-          <span className="text-[10px] opacity-80">({products.length})</span>
+          {hasLoaded && products.length > 0 && (
+            <span className="text-[10px] opacity-80">({products.length})</span>
+          )}
         </button>
 
         {categoryList.map((cat) => {
@@ -263,7 +276,9 @@ function ProductCatalogContent() {
               }`}
             >
               <span>{cat.name}</span>
-              <span className="text-[10px] opacity-80">({count})</span>
+              {hasLoaded && products.length > 0 && (
+                <span className="text-[10px] opacity-80">({count})</span>
+              )}
             </button>
           );
         })}
@@ -337,10 +352,26 @@ function ProductCatalogContent() {
           {Array.from({ length: 8 }).map((_, i) => (
             <div
               key={i}
-              className="aspect-[3/4] rounded-2xl bg-[#EADBBE]/20 animate-pulse border border-[#EADBBE]/40 flex flex-col justify-end p-4 space-y-2"
+              className="flex flex-col bg-card rounded-xl border border-border/70 overflow-hidden shadow-sm animate-pulse"
             >
-              <div className="h-4 bg-stone-200/80 rounded w-3/4 animate-pulse" />
-              <div className="h-3 bg-stone-200/60 rounded w-1/2 animate-pulse" />
+              {/* Image Frame Shimmer */}
+              <div className="relative aspect-square w-full overflow-hidden bg-[#FAF8F5] dark:bg-stone-900/40 p-4 flex items-center justify-center">
+                <div className="w-12 h-12 rounded-full bg-stone-200/60 dark:bg-stone-800/60 flex items-center justify-center">
+                  <Sparkles className="w-5 h-5 text-stone-300 dark:text-stone-700 animate-pulse" />
+                </div>
+                <div className="absolute top-2 left-2 w-14 h-4 rounded-full bg-stone-200/70 dark:bg-stone-800/70" />
+              </div>
+              {/* Product Details Shimmer */}
+              <div className="p-2.5 sm:p-3 flex-1 flex flex-col justify-between space-y-3">
+                <div className="space-y-1.5">
+                  <div className="h-2.5 bg-stone-200/70 dark:bg-stone-800/70 rounded w-1/3" />
+                  <div className="h-3.5 bg-stone-200/90 dark:bg-stone-800/90 rounded w-4/5" />
+                </div>
+                <div className="pt-2 border-t border-border/40 flex items-center justify-between">
+                  <div className="h-4 bg-stone-200 dark:bg-stone-800 rounded w-2/5" />
+                  <div className="h-7 w-7 rounded-lg bg-stone-200/80 dark:bg-stone-800/80" />
+                </div>
+              </div>
             </div>
           ))}
         </div>

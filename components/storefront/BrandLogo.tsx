@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import { storeConfig } from "@/config/store.config";
 
 interface BrandLogoProps {
   variant?: "full" | "compact" | "emblem-only";
@@ -20,34 +21,37 @@ export function BrandLogo({
     <Link
       href="/"
       className={`inline-flex items-center gap-2.5 sm:gap-3 group select-none ${className}`}
-      aria-label="GleamNest.in Home"
+      aria-label="Alnaya.in Home"
     >
-      {/* 1. Official GN Monogram Emblem */}
-      <div className="relative w-9 h-9 sm:w-11 sm:h-11 flex-shrink-0 flex items-center justify-center">
+      {/* 1. Official Alnaya Circular Emblem */}
+      <div className="relative w-9 h-9 sm:w-11 sm:h-11 flex-shrink-0 flex items-center justify-center rounded-full overflow-hidden border border-primary/25 shadow-sm group-hover:scale-105 transition-all duration-300">
         <img
-          src="/images/logo-mark.png"
-          alt="GleamNest Emblem"
-          className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
+          src="/alnaya-logo.png"
+          alt="Alnaya Logo"
+          className="w-full h-full object-cover"
         />
       </div>
 
-      {/* 2. Official Brand Wordmark & Tagline */}
+      {/* 2. Brand Wordmark & Tagline */}
       {variant !== "emblem-only" && (
         <div className="flex flex-col text-left justify-center">
-          <img
-            src="/images/logo-text.png"
-            alt="GleamNest.in"
-            className={`h-5 sm:h-6 md:h-6.5 w-auto object-contain object-left transition-all ${
-              theme === "dark" ? "brightness-0 invert opacity-95" : ""
-            }`}
-          />
-          {showTagline && (
+          <div className="flex items-center gap-1.5">
             <span
-              className={`font-script text-[9.5px] sm:text-xs md:text-[13px] tracking-normal mt-0.5 truncate max-w-[210px] sm:max-w-none ${
-                theme === "dark" ? "text-[#EADBBE]" : "text-[#C5A059]"
+              className={`font-serif-luxury text-lg sm:text-xl font-bold tracking-[0.16em] uppercase transition-colors ${
+                theme === "dark" ? "text-white" : "text-foreground"
               }`}
             >
-              The place where elegance and sparkle come together.
+              ALNAYA<span className={`text-sm ${theme === "dark" ? "text-amber-300 font-semibold" : "text-primary font-light"}`}>.IN</span>
+            </span>
+            <span className="text-[10px] text-amber-500">✦</span>
+          </div>
+          {showTagline && (
+            <span
+              className={`font-editorial italic text-[10px] sm:text-[11.5px] tracking-wide mt-[-2px] truncate max-w-[210px] sm:max-w-none ${
+                theme === "dark" ? "text-amber-200/80" : "text-primary/90"
+              }`}
+            >
+              {storeConfig.meta.tagline}
             </span>
           )}
         </div>

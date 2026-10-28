@@ -53,7 +53,11 @@ export async function GET() {
 
     // Format DB products into application Product interface
     const formatted = dbProducts.map(formatProduct);
-    return NextResponse.json(formatted);
+    return NextResponse.json(formatted, {
+      headers: {
+        "Cache-Control": "public, s-maxage=10, stale-while-revalidate=59",
+      },
+    });
   } catch (err) {
     console.error("GET /api/products error:", err);
     return NextResponse.json([]);
@@ -78,6 +82,10 @@ export async function POST(req: Request) {
         ? [body.imageUrl.trim()]
         : ["https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&q=80&w=800"];
 
+    const stockCountNum = body.stockCount !== undefined && body.stockCount !== "" && !isNaN(parseInt(body.stockCount))
+      ? Math.max(0, parseInt(body.stockCount))
+      : 10;
+
     const newProduct = await prisma.product.create({
       data: {
         slug,
@@ -97,8 +105,8 @@ export async function POST(req: Request) {
         images: JSON.stringify(imageUrls),
         rating: 5.0,
         reviewCount: 0,
-        inStock: body.inStock !== false,
-        stockCount: parseInt(body.stockCount) || 10,
+        inStock: stockCountNum > 0,
+        stockCount: stockCountNum,
         featured: !!body.featured,
         isNewArrival: true,
         isBestSeller: !!body.isBestSeller,

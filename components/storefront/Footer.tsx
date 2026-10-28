@@ -80,33 +80,33 @@ export function Footer() {
             </h5>
             <ul className="space-y-2 text-xs sm:text-[13px] text-stone-400">
               <li>
-                <Link href="/products?category=new-arrivals" className="hover:text-white transition-colors text-white font-medium flex items-center gap-1">
-                  <span>✦ New Arrivals</span>
+                <Link href="/products?category=minimal-chains" className="hover:text-white transition-colors">
+                  Minimal Chains
                 </Link>
               </li>
               <li>
-                <Link href="/products?category=necklaces-and-chains" className="hover:text-white transition-colors">
-                  Necklaces & Chains
+                <Link href="/products?category=jhumkas" className="hover:text-white transition-colors">
+                  Ethnic Jhumkas
                 </Link>
               </li>
               <li>
-                <Link href="/products?category=rings" className="hover:text-white transition-colors">
-                  Rings & Bands
+                <Link href="/products?category=traditional-sets" className="hover:text-white transition-colors">
+                  Traditional Sets
                 </Link>
               </li>
               <li>
-                <Link href="/products?category=earrings" className="hover:text-white transition-colors">
-                  Earrings & Hoops
+                <Link href="/products?category=bangles" className="hover:text-white transition-colors">
+                  Bangles & Kada
                 </Link>
               </li>
               <li>
-                <Link href="/products?category=bracelets" className="hover:text-white transition-colors">
-                  Bracelets & Bangles
+                <Link href="/products?category=offer-products" className="text-amber-400 hover:text-white transition-colors flex items-center gap-1 font-semibold">
+                  <span>✦ Offer Products</span>
                 </Link>
               </li>
               <li>
                 <Link href="/products" className="text-[#C5A059] hover:underline transition-colors flex items-center gap-1 pt-1 font-medium">
-                  <span>All Collections</span>
+                  <span>All 12 Categories</span>
                   <span>→</span>
                 </Link>
               </li>

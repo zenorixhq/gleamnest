@@ -32,7 +32,11 @@ export function QuickViewModal() {
     });
   }
 
+  const isOutOfStock = !product.inStock || product.stockCount <= 0;
+  const isVeryFewLeft = !isOutOfStock && product.stockCount <= 3;
+
   const handleAddToCart = () => {
+    if (isOutOfStock) return;
     const hasVariants =
       product.variantAttributes && product.variantAttributes.length > 0;
     const variantId = hasVariants
@@ -154,38 +158,63 @@ export function QuickViewModal() {
                 </div>
               ))}
 
-              {/* Quantity */}
-              <div className="space-y-1.5 pt-2">
-                <span className="text-xs font-semibold text-foreground">Quantity</span>
-                <div className="flex items-center w-28 border border-border rounded-lg bg-muted/20">
-                  <button
-                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="p-2 hover:bg-muted text-foreground transition-colors"
-                  >
-                    <Minus className="w-3.5 h-3.5" />
-                  </button>
-                  <span className="flex-1 text-center text-xs font-bold text-foreground">
-                    {quantity}
-                  </span>
-                  <button
-                    onClick={() => setQuantity(quantity + 1)}
-                    className="p-2 hover:bg-muted text-foreground transition-colors"
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                  </button>
+              {/* Stock Indicator & Quantity */}
+              <div className="space-y-2 pt-2">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-semibold text-foreground">Availability</span>
+                  {isOutOfStock ? (
+                    <span className="text-rose-600 font-bold">Out of Stock</span>
+                  ) : isVeryFewLeft ? (
+                    <span className="text-amber-600 font-bold flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                      Very Few Left! Only {product.stockCount} left
+                    </span>
+                  ) : (
+                    <span className="text-emerald-600 font-semibold">In Stock ({product.stockCount} units)</span>
+                  )}
                 </div>
+
+                {!isOutOfStock && (
+                  <div className="flex items-center w-28 border border-border rounded-lg bg-muted/20">
+                    <button
+                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                      className="p-2 hover:bg-muted text-foreground transition-colors"
+                    >
+                      <Minus className="w-3.5 h-3.5" />
+                    </button>
+                    <span className="flex-1 text-center text-xs font-bold text-foreground">
+                      {quantity}
+                    </span>
+                    <button
+                      onClick={() => setQuantity(Math.min(product.stockCount, quantity + 1))}
+                      className="p-2 hover:bg-muted text-foreground transition-colors"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
 
             {/* CTA Buttons */}
             <div className="pt-6 mt-6 border-t border-border space-y-2.5">
-              <button
-                onClick={handleAddToCart}
-                className="w-full py-3 px-4 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:bg-primary/90 flex items-center justify-center gap-2 shadow-md transition-all"
-              >
-                <ShoppingBag className="w-4 h-4" />
-                <span>Add to Bag</span>
-              </button>
+              {isOutOfStock ? (
+                <button
+                  disabled
+                  className="w-full py-3 px-4 rounded-xl bg-muted text-muted-foreground font-semibold text-sm cursor-not-allowed flex items-center justify-center gap-2 border border-border"
+                >
+                  <ShoppingBag className="w-4 h-4 opacity-50" />
+                  <span>Out of Stock</span>
+                </button>
+              ) : (
+                <button
+                  onClick={handleAddToCart}
+                  className="w-full py-3 px-4 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:bg-primary/90 flex items-center justify-center gap-2 shadow-md transition-all"
+                >
+                  <ShoppingBag className="w-4 h-4" />
+                  <span>Add to Bag</span>
+                </button>
+              )}
 
               <Link
                 href={`/products/${product.slug}`}

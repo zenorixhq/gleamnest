@@ -36,8 +36,8 @@ export default function RootLayout({
   } as React.CSSProperties;
 
   return (
-    <html lang="en" className="scroll-smooth" style={dynamicThemeStyles}>
-      <body className="min-h-screen flex flex-col font-sans bg-background text-foreground">
+    <html lang="en" className="scroll-smooth" style={dynamicThemeStyles} suppressHydrationWarning>
+      <body className="min-h-screen flex flex-col font-sans bg-background text-foreground" suppressHydrationWarning>
         <AnnouncementBar />
         <Header />
         <main className="flex-1">{children}</main>

@@ -2,96 +2,134 @@ import { Product, Category, Order } from "@/types/store";
 
 export const categories: Category[] = [
   {
-    id: "cat-new-arrivals",
-    slug: "new-arrivals",
-    name: "✦ New Arrivals",
-    description: "Our latest seasonal drops in 304 & 306 grade stainless steel waterproof jewelry.",
-    image: "https://images.unsplash.com/photo-1573408301185-9146fe634ad0?auto=format&fit=crop&q=80&w=800",
-    productCount: 31,
+    "id": "cat-minimal-chains",
+    "slug": "minimal-chains",
+    "name": "Minimal Chains",
+    "description": "Sleek, dainty daily-wear chains & delicate gold pendants made to live in.",
+    "image": "/images/emerald-necklace-product.jpg",
+    "productCount": 16
   },
   {
-    id: "cat-necklaces-and-chains",
-    slug: "necklaces-and-chains",
-    name: "Necklaces and Chains",
-    description: "Everyday anti-tarnish chains, pendants, and layering necklaces in 304 & 306 grade stainless steel.",
-    image: "/images/category-necklaces-and-chains.jpg",
-    productCount: 21,
+    "id": "cat-anklets",
+    "slug": "anklets",
+    "name": "Anklets",
+    "description": "Shimmering anti-tarnish payals, dainty charms & waterproof evil eye anklets.",
+    "image": "https://images.unsplash.com/photo-1598560917505-59a3ad559071?auto=format&fit=crop&q=80&w=800",
+    "productCount": 9
   },
   {
-    id: "cat-rings",
-    slug: "rings",
-    name: "Rings",
-    description: "Waterproof adjustable rings, statement bands, and stackable sets.",
-    image: "/images/category-rings.jpg",
-    productCount: 13,
+    "id": "cat-bangles",
+    "slug": "bangles",
+    "name": "Bangles",
+    "description": "Royal Indian bangles, stackable gold kadas & openable everyday choodas.",
+    "image": "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&q=80&w=800",
+    "productCount": 18
   },
   {
-    id: "cat-earrings",
-    slug: "earrings",
-    name: "Earrings",
-    description: "Hypoallergenic hoops, contemporary drop earrings, and dainty daily studs.",
-    image: "https://images.unsplash.com/photo-1630019852942-f89202989a59?auto=format&fit=crop&q=80&w=800",
-    productCount: 14,
+    "id": "cat-bracelet",
+    "slug": "bracelet",
+    "name": "Bracelet",
+    "description": "Clover charm bracelets, tennis bracelets & luxury paperclip link cuffs.",
+    "image": "/images/category-bracelets.jpg",
+    "productCount": 14
   },
   {
-    id: "cat-bracelets",
-    slug: "bracelets",
-    name: "Bracelets",
-    description: "Waterproof clover bracelets, paperclip chains, and link cuffs.",
-    image: "/images/category-bracelets.jpg",
-    productCount: 15,
+    "id": "cat-hanging-chains",
+    "slug": "hanging-chains",
+    "name": "Hanging Chains",
+    "description": "Graceful layered hanging necklaces, lariat chains & statement drops.",
+    "image": "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&q=80&w=800",
+    "productCount": 12
   },
   {
-    id: "cat-bangles-kada",
-    slug: "bangles-kada",
-    name: "Bangles Kada",
-    description: "Rigid luxury bangles, open-cuff kadas, and screw-lock everyday bangles.",
-    image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&q=80&w=800",
-    productCount: 19,
+    "id": "cat-jhumkas",
+    "slug": "jhumkas",
+    "name": "Jhumkas",
+    "description": "Authentic ethnic temple jhumkas, pearl drops & royal kundan bells.",
+    "image": "https://images.unsplash.com/photo-1630019852942-f89202989a59?auto=format&fit=crop&q=80&w=800",
+    "productCount": 15
   },
   {
-    id: "cat-watches",
-    slug: "watches",
-    name: "Watches",
-    description: "Refined minimalist luxury timepieces with stainless steel waterproof mesh and link bracelets.",
-    image: "https://images.unsplash.com/photo-1524805444758-089113d48a6d?auto=format&fit=crop&q=80&w=800",
-    productCount: 8,
+    "id": "cat-ring",
+    "slug": "ring",
+    "name": "Ring",
+    "description": "Waterproof adjustable rings, eternity emerald bands & solitaire statement rings.",
+    "image": "/images/category-rings.jpg",
+    "productCount": 17
   },
   {
-    id: "cat-charms",
-    slug: "charms",
-    name: "Charms",
-    description: "Interchangeable gemstone, clover, and botanical pendant charms for chains and bracelets.",
-    image: "https://images.unsplash.com/photo-1602751584552-8ba73aad10e1?auto=format&fit=crop&q=80&w=800",
-    productCount: 10,
+    "id": "cat-nosepin",
+    "slug": "nosepin",
+    "name": "Nosepin",
+    "description": "Dainty cubic zirconia clips, traditional maharashtrian naths & daily gold studs.",
+    "image": "https://images.unsplash.com/photo-1602751584552-8ba73aad10e1?auto=format&fit=crop&q=80&w=800",
+    "productCount": 8
   },
   {
-    id: "cat-hip-chains",
-    slug: "hip-chains",
-    name: "Hip Chains",
-    description: "Delicate and bold waist chains, anti-tarnish belly chains crafted for enduring daily wear.",
-    image: "https://images.unsplash.com/photo-1506630448388-4e683c67ddb0?auto=format&fit=crop&q=80&w=800",
-    productCount: 6,
+    "id": "cat-stud-and-hoops",
+    "slug": "stud-and-hoops",
+    "name": "Stud & Hoops",
+    "description": "Everyday huggies, chunky gold hoops & sparkling solitaire studs.",
+    "image": "https://images.unsplash.com/photo-1635767798638-3e25273a8236?auto=format&fit=crop&q=80&w=800",
+    "productCount": 13
   },
   {
-    id: "cat-anklets",
-    slug: "anklets",
-    name: "Anklets",
-    description: "Boho bead anklets, butterfly charms, and shimmering multi-diamond anklets.",
-    image: "https://images.unsplash.com/photo-1598560917505-59a3ad559071?auto=format&fit=crop&q=80&w=800",
-    productCount: 7,
+    "id": "cat-traditional-earrings",
+    "slug": "traditional-earrings",
+    "name": "Traditional Earrings",
+    "description": "Intricate chandbalis, bahubali ear-chains & festive kundan drops.",
+    "image": "https://images.unsplash.com/photo-1611591475805-4c0d1e576fd3?auto=format&fit=crop&q=80&w=800",
+    "productCount": 14
   },
   {
-    id: "cat-kids-collection",
-    slug: "kids-collection",
-    name: "Kids",
-    description: "Gentle bell charms, mini studs, and lightweight hypoallergenic pieces safe for sensitive skin.",
-    image: "/images/category-kids-collection.jpg",
-    productCount: 4,
+    "id": "cat-traditional-sets",
+    "slug": "traditional-sets",
+    "name": "Traditional Sets",
+    "description": "Bridal & festive necklace sets, matching earrings & maang tikka ensembles.",
+    "image": "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&q=80&w=800",
+    "productCount": 11
   },
+  {
+    "id": "cat-offer-products",
+    "slug": "offer-products",
+    "name": "Offer Products",
+    "description": "Curated bestsellers & festive gift sets at exclusive limited-time prices.",
+    "image": "/images/hero-card-necklace.jpg",
+    "productCount": 20
+  }
 ];
 
 export const products: Product[] = [
+  {
+  "id": "alnaya-prod-000",
+  "slug": "imperial-emerald-cuban-pendant",
+  "title": "Imperial Emerald & Gold Cuban Pendant",
+  "shortDescription": "Signature 18K gold Cuban link chain featuring an emerald-cut radiant green stone in a double micro-pavé halo.",
+  "description": "The crown jewel of the Alnaya Atelier. This masterpiece features a bold, fluid 18K PVD gold-finish Cuban link chain holding an exquisite emerald-cut radiant green stone, wrapped in a double halo of light-catching micro-pavé crystals. 100% anti-tarnish, waterproof, hypoallergenic, and crafted for everyday luxury and statement evenings.",
+  "price": 2499,
+  "salePrice": 1899,
+  "category": "minimal-chains",
+  "tags": [
+    "Minimal Chains",
+    "Hanging Chains",
+    "Offer Products",
+    "Bestseller",
+    "Atelier Signature"
+  ],
+  "images": [
+    "/images/emerald-necklace-product.jpg",
+    "/images/hero-necklace.png",
+    "/videos/hero-poster.webp"
+  ],
+  "rating": 5,
+  "reviewCount": 128,
+  "inStock": true,
+  "stockCount": 15,
+  "featured": true,
+  "isNewArrival": true,
+  "isBestSeller": true
+},
+
   {
     "id": "gn-prod-001",
     "slug": "statement-ring",
@@ -100,7 +138,7 @@ export const products: Product[] = [
     "description": "Bold gold-finish statement ring designed for modern daily styling. Hypoallergenic and lightweight. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 140,
     "priceQatar": 12,
-    "category": "rings",
+    "category": "ring",
     "tags": [
       "Rings",
       "Statement",
@@ -125,7 +163,7 @@ export const products: Product[] = [
     "description": "Easy comfort fit adjustable gold ring. Fits all finger sizes seamlessly. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 230,
     "priceQatar": 18,
-    "category": "rings",
+    "category": "ring",
     "tags": [
       "Rings",
       "Adjustable",
@@ -150,7 +188,7 @@ export const products: Product[] = [
     "description": "Delicate floral bloom motif ring crafted in gold finish PVD finish. Beautiful solo or stacked. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 230,
     "priceQatar": 18,
-    "category": "rings",
+    "category": "ring",
     "tags": [
       "Rings",
       "Floral",
@@ -175,7 +213,7 @@ export const products: Product[] = [
     "description": "Subtle open band design offering flexible sizing and daily wear durability. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 240,
     "priceQatar": 20,
-    "category": "rings",
+    "category": "ring",
     "tags": [
       "Rings",
       "Adjustable",
@@ -200,7 +238,7 @@ export const products: Product[] = [
     "description": "Clean aesthetic ring with polished luster that resists tarnish and sweat. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 250,
     "priceQatar": 20,
-    "category": "rings",
+    "category": "ring",
     "tags": [
       "Rings",
       "Minimalist",
@@ -225,7 +263,7 @@ export const products: Product[] = [
     "description": "Curated stackable multi-ring combo set. Mix, match, and stack across multiple fingers. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 290,
     "priceQatar": 25,
-    "category": "rings",
+    "category": "ring",
     "tags": [
       "Rings",
       "Stackable",
@@ -250,7 +288,7 @@ export const products: Product[] = [
     "description": "Smooth domed contour gold band. Elegant mirror shine that stays brilliant every day. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 300,
     "priceQatar": 25,
-    "category": "rings",
+    "category": "ring",
     "tags": [
       "Rings",
       "Simple",
@@ -275,7 +313,7 @@ export const products: Product[] = [
     "description": "Timeless ring silhouette designed to withstand daily chores, sanitizing, and water exposure. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 310,
     "priceQatar": 29,
-    "category": "rings",
+    "category": "ring",
     "tags": [
       "Rings",
       "Classic",
@@ -300,7 +338,7 @@ export const products: Product[] = [
     "description": "Premium gold finish-plated adjustable ring featuring open comfort band construction. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 310,
     "priceQatar": 29,
-    "category": "rings",
+    "category": "ring",
     "tags": [
       "Rings",
       "Gold Plated",
@@ -325,7 +363,7 @@ export const products: Product[] = [
     "description": "Pastel lavender enamel inlay paired with high-shine gold plating. A charming pop of color. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 310,
     "priceQatar": 29,
-    "category": "rings",
+    "category": "ring",
     "tags": [
       "Rings",
       "Lavender",
@@ -350,7 +388,7 @@ export const products: Product[] = [
     "description": "Vibrant sapphire blue accent adjustable ring with anti-tarnish stainless steel base. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 310,
     "priceQatar": 29,
-    "category": "rings",
+    "category": "ring",
     "tags": [
       "Rings",
       "Blue",
@@ -375,7 +413,7 @@ export const products: Product[] = [
     "description": "Playful multicoloured enamel stone round centerpiece on an adjustable golden shank. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 310,
     "priceQatar": 29,
-    "category": "rings",
+    "category": "ring",
     "tags": [
       "Rings",
       "Multicoloured",
@@ -400,7 +438,7 @@ export const products: Product[] = [
     "description": "Iconic four-leaf clover motif with black onyx-style inlay on a dainty gold cable chain. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 150,
     "priceQatar": 12,
-    "category": "bracelets",
+    "category": "bracelet",
     "tags": [
       "Bracelets",
       "Clover",
@@ -426,7 +464,7 @@ export const products: Product[] = [
     "description": "Full gold-finish lucky clover motif bracelet. Lightweight, dainty, and effortlessly layerable. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 150,
     "priceQatar": 12,
-    "category": "bracelets",
+    "category": "bracelet",
     "tags": [
       "Bracelets",
       "Clover",
@@ -451,7 +489,7 @@ export const products: Product[] = [
     "description": "Alternating mother-of-pearl white and black clover motifs along a shimmering golden chain. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 150,
     "priceQatar": 12,
-    "category": "bracelets",
+    "category": "bracelet",
     "tags": [
       "Bracelets",
       "Clover",
@@ -476,7 +514,7 @@ export const products: Product[] = [
     "description": "Protective evil eye emblem centered on a sleek open cuff bangle. Ward off negativity in style. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 210,
     "priceQatar": 18,
-    "category": "bangles-kada",
+    "category": "bangles",
     "tags": [
       "Bangles",
       "Evil Eye",
@@ -501,7 +539,7 @@ export const products: Product[] = [
     "description": "Freshwater-style green pearl beads interspersed with golden accents. SKU: GNBR003. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 218,
     "priceQatar": 18,
-    "category": "bracelets",
+    "category": "bracelet",
     "tags": [
       "Bracelets",
       "Pearl",
@@ -527,7 +565,7 @@ export const products: Product[] = [
     "description": "Playful dangling golden charms that chime softly with movement. Daily anti-tarnish finish. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 249,
     "priceQatar": 20,
-    "category": "bracelets",
+    "category": "bracelet",
     "tags": [
       "Bracelets",
       "Charm",
@@ -552,7 +590,7 @@ export const products: Product[] = [
     "description": "Tailored fit charm bracelet sized specifically for standard 2.4 to 2.6 wrist dimensions. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 249,
     "priceQatar": 20,
-    "category": "bracelets",
+    "category": "bracelet",
     "tags": [
       "Bracelets",
       "Charm",
@@ -577,7 +615,7 @@ export const products: Product[] = [
     "description": "Richly detailed charms with pavé cubic zirconia micro-accents. gold finish luster. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 270,
     "priceQatar": 22,
-    "category": "bracelets",
+    "category": "bracelet",
     "tags": [
       "Bracelets",
       "Charm",
@@ -602,7 +640,7 @@ export const products: Product[] = [
     "description": "Architectural structured statement bangle. Precision clasp closure. SKU: GNBL001. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 270,
     "priceQatar": 22,
-    "category": "bangles-kada",
+    "category": "bangles",
     "tags": [
       "Bangles",
       "Statement",
@@ -627,7 +665,7 @@ export const products: Product[] = [
     "description": "Modern minimalist sculpted statement bangle. Smooth mirror gold polish. SKU: GNBL002. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 270,
     "priceQatar": 22,
-    "category": "bangles-kada",
+    "category": "bangles",
     "tags": [
       "Bangles",
       "Statement",
@@ -652,7 +690,7 @@ export const products: Product[] = [
     "description": "Twisted textured statement bangle designed for effortless stacking. SKU: GNBL003. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 270,
     "priceQatar": 22,
-    "category": "bangles-kada",
+    "category": "bangles",
     "tags": [
       "Bangles",
       "Statement",
@@ -677,7 +715,7 @@ export const products: Product[] = [
     "description": "Emerald green crystal faceted beads on an anti-tarnish stainless steel link chain. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 280,
     "priceQatar": 25,
-    "category": "bracelets",
+    "category": "bracelet",
     "tags": [
       "Bracelets",
       "Green",
@@ -702,7 +740,7 @@ export const products: Product[] = [
     "description": "Organically contoured bamboo node links highlighted with white & black enamel (per piece). Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 299,
     "priceQatar": 25,
-    "category": "bracelets",
+    "category": "bracelet",
     "tags": [
       "Bracelets",
       "Bamboo",
@@ -727,7 +765,7 @@ export const products: Product[] = [
     "description": "Upgraded multi-motif black clover bracelet with weighted gold cable links. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 299,
     "priceQatar": 25,
-    "category": "bracelets",
+    "category": "bracelet",
     "tags": [
       "Bracelets",
       "Clover",
@@ -753,7 +791,7 @@ export const products: Product[] = [
     "description": "Romantic puffed heart pendant suspended from a glossy paperclip chain. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 299,
     "priceQatar": 25,
-    "category": "bracelets",
+    "category": "bracelet",
     "tags": [
       "Bracelets",
       "Heart",
@@ -778,7 +816,7 @@ export const products: Product[] = [
     "description": "Iridescent mother-of-pearl white clover motifs bordered in beaded golden edging. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 299,
     "priceQatar": 25,
-    "category": "bracelets",
+    "category": "bracelet",
     "tags": [
       "Bracelets",
       "Clover",
@@ -803,7 +841,7 @@ export const products: Product[] = [
     "description": "Bezel-set brilliant white cubic zirconia stones with continuous everyday brilliance. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 320,
     "priceQatar": 29,
-    "category": "bracelets",
+    "category": "bracelet",
     "tags": [
       "Bracelets",
       "Zircon",
@@ -828,7 +866,7 @@ export const products: Product[] = [
     "description": "Rigid hinged oval bangle featuring delicate dangling charm accents. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 340,
     "priceQatar": 29,
-    "category": "bangles-kada",
+    "category": "bangles",
     "tags": [
       "Bangles",
       "Charm",
@@ -853,7 +891,7 @@ export const products: Product[] = [
     "description": "Lush emerald green stone centerpiece set into a polished golden cuff bangle. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 350,
     "priceQatar": 29,
-    "category": "bangles-kada",
+    "category": "bangles",
     "tags": [
       "Bangles",
       "Green",
@@ -878,7 +916,7 @@ export const products: Product[] = [
     "description": "Fine enamel and crystal evil eye embedded in a solid anti-tarnish bangle. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 350,
     "priceQatar": 29,
-    "category": "bangles-kada",
+    "category": "bangles",
     "tags": [
       "Bangles",
       "Evil Eye",
@@ -903,7 +941,7 @@ export const products: Product[] = [
     "description": "Sculpted floral petals forming the focal point of a luxury golden wrist cuff. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 350,
     "priceQatar": 29,
-    "category": "bangles-kada",
+    "category": "bangles",
     "tags": [
       "Bangles",
       "Flower",
@@ -928,7 +966,7 @@ export const products: Product[] = [
     "description": "Intertwined heart motif bangle celebrating affection. Secure click-lock clasp. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 350,
     "priceQatar": 29,
-    "category": "bangles-kada",
+    "category": "bangles",
     "tags": [
       "Bangles",
       "Heart",
@@ -953,7 +991,7 @@ export const products: Product[] = [
     "description": "Minimalist seamless gold oval bangle that pairs effortlessly with all outfits. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 350,
     "priceQatar": 29,
-    "category": "bangles-kada",
+    "category": "bangles",
     "tags": [
       "Bangles",
       "Simple",
@@ -978,7 +1016,7 @@ export const products: Product[] = [
     "description": "Artistic blue tulip blossom charms set in warm gold finish. Signature GN piece. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 350,
     "priceQatar": 29,
-    "category": "bracelets",
+    "category": "bracelet",
     "tags": [
       "Bracelets",
       "Tulip",
@@ -1004,7 +1042,7 @@ export const products: Product[] = [
     "description": "Channel-set green cubic zirconia diamonds glittering along a sleek gold bangle. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 360,
     "priceQatar": 32,
-    "category": "bangles-kada",
+    "category": "bangles",
     "tags": [
       "Bangles",
       "Diamond",
@@ -1029,7 +1067,7 @@ export const products: Product[] = [
     "description": "Pavé white diamonds line this luxury bangle for an elevated evening and daily sparkle. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 360,
     "priceQatar": 32,
-    "category": "bangles-kada",
+    "category": "bangles",
     "tags": [
       "Bangles",
       "Diamond",
@@ -1054,7 +1092,7 @@ export const products: Product[] = [
     "description": "Heavyweight mirror polished oval cuff with smooth beveled edges. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 360,
     "priceQatar": 32,
-    "category": "bangles-kada",
+    "category": "bangles",
     "tags": [
       "Bangles",
       "Classic",
@@ -1079,7 +1117,7 @@ export const products: Product[] = [
     "description": "Solitaire and accent white stones mounted on a refined gold-plated framework. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 360,
     "priceQatar": 32,
-    "category": "bangles-kada",
+    "category": "bangles",
     "tags": [
       "Bangles",
       "White Stone",
@@ -1104,7 +1142,7 @@ export const products: Product[] = [
     "description": "Crisp white enamel flower blossoms with golden pistil centers on a luxury cuff. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 370,
     "priceQatar": 32,
-    "category": "bangles-kada",
+    "category": "bangles",
     "tags": [
       "Bangles",
       "White Flower",
@@ -1129,7 +1167,7 @@ export const products: Product[] = [
     "description": "Intricately hammered tactile finish capturing and diffusing ambient light beautifully. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 390,
     "priceQatar": 32,
-    "category": "bangles-kada",
+    "category": "bangles",
     "tags": [
       "Bangles",
       "Textured",
@@ -1154,7 +1192,7 @@ export const products: Product[] = [
     "description": "High-end designer inspired cuff with engraved Roman numerals and center crystal. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 390,
     "priceQatar": 32,
-    "category": "bangles-kada",
+    "category": "bangles",
     "tags": [
       "Bangles",
       "Luxury Look",
@@ -1179,7 +1217,7 @@ export const products: Product[] = [
     "description": "Opulent multi-drop charm bangle featuring hearts, stars, and celestial motifs. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 450,
     "priceQatar": 40,
-    "category": "bangles-kada",
+    "category": "bangles",
     "tags": [
       "Bangles",
       "Multi Charm",
@@ -1204,7 +1242,7 @@ export const products: Product[] = [
     "description": "Versatile lightweight golden chain that pairs seamlessly with any shirt, dress, or tee. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 120,
     "priceQatar": 10,
-    "category": "necklaces-and-chains",
+    "category": "hanging-chains",
     "tags": [
       "Necklaces",
       "Everyday",
@@ -1229,7 +1267,7 @@ export const products: Product[] = [
     "description": "Lustrous white freshwater-style pearl drop on a whisper-thin golden cable link. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 150,
     "priceQatar": 12,
-    "category": "necklaces-and-chains",
+    "category": "minimal-chains",
     "tags": [
       "Necklaces",
       "Pearl",
@@ -1254,7 +1292,7 @@ export const products: Product[] = [
     "description": "Delicate crystalline snowflake pendant with micro zircon sparkle in the core. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 150,
     "priceQatar": 12,
-    "category": "necklaces-and-chains",
+    "category": "hanging-chains",
     "tags": [
       "Necklaces",
       "Snowflake",
@@ -1279,7 +1317,7 @@ export const products: Product[] = [
     "description": "Meaningful intertwined heart and cross motif suspended from a delicate chain. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 160,
     "priceQatar": 14,
-    "category": "necklaces-and-chains",
+    "category": "minimal-chains",
     "tags": [
       "Necklaces",
       "Heart",
@@ -1304,7 +1342,7 @@ export const products: Product[] = [
     "description": "Deep ruby red faceted solitaire gem set in a 4-prong golden basket pendant. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 160,
     "priceQatar": 14,
-    "category": "necklaces-and-chains",
+    "category": "hanging-chains",
     "tags": [
       "Necklaces",
       "Ruby Red",
@@ -1329,7 +1367,7 @@ export const products: Product[] = [
     "description": "Polished hollow heart charm that slides effortlessly along a sleek gold chain. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 200,
     "priceQatar": 16,
-    "category": "necklaces-and-chains",
+    "category": "minimal-chains",
     "tags": [
       "Necklaces",
       "Heart",
@@ -1354,7 +1392,7 @@ export const products: Product[] = [
     "description": "Deep obsidian black stone set in a geometric gold bezel. SKU: GNCN001. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 220,
     "priceQatar": 18,
-    "category": "necklaces-and-chains",
+    "category": "hanging-chains",
     "tags": [
       "Necklaces",
       "Black Pendant",
@@ -1379,7 +1417,7 @@ export const products: Product[] = [
     "description": "Graceful sculpted flower blossom pendant on a glistening gold finish chain. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 240,
     "priceQatar": 20,
-    "category": "necklaces-and-chains",
+    "category": "minimal-chains",
     "tags": [
       "Necklaces",
       "Flower",
@@ -1404,7 +1442,7 @@ export const products: Product[] = [
     "description": "Iridescent white mother-of-pearl disc pendant framed by textured gold edging. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 260,
     "priceQatar": 22,
-    "category": "necklaces-and-chains",
+    "category": "hanging-chains",
     "tags": [
       "Necklaces",
       "White Pendant",
@@ -1429,7 +1467,7 @@ export const products: Product[] = [
     "description": "Pre-layered two-tier necklace providing an instant stacked collarbone look. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 270,
     "priceQatar": 22,
-    "category": "necklaces-and-chains",
+    "category": "minimal-chains",
     "tags": [
       "Necklaces",
       "Double Layer",
@@ -1454,7 +1492,7 @@ export const products: Product[] = [
     "description": "Organic freeform baroque pearl centerpiece with warm gold satellite beads. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 270,
     "priceQatar": 22,
-    "category": "necklaces-and-chains",
+    "category": "hanging-chains",
     "tags": [
       "Necklaces",
       "Pearl",
@@ -1479,7 +1517,7 @@ export const products: Product[] = [
     "description": "Sleek flat liquid herringbone snake chain resting flush against the collarbone. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 280,
     "priceQatar": 25,
-    "category": "necklaces-and-chains",
+    "category": "minimal-chains",
     "tags": [
       "Necklaces",
       "Herringbone",
@@ -1504,7 +1542,7 @@ export const products: Product[] = [
     "description": "Tiny white enamel charm drop necklace. Dainty, understated, and waterproof. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 290,
     "priceQatar": 25,
-    "category": "necklaces-and-chains",
+    "category": "hanging-chains",
     "tags": [
       "Necklaces",
       "White Charm",
@@ -1529,7 +1567,7 @@ export const products: Product[] = [
     "description": "Modern elongated paperclip links in rich gold finish finish. Wear solo or add charms. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 290,
     "priceQatar": 25,
-    "category": "necklaces-and-chains",
+    "category": "minimal-chains",
     "tags": [
       "Necklaces",
       "Paperclip",
@@ -1554,7 +1592,7 @@ export const products: Product[] = [
     "description": "Chunky puffed 3D heart pendant suspended from a substantial trending chain. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 320,
     "priceQatar": 29,
-    "category": "necklaces-and-chains",
+    "category": "hanging-chains",
     "tags": [
       "Necklaces",
       "Heart",
@@ -1579,7 +1617,7 @@ export const products: Product[] = [
     "description": "Coordinated dual necklace set designed for complementary everyday layering. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 320,
     "priceQatar": 29,
-    "category": "necklaces-and-chains",
+    "category": "minimal-chains",
     "tags": [
       "Necklaces",
       "Chain Set",
@@ -1604,7 +1642,7 @@ export const products: Product[] = [
     "description": "Shimmering multi-facet white zircon charm on luxury link chain. SKU: GNCN series. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 350,
     "priceQatar": 29,
-    "category": "necklaces-and-chains",
+    "category": "hanging-chains",
     "tags": [
       "Necklaces",
       "White Stone",
@@ -1629,7 +1667,7 @@ export const products: Product[] = [
     "description": "Streamlined linear drop earrings offering gentle sway and modern refinement. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 118,
     "priceQatar": 10,
-    "category": "earrings",
+    "category": "stud-and-hoops",
     "tags": [
       "Earrings",
       "Drop",
@@ -1654,7 +1692,7 @@ export const products: Product[] = [
     "description": "Petite heart silhouette earrings designed for sensitive ears and everyday comfort. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 118,
     "priceQatar": 10,
-    "category": "earrings",
+    "category": "traditional-earrings",
     "tags": [
       "Earrings",
       "Heart",
@@ -1679,7 +1717,7 @@ export const products: Product[] = [
     "description": "Sharp geometric square studs with high-polish mirror gold finish. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 118,
     "priceQatar": 10,
-    "category": "earrings",
+    "category": "jhumkas",
     "tags": [
       "Earrings",
       "Studs",
@@ -1704,7 +1742,7 @@ export const products: Product[] = [
     "description": "Minimalist triangular posts that add subtle edge to any casual or formal outfit. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 118,
     "priceQatar": 10,
-    "category": "earrings",
+    "category": "stud-and-hoops",
     "tags": [
       "Earrings",
       "Studs",
@@ -1729,7 +1767,7 @@ export const products: Product[] = [
     "description": "Everyday gold ball stud earrings (per pair). Sleep-safe, shower-safe, and hypoallergenic. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 120,
     "priceQatar": 10,
-    "category": "earrings",
+    "category": "traditional-earrings",
     "tags": [
       "Earrings",
       "Studs",
@@ -1754,7 +1792,7 @@ export const products: Product[] = [
     "description": "Golden blossom flower stud earrings with delicate petal detailing. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 150,
     "priceQatar": 12,
-    "category": "earrings",
+    "category": "jhumkas",
     "tags": [
       "Earrings",
       "Flower",
@@ -1779,7 +1817,7 @@ export const products: Product[] = [
     "description": "Substantial polished heart studs with secure comfort butterfly backs. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 200,
     "priceQatar": 16,
-    "category": "earrings",
+    "category": "stud-and-hoops",
     "tags": [
       "Earrings",
       "Heart",
@@ -1804,7 +1842,7 @@ export const products: Product[] = [
     "description": "Dangling golden hearts on lever-back hoops for lightweight movement. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 230,
     "priceQatar": 18,
-    "category": "earrings",
+    "category": "traditional-earrings",
     "tags": [
       "Earrings",
       "Heart",
@@ -1829,7 +1867,7 @@ export const products: Product[] = [
     "description": "Ornate floral motif drop earrings with fine botanical curves in gold finish. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 250,
     "priceQatar": 20,
-    "category": "earrings",
+    "category": "jhumkas",
     "tags": [
       "Earrings",
       "Floral",
@@ -1854,7 +1892,7 @@ export const products: Product[] = [
     "description": "Swirling dimensional spiral studs that catch sunlight from every angle. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 240,
     "priceQatar": 20,
-    "category": "earrings",
+    "category": "stud-and-hoops",
     "tags": [
       "Earrings",
       "Spiral",
@@ -1879,7 +1917,7 @@ export const products: Product[] = [
     "description": "Authentic Xuping huggie hoops studded with vibrant multicolour rainbow crystals. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 269,
     "priceQatar": 22,
-    "category": "earrings",
+    "category": "traditional-earrings",
     "tags": [
       "Earrings",
       "Xuping",
@@ -1905,7 +1943,7 @@ export const products: Product[] = [
     "description": "Chunky hollow croissant twist hoop earrings. Ultra-lightweight for all-day wear. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 270,
     "priceQatar": 22,
-    "category": "earrings",
+    "category": "jhumkas",
     "tags": [
       "Earrings",
       "Hoops",
@@ -1930,7 +1968,7 @@ export const products: Product[] = [
     "description": "Pavé micro-zircon paved heart earrings delivering extraordinary luxury sparkle. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 320,
     "priceQatar": 29,
-    "category": "earrings",
+    "category": "stud-and-hoops",
     "tags": [
       "Earrings",
       "Heart",
@@ -1982,7 +2020,7 @@ export const products: Product[] = [
     "description": "Dainty gentle bell charm anklet sized safely and comfortably for children. Handcrafted with premium 304 & 306 grade stainless steel with high-grade PVD gold plating. 100% waterproof, sweatproof, and hypoallergenic. Wear it everyday anywhere.",
     "price": 480,
     "priceQatar": 40,
-    "category": "kids-collection",
+    "category": "traditional-sets",
     "tags": [
       "Anklets",
       "Kids",

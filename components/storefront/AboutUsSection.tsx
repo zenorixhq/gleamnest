@@ -38,7 +38,7 @@ export function AboutUsSection() {
           </div>
 
           <p className="text-xs sm:text-sm text-[#5C5346] leading-relaxed font-light max-w-lg mx-auto px-2">
-            GleamNest designs modern, everyday luxury jewellery pieces handcrafted from premium 304 & 306 grade stainless steel. We believe in timeless daily elegance.
+            Alnaya crafts timeless, everyday luxury jewellery with hand-set stones and radiant 18K gold finishes. We believe in everyday elegance made to last.
           </p>
         </div>
 
