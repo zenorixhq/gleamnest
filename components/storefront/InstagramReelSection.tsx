@@ -14,6 +14,8 @@ import {
   Maximize2,
 } from "lucide-react";
 
+import initialReviewData from "@/data/clientReviews.json";
+
 export interface InstagramVideoItem {
   id: string | number;
   title: string;
@@ -26,48 +28,7 @@ export interface InstagramVideoItem {
   instagramLink?: string;
 }
 
-const defaultInstagramVideos: InstagramVideoItem[] = [
-  {
-    id: "insta-1",
-    title: "Daily Jewelry Stack & Styling Glow",
-    handle: "@gleamnest.in",
-    caption: "Waterproof & anti-tarnish everyday luxury crafted in 304 & 306 steel ✨",
-    videoUrl: "https://assets.mixkit.co/videos/preview/mixkit-woman-wearing-jewelry-in-front-of-a-mirror-42407-large.mp4",
-    poster: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&q=80&w=700",
-    views: "28.4K",
-    instagramLink: "https://www.instagram.com/gleamnest.in?igsh=c3I4M2h1YmprdXI5",
-  },
-  {
-    id: "insta-2",
-    title: "Anti-Tarnish Water & Perfume Test",
-    handle: "@gleamnest.in",
-    caption: "Shower safe, sweatproof, and designed to never turn green 💧",
-    videoUrl: "https://assets.mixkit.co/videos/preview/mixkit-close-up-of-a-woman-showing-a-gold-ring-42409-large.mp4",
-    poster: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&q=80&w=700",
-    views: "34.1K",
-    instagramLink: "https://www.instagram.com/gleamnest.in?igsh=c3I4M2h1YmprdXI5",
-  },
-  {
-    id: "insta-3",
-    title: "Unboxing the GleamNest Velvet Pouch",
-    handle: "@gleamnest.in",
-    caption: "Every order packed with real care. Pan-India delivery via DTDC & India Post 📦",
-    videoUrl: "https://assets.mixkit.co/videos/preview/mixkit-holding-a-gold-ring-in-hand-42410-large.mp4",
-    poster: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&q=80&w=700",
-    views: "19.8K",
-    instagramLink: "https://www.instagram.com/gleamnest.in?igsh=c3I4M2h1YmprdXI5",
-  },
-  {
-    id: "insta-4",
-    title: "Earrings & Hoops Real Mirror Finish",
-    handle: "@gleamnest.in",
-    caption: "Lightweight, hypoallergenic, and crafted for all-day sensitive ear wear ✨",
-    videoUrl: "https://assets.mixkit.co/videos/preview/mixkit-woman-wearing-jewelry-in-front-of-a-mirror-42407-large.mp4",
-    poster: "https://images.unsplash.com/photo-1630019852942-f89202989a59?auto=format&fit=crop&q=80&w=700",
-    views: "22.5K",
-    instagramLink: "https://www.instagram.com/gleamnest.in?igsh=c3I4M2h1YmprdXI5",
-  },
-];
+const defaultInstagramVideos: InstagramVideoItem[] = (initialReviewData.instagramVideos || []) as InstagramVideoItem[];
 
 function AutoPlayingInstaCard({
   vid,
@@ -205,7 +166,15 @@ export function InstagramReelSection() {
         const cached = localStorage.getItem("gleamnest_instagram_reels");
         if (cached) {
           const parsed = JSON.parse(cached);
-          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          if (
+            Array.isArray(parsed) &&
+            parsed.length > 0 &&
+            !parsed.some((v: any) => v.id === "insta-1" || v.id === "insta-2")
+          ) {
+            return parsed;
+          } else {
+            localStorage.removeItem("gleamnest_instagram_reels");
+          }
         }
       } catch (e) {}
     }

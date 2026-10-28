@@ -17,14 +17,6 @@
       "quote": "My solitaire arrived in a velvet box that already felt like an heirloom. The stone is extraordinary, and the WhatsApp ordering was so personal."
     },
     {
-      "id": "rev-3",
-      "author": "Sofia A.",
-      "location": "Bengaluru, Karnataka",
-      "piece": "Clover Bracelet - Gold",
-      "rating": 5,
-      "quote": "The atelier answered every question personally on WhatsApp. Rare, and quite lovely. Fast 2-day delivery across South India."
-    },
-    {
       "id": "rev-4",
       "author": "Meera K.",
       "location": "Mumbai, Maharashtra",
@@ -35,28 +27,16 @@
   ],
   "videoReels": [
     {
-      "id": "vid-1",
-      "influencer": "Ananya Sanil",
-      "handle": "@ananya.styling",
-      "title": "100% Waterproof Shower Test 💧",
+      "id": "vid-1793108116186",
+      "influencer": "gleamnest",
+      "handle": "@gleamnest.in",
+      "title": "Jewelry Packing Video",
       "poster": "https://images.unsplash.com/photo-1611591475806-039775089201?auto=format&fit=crop&q=80&w=700",
-      "videoUrl": "https://assets.mixkit.co/videos/preview/mixkit-woman-wearing-jewelry-in-front-of-a-mirror-42407-large.mp4",
-      "views": "18.4K views",
-      "productTitle": "Clover Bracelet - Gold",
-      "productSlug": "clover-bracelet-gold",
+      "videoUrl": "/videos/review-vid-1793108116186.mp4",
+      "views": "1.2K views",
+      "productTitle": "GleamNest Jewelry",
+      "productSlug": "all",
       "productPrice": 150
-    },
-    {
-      "id": "vid-2",
-      "influencer": "Devika Menon",
-      "handle": "@devika_curates",
-      "title": "Unboxing & Daily Stack Review ✨",
-      "poster": "https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&q=80&w=700",
-      "videoUrl": "https://assets.mixkit.co/videos/preview/mixkit-close-up-of-a-woman-showing-a-gold-ring-42409-large.mp4",
-      "views": "24.1K views",
-      "productTitle": "Statement Ring",
-      "productSlug": "statement-ring",
-      "productPrice": 140
     }
   ],
   "feedbackScreenshots": [
@@ -103,44 +83,59 @@
   ],
   "instagramVideos": [
     {
-      "id": "insta-1",
-      "title": "Daily Jewelry Stack & Styling Glow",
+      "id": "insta-1793165217096",
+      "title": "Bamboo Chain",
       "handle": "@gleamnest.in",
-      "caption": "Waterproof & anti-tarnish everyday luxury crafted in 304 & 306 steel ✨",
-      "videoUrl": "https://assets.mixkit.co/videos/preview/mixkit-woman-wearing-jewelry-in-front-of-a-mirror-42407-large.mp4",
-      "poster": "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&q=80&w=700",
-      "views": "28.4K",
-      "instagramLink": "https://www.instagram.com/gleamnest.in?igsh=c3I4M2h1YmprdXI5"
-    },
-    {
-      "id": "insta-2",
-      "title": "Anti-Tarnish Water & Perfume Test",
-      "handle": "@gleamnest.in",
-      "caption": "Shower safe, sweatproof, and designed to never turn green 💧",
-      "videoUrl": "https://assets.mixkit.co/videos/preview/mixkit-close-up-of-a-woman-showing-a-gold-ring-42409-large.mp4",
+      "caption": "Simple, classy & timeless!\n\nAdd a touch of elegance to your everyday look with our beautiful Bamboo Chain\n\nMinimal jewellery, maximum charm!\n\nDM us to order yours.\n\nFollow @gleamnest.in for more beautiful jewellery finds!\n\nSave this reel & share it with someone who loves minimal jewellery!",
+      "videoUrl": "/videos/reel-bamboo-chain.mp4",
+      "embedUrl": "",
       "poster": "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&q=80&w=700",
-      "views": "34.1K",
-      "instagramLink": "https://www.instagram.com/gleamnest.in?igsh=c3I4M2h1YmprdXI5"
+      "views": "1.4K",
+      "instagramLink": "https://www.instagram.com/reel/DfAlVJ0yLlC/?mdxt=MXVvNjFmMmloZGZh"
     },
     {
-      "id": "insta-3",
-      "title": "Unboxing the GleamNest Velvet Pouch",
+      "id": "insta-1793156081907",
+      "title": "Golden Clover Bracelet",
       "handle": "@gleamnest.in",
-      "caption": "Every order packed with real care. Pan-India delivery via DTDC & India Post 📦",
-      "videoUrl": "https://assets.mixkit.co/videos/preview/mixkit-holding-a-gold-ring-in-hand-42410-large.mp4",
-      "poster": "https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&q=80&w=700",
-      "views": "19.8K",
-      "instagramLink": "https://www.instagram.com/gleamnest.in?igsh=c3I4M2h1YmprdXI5"
+      "caption": "A little clover, a lot of elegance!\n\nFall in love with the timeless beauty of our Golden Clover Bracelet A delicate touch of gold that makes every look\n\nextra special!\n\nSave this for your jewellery wishlist\n\nDM us to order\n\nFollow @gleamnest.in for more beautiful jewellery finds!\n\nWhich look would you style it with?",
+      "videoUrl": "/videos/reel-golden-clover.mp4",
+      "embedUrl": "",
+      "poster": "/videos/reel-golden-clover-poster.jpg",
+      "views": "28.4K",
+      "instagramLink": "https://www.instagram.com/reel/De4rz6hylG2/?dlrf=MTFzY2U2MTZqem1jag=="
     },
     {
-      "id": "insta-4",
-      "title": "Earrings & Hoops Real Mirror Finish",
+      "id": "insta-1793155897521",
+      "title": "Pack an order with me",
       "handle": "@gleamnest.in",
-      "caption": "Lightweight, hypoallergenic, and crafted for all-day sensitive ear wear ✨",
-      "videoUrl": "https://assets.mixkit.co/videos/preview/mixkit-woman-wearing-jewelry-in-front-of-a-mirror-42407-large.mp4",
-      "poster": "https://images.unsplash.com/photo-1630019852942-f89202989a59?auto=format&fit=crop&q=80&w=700",
-      "views": "22.5K",
-      "instagramLink": "https://www.instagram.com/gleamnest.in?igsh=c3I4M2h1YmprdXI5"
+      "caption": "Pack an order with me!\n\nEvery little order comes with lots of love, care & gratitude\n\nBehind every package is a small business dream growing one order at a time.\n\nThank you for supporting Gleamnest.in and being part of our journey!\n\nLove jewellery? Follow @gleamnest.in for more beautiful and affordable jewellery finds!\n\nSave this Reel & share it with someone who loves small businesses!",
+      "videoUrl": "/videos/reel-pack-order.mp4",
+      "embedUrl": "",
+      "poster": "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&q=80&w=700",
+      "views": "28.4K",
+      "instagramLink": "https://www.instagram.com/reel/De4rz6hylG2/?srtk=MTFzY2U2MTZqem1jag=="
+    },
+    {
+      "id": "insta-1793155580997",
+      "title": "Baby Bangles",
+      "handle": "@gleamnest.in",
+      "caption": "Elegance that fits your wrist perfectly!\n\nBeautiful, stylish bangles designed for a delicate, slim wrist.\n\nA little sparkle to make your everyday look extra special!\n\nDM us to order\n\nFollow @gleamnest.in for more beautiful jewellery finds!\n\n#SlimWristBangles #ElegantBangles #StoneStuddedBangles #WomensJewellery #gleamnestin",
+      "videoUrl": "/videos/reel-baby-bangles.mp4",
+      "embedUrl": "",
+      "poster": "/videos/reel-baby-bangles-poster.jpg",
+      "views": "1.2",
+      "instagramLink": "https://www.instagram.com/reel/DemoFOoyA2i/?cplk=a2U5aHFyMm1hcWZ6"
+    },
+    {
+      "id": "insta-1793155339776",
+      "title": "Rings",
+      "handle": "@gleamnest.in",
+      "caption": "One ring, endless possibilities!\n\nColourful, classy & adjustable - the perfect little sparkle for your everyday style!\n\nComment your\n\nWhich colour would you choose?\n\nfavourite below!\n\nFollow @gleamnest.in for more beautiful jewellery finds, trendy designs & affordable styles!",
+      "videoUrl": "/videos/reel-rings.mp4",
+      "embedUrl": "",
+      "poster": "/videos/reel-rings-poster.jpg",
+      "views": "15.2K",
+      "instagramLink": "https://www.instagram.com/reel/DemoFOoyA2i/?xtok=a2U5aHFyMm1hcWZ6"
     }
   ]
 }

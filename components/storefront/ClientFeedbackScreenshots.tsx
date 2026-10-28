@@ -24,12 +24,16 @@ export interface FeedbackScreenshot {
   date?: string;
 }
 
+import initialReviewData from "@/data/clientReviews.json";
+
 interface ClientFeedbackScreenshotsProps {
   className?: string;
 }
 
 export function ClientFeedbackScreenshots({ className = "" }: ClientFeedbackScreenshotsProps) {
-  const [screenshots, setScreenshots] = useState<FeedbackScreenshot[]>([]);
+  const [screenshots, setScreenshots] = useState<FeedbackScreenshot[]>(
+    () => (initialReviewData.feedbackScreenshots || []) as FeedbackScreenshot[]
+  );
   const [zoomedScreenshot, setZoomedScreenshot] = useState<FeedbackScreenshot | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 

@@ -14,7 +14,7 @@ export const categories: Category[] = [
     slug: "necklaces-and-chains",
     name: "Necklaces and Chains",
     description: "Everyday anti-tarnish chains, pendants, and layering necklaces in 304 & 306 grade stainless steel.",
-    image: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&q=80&w=800",
+    image: "/images/category-necklaces-and-chains.jpg",
     productCount: 21,
   },
   {
@@ -22,7 +22,7 @@ export const categories: Category[] = [
     slug: "rings",
     name: "Rings",
     description: "Waterproof adjustable rings, statement bands, and stackable sets.",
-    image: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&q=80&w=800",
+    image: "/images/category-rings.jpg",
     productCount: 13,
   },
   {
@@ -38,7 +38,7 @@ export const categories: Category[] = [
     slug: "bracelets",
     name: "Bracelets",
     description: "Waterproof clover bracelets, paperclip chains, and link cuffs.",
-    image: "https://images.unsplash.com/photo-1611591475806-039775089201?auto=format&fit=crop&q=80&w=800",
+    image: "/images/category-bracelets.jpg",
     productCount: 15,
   },
   {
@@ -86,7 +86,7 @@ export const categories: Category[] = [
     slug: "kids-collection",
     name: "Kids",
     description: "Gentle bell charms, mini studs, and lightweight hypoallergenic pieces safe for sensitive skin.",
-    image: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&q=80&w=800",
+    image: "/images/category-kids-collection.jpg",
     productCount: 4,
   },
 ];
