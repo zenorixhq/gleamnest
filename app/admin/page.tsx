@@ -210,6 +210,10 @@ export default function AdminDashboardPage() {
   };
 
   useEffect(() => {
+    try {
+      localStorage.removeItem("gleamnest_products_catalog");
+    } catch (e) {}
+
     if (isAuthenticated) {
       fetchProducts();
       fetchReviewsAndVideos();
