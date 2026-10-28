@@ -202,14 +202,14 @@ ${greetingMessage}
     }
   };
 
-  // 4 pieces total: same category first, followed by catalog favorites (2 rows x 2 cols)
+  // 8 pieces total: same category first, followed by catalog favorites (2*4 desktop, 2*2 mobile)
   const categoryProducts = products.filter(
     (p) => p.id !== product.id && p.category === product.category
   );
   const otherProducts = products.filter(
     (p) => p.id !== product.id && p.category !== product.category
   );
-  const relatedProducts = [...categoryProducts, ...otherProducts].slice(0, 4);
+  const relatedProducts = [...categoryProducts, ...otherProducts].slice(0, 8);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-12 space-y-12 sm:space-y-16 pb-24 sm:pb-12">
@@ -640,7 +640,7 @@ ${greetingMessage}
         </div>
       </section>
 
-      {/* Related Products: 2 rows and 2 columns of cards (2*2) */}
+      {/* Related Products: 2 rows x 4 columns on desktop (2*4 = 8), 2 rows x 2 columns on mobile (2*2 = 4) */}
       {relatedProducts.length > 0 && (
         <section className="border-t border-border pt-10 sm:pt-14 space-y-6">
           <div className="flex items-center justify-between">
@@ -659,10 +659,12 @@ ${greetingMessage}
             </Link>
           </div>
 
-          {/* 2 Rows x 2 Columns Grid (2*2) */}
-          <div className="grid grid-cols-2 gap-3 sm:gap-5 md:gap-6">
-            {relatedProducts.map((p) => (
-              <ProductCard key={p.id} product={p} />
+          {/* Grid: 2*2 on Mobile (first 4 items), 2*4 on Desktop (8 items) */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
+            {relatedProducts.map((p, idx) => (
+              <div key={p.id} className={idx >= 4 ? "hidden md:block" : "block"}>
+                <ProductCard product={p} />
+              </div>
             ))}
           </div>
 
