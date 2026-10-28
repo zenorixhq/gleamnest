@@ -82,10 +82,10 @@ export async function POST(req: Request) {
       console.warn("Local filesystem write skipped (read-only environment):", fsErr.message);
     }
 
-    // 3. Resilient fallback for serverless (Vercel) when BLOB_READ_WRITE_TOKEN is not yet connected:
-    // For images, thumbnails, and screenshots (or small videos under 4MB): return Data URL
-    if (safeFolder !== "videos" || buffer.length <= 4 * 1024 * 1024) {
-      const mimeType = file.type || (safeFolder === "videos" ? "video/mp4" : "image/jpeg");
+    // 3. Fallback for serverless (Vercel) when BLOB_READ_WRITE_TOKEN is not yet connected:
+    // Only allowed for small compressed images/thumbnails under 500KB. NEVER return base64 for videos!
+    if (safeFolder !== "videos" && buffer.length <= 500 * 1024) {
+      const mimeType = file.type || "image/jpeg";
       const dataUrl = `data:${mimeType};base64,${buffer.toString("base64")}`;
 
       return NextResponse.json(
@@ -104,11 +104,13 @@ export async function POST(req: Request) {
       );
     }
 
-    // 4. For large videos on Vercel when Vercel Blob is not yet enabled in the dashboard
+    // 4. If Vercel Blob was not reachable and filesystem is read-only
     return NextResponse.json(
       {
         error:
-          "Video file is larger than 4MB. To upload video files directly on Vercel, please connect Vercel Blob in your Vercel Dashboard (Storage -> Create Blob Store), OR paste an Instagram Reel / public video URL.",
+          safeFolder === "videos"
+            ? "Video upload requires Vercel Blob Storage. Please verify BLOB_READ_WRITE_TOKEN in Vercel settings, or paste a public video / Instagram Reel URL."
+            : "Image upload failed. Please verify storage configuration or paste an image URL.",
       },
       { status: 400 }
     );

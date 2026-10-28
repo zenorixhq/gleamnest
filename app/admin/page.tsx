@@ -254,9 +254,13 @@ export default function AdminDashboardPage() {
   const [uploadProgressText, setUploadProgressText] = useState("");
   const [isSavingItem, setIsSavingItem] = useState(false);
 
-  const compressImageIfNeeded = async (file: File, maxDim = 1600, quality = 0.85): Promise<File> => {
+  // Media Optimization & Upload
+  const compressImageIfNeeded = async (file: File, maxDim = 1400, quality = 0.82): Promise<File> => {
     if (!file.type.startsWith("image/")) return file;
-    if (file.size <= 800 * 1024) return file;
+    // Don't re-encode vector or animated images
+    if (file.type === "image/svg+xml" || file.type === "image/gif") return file;
+    // Already lightweight and compact
+    if (file.size <= 100 * 1024) return file;
 
     return new Promise((resolve) => {
       const reader = new FileReader();
@@ -284,11 +288,18 @@ export default function AdminDashboardPage() {
           }
 
           ctx.drawImage(img, 0, 0, width, height);
+
+          // WebP delivers 30-40% smaller file size with zero perceptible quality loss
+          const supportsWebp = canvas.toDataURL("image/webp").indexOf("data:image/webp") === 0;
+          const targetMime = supportsWebp ? "image/webp" : "image/jpeg";
+          const targetExt = supportsWebp ? ".webp" : ".jpg";
+
           canvas.toBlob(
             (blob) => {
               if (blob && blob.size < file.size) {
-                const optimized = new File([blob], file.name.replace(/\.[^.]+$/, ".jpg"), {
-                  type: "image/jpeg",
+                const cleanBase = file.name.replace(/\.[^.]+$/, "");
+                const optimized = new File([blob], `${cleanBase}${targetExt}`, {
+                  type: targetMime,
                   lastModified: Date.now(),
                 });
                 resolve(optimized);
@@ -296,7 +307,7 @@ export default function AdminDashboardPage() {
                 resolve(file);
               }
             },
-            "image/jpeg",
+            targetMime,
             quality
           );
         };
@@ -308,16 +319,352 @@ export default function AdminDashboardPage() {
     });
   };
 
+  const generateVideoPoster = async (file: File): Promise<File | null> => {
+    if (!file.type.startsWith("video/") && !file.name.match(/\.(mp4|mov|webm|m4v)$/i)) {
+      return null;
+    }
+    return new Promise((resolve) => {
+      const video = document.createElement("video");
+      const videoUrl = URL.createObjectURL(file);
+      video.src = videoUrl;
+      video.muted = true;
+      video.playsInline = true;
+      video.crossOrigin = "anonymous";
+      video.preload = "auto";
+
+      const cleanup = () => {
+        URL.revokeObjectURL(videoUrl);
+        video.remove();
+      };
+
+      const timeout = setTimeout(() => {
+        cleanup();
+        resolve(null);
+      }, 7000);
+
+      video.onloadeddata = () => {
+        // Seek to 0.5s or 15% to grab an active preview frame (avoid initial black frame)
+        const targetTime = Math.min(1.0, (video.duration || 2) * 0.15);
+        video.currentTime = targetTime;
+      };
+
+      video.onseeked = () => {
+        try {
+          const width = video.videoWidth || 720;
+          const height = video.videoHeight || 1280;
+          const maxDim = 1000;
+          let targetW = width;
+          let targetH = height;
+          if (targetW > maxDim || targetH > maxDim) {
+            if (targetW > targetH) {
+              targetH = Math.round((height * maxDim) / width);
+              targetW = maxDim;
+            } else {
+              targetW = Math.round((width * maxDim) / height);
+              targetH = maxDim;
+            }
+          }
+
+          const canvas = document.createElement("canvas");
+          canvas.width = targetW;
+          canvas.height = targetH;
+          const ctx = canvas.getContext("2d");
+          if (!ctx) {
+            clearTimeout(timeout);
+            cleanup();
+            resolve(null);
+            return;
+          }
+
+          ctx.drawImage(video, 0, 0, targetW, targetH);
+          canvas.toBlob(
+            (blob) => {
+              clearTimeout(timeout);
+              cleanup();
+              if (blob) {
+                const cleanBase = file.name.replace(/\.[^.]+$/, "");
+                const posterFile = new File([blob], `${cleanBase}-poster.jpg`, {
+                  type: "image/jpeg",
+                  lastModified: Date.now(),
+                });
+                resolve(posterFile);
+              } else {
+                resolve(null);
+              }
+            },
+            "image/jpeg",
+            0.82
+          );
+        } catch (e) {
+          clearTimeout(timeout);
+          cleanup();
+          resolve(null);
+        }
+      };
+
+      video.onerror = () => {
+        clearTimeout(timeout);
+        cleanup();
+        resolve(null);
+      };
+    });
+  };
+
+  const compressVideoIfNeeded = async (
+    file: File,
+    onProgress?: (percent: number, currentMB: number, targetMB: number) => void
+  ): Promise<File> => {
+    // Only compress video files larger than 2.5 MB
+    const isVideo = file.type.startsWith("video/") || file.name.match(/\.(mp4|mov|webm|m4v|avi|mkv)$/i);
+    if (!isVideo) return file;
+    if (file.size <= 2.5 * 1024 * 1024) return file;
+
+    // Check browser MediaRecorder and Canvas captureStream support
+    if (typeof window === "undefined" || !window.MediaRecorder || !HTMLCanvasElement.prototype.captureStream) {
+      console.warn("Browser does not support in-browser video compression. Skipping.");
+      return file;
+    }
+
+    return new Promise((resolve) => {
+      // 45-second fallback timeout
+      const timeout = setTimeout(() => {
+        console.warn("Video compression timed out, proceeding with original file.");
+        resolve(file);
+      }, 45000);
+
+      const video = document.createElement("video");
+      const videoUrl = URL.createObjectURL(file);
+      video.src = videoUrl;
+      video.muted = true;
+      video.playsInline = true;
+      video.crossOrigin = "anonymous";
+      video.preload = "auto";
+
+      video.onloadedmetadata = async () => {
+        try {
+          const origWidth = video.videoWidth || 1280;
+          const origHeight = video.videoHeight || 720;
+          const duration = video.duration || 10;
+
+          // Skip client compression if video is extremely long (> 120s) to avoid freezing UI
+          if (duration > 120) {
+            clearTimeout(timeout);
+            URL.revokeObjectURL(videoUrl);
+            resolve(file);
+            return;
+          }
+
+          // Target 720p maximum resolution with preserved aspect ratio
+          const isPortrait = origHeight > origWidth;
+          const maxLongDim = 1280;
+          const maxShortDim = 720;
+
+          let targetWidth = origWidth;
+          let targetHeight = origHeight;
+
+          if (isPortrait) {
+            if (targetWidth > maxShortDim) {
+              targetHeight = Math.round((origHeight * maxShortDim) / origWidth);
+              targetWidth = maxShortDim;
+            }
+            if (targetHeight > maxLongDim) {
+              targetWidth = Math.round((targetWidth * maxLongDim) / targetHeight);
+              targetHeight = maxLongDim;
+            }
+          } else {
+            if (targetWidth > maxLongDim) {
+              targetHeight = Math.round((origHeight * maxLongDim) / origWidth);
+              targetWidth = maxLongDim;
+            }
+            if (targetHeight > maxShortDim) {
+              targetWidth = Math.round((targetWidth * maxShortDim) / targetHeight);
+              targetHeight = maxShortDim;
+            }
+          }
+
+          // Codecs strictly require even dimensions
+          targetWidth = Math.max(2, Math.floor(targetWidth / 2) * 2);
+          targetHeight = Math.max(2, Math.floor(targetHeight / 2) * 2);
+
+          const canvas = document.createElement("canvas");
+          canvas.width = targetWidth;
+          canvas.height = targetHeight;
+          const ctx = canvas.getContext("2d", { alpha: false });
+          if (!ctx) {
+            clearTimeout(timeout);
+            URL.revokeObjectURL(videoUrl);
+            resolve(file);
+            return;
+          }
+
+          // Capture canvas stream at 30fps
+          const canvasStream = canvas.captureStream(30);
+
+          // Capture audio from video element if available
+          try {
+            const vidElementStream = (video as any).captureStream
+              ? (video as any).captureStream()
+              : (video as any).mozCaptureStream
+              ? (video as any).mozCaptureStream()
+              : null;
+
+            if (vidElementStream) {
+              const audioTracks = vidElementStream.getAudioTracks();
+              if (audioTracks && audioTracks.length > 0) {
+                canvasStream.addTrack(audioTracks[0]);
+              }
+            }
+          } catch (audioErr) {
+            console.warn("Could not capture audio track:", audioErr);
+          }
+
+          // Determine optimal supported mime type
+          const candidateMimes = [
+            "video/mp4;codecs=avc1.42E01E,mp4a.40.2",
+            "video/mp4",
+            "video/webm;codecs=vp9,opus",
+            "video/webm;codecs=vp8,opus",
+            "video/webm",
+          ];
+          let chosenMime = "";
+          let chosenExt = ".webm";
+          for (const m of candidateMimes) {
+            if (MediaRecorder.isTypeSupported(m)) {
+              chosenMime = m;
+              chosenExt = m.includes("mp4") ? ".mp4" : ".webm";
+              break;
+            }
+          }
+
+          // Bitrate: ~1.4 Mbps video bitrate yields crystal clear 720p reels at ~1.5 - 2.8 MB
+          const targetBitrate = 1400000;
+          let mediaRecorder: MediaRecorder;
+          try {
+            mediaRecorder = new MediaRecorder(canvasStream, {
+              ...(chosenMime ? { mimeType: chosenMime } : {}),
+              videoBitsPerSecond: targetBitrate,
+            });
+          } catch (e) {
+            mediaRecorder = new MediaRecorder(canvasStream);
+          }
+
+          const chunks: Blob[] = [];
+          mediaRecorder.ondataavailable = (e) => {
+            if (e.data && e.data.size > 0) {
+              chunks.push(e.data);
+            }
+          };
+
+          let isDone = false;
+          const finish = () => {
+            if (isDone) return;
+            isDone = true;
+            clearTimeout(timeout);
+            URL.revokeObjectURL(videoUrl);
+
+            try {
+              const outputBlob = new Blob(chunks, { type: chosenMime || "video/webm" });
+              if (outputBlob.size < file.size && outputBlob.size > 10000) {
+                const cleanBase = file.name.replace(/\.[^.]+$/, "");
+                const compressedFile = new File([outputBlob], `${cleanBase}-opt${chosenExt}`, {
+                  type: (chosenMime || "video/webm").split(";")[0],
+                  lastModified: Date.now(),
+                });
+                resolve(compressedFile);
+              } else {
+                resolve(file);
+              }
+            } catch (err) {
+              resolve(file);
+            }
+          };
+
+          mediaRecorder.onstop = finish;
+          mediaRecorder.onerror = () => {
+            clearTimeout(timeout);
+            URL.revokeObjectURL(videoUrl);
+            resolve(file);
+          };
+
+          mediaRecorder.start(250);
+
+          let animId: number;
+          const render = () => {
+            if (video.paused || video.ended) return;
+            ctx.drawImage(video, 0, 0, targetWidth, targetHeight);
+
+            if (duration > 0 && onProgress) {
+              const pct = Math.min(99, Math.round((video.currentTime / duration) * 100));
+              const curMB = file.size / (1024 * 1024);
+              const estMB = Math.max(0.8, (targetBitrate * duration) / (8 * 1024 * 1024));
+              onProgress(pct, curMB, estMB);
+            }
+
+            if ("requestVideoFrameCallback" in video) {
+              (video as any).requestVideoFrameCallback(render);
+            } else {
+              animId = requestAnimationFrame(render);
+            }
+          };
+
+          video.onended = () => {
+            cancelAnimationFrame(animId);
+            setTimeout(() => {
+              if (mediaRecorder.state !== "inactive") {
+                mediaRecorder.stop();
+              }
+            }, 200);
+          };
+
+          video.onerror = () => {
+            clearTimeout(timeout);
+            URL.revokeObjectURL(videoUrl);
+            resolve(file);
+          };
+
+          await video.play();
+          render();
+        } catch (err) {
+          console.warn("Video compression encountered error, using original file:", err);
+          clearTimeout(timeout);
+          URL.revokeObjectURL(videoUrl);
+          resolve(file);
+        }
+      };
+
+      video.onerror = () => {
+        clearTimeout(timeout);
+        URL.revokeObjectURL(videoUrl);
+        resolve(file);
+      };
+    });
+  };
+
   const uploadFileToServer = async (file: File, folder: "screenshots" | "videos" | "images") => {
     setIsUploading(true);
     try {
       let fileToUpload = file;
-      if (file.type.startsWith("image/") && file.size > 800 * 1024) {
-        setUploadProgressText(`Optimizing image (${(file.size / (1024 * 1024)).toFixed(1)} MB)...`);
-        fileToUpload = await compressImageIfNeeded(file);
-      }
 
-      setUploadProgressText(`Uploading ${fileToUpload.name} (${(fileToUpload.size / (1024 * 1024)).toFixed(1)} MB)...`);
+      // 1. Convert images to low size immediately (crisp 1400px, 0.82 WebP/JPEG, ~80-160KB)
+      if (file.type.startsWith("image/") && file.size > 100 * 1024) {
+        const origSizeMB = (file.size / (1024 * 1024)).toFixed(1);
+        setUploadProgressText(`Optimizing image (${origSizeMB} MB ➔ converting to fast web format)...`);
+        fileToUpload = await compressImageIfNeeded(file);
+        const newSizeKB = Math.round(fileToUpload.size / 1024);
+        setUploadProgressText(`Image optimized to ${newSizeKB} KB! Uploading...`);
+      }
+      // 2. Convert videos to low size immediately (720p 30fps ~1.4Mbps, ~1.5 - 3MB)
+      else if ((file.type.startsWith("video/") || folder === "videos") && file.size > 2.5 * 1024 * 1024) {
+        const origSizeMB = (file.size / (1024 * 1024)).toFixed(1);
+        setUploadProgressText(`Compressing video (original: ${origSizeMB} MB ➔ converting to fast web video)...`);
+        fileToUpload = await compressVideoIfNeeded(file, (percent, curMB, tgtMB) => {
+          setUploadProgressText(`Compressing video: ${percent}% (reducing ${curMB.toFixed(1)} MB to ~${tgtMB.toFixed(1)} MB)...`);
+        });
+        const newSizeMB = (fileToUpload.size / (1024 * 1024)).toFixed(1);
+        setUploadProgressText(`Video compressed to ${newSizeMB} MB! Uploading to cloud...`);
+      } else {
+        setUploadProgressText(`Uploading ${fileToUpload.name}...`);
+      }
 
       // 1. Direct client-to-cloud Vercel Blob upload (supports files up to 150MB directly to CDN)
       try {
@@ -403,12 +750,28 @@ export default function AdminDashboardPage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 80 * 1024 * 1024) {
-      alert("Video file is larger than 80MB. Please choose a smaller video clip.");
+    if (file.size > 150 * 1024 * 1024) {
+      alert("Video file is larger than 150MB. Please choose a smaller video clip.");
       return;
     }
 
     try {
+      // Auto-extract thumbnail poster from video if none is set
+      if (!videoForm.poster) {
+        generateVideoPoster(file).then(async (posterFile) => {
+          if (posterFile) {
+            try {
+              const posterUrl = await uploadFileToServer(posterFile, "images");
+              if (posterUrl) {
+                setVideoForm((prev) => ({ ...prev, poster: prev.poster || posterUrl }));
+              }
+            } catch (pErr) {
+              console.warn("Poster auto-upload skipped:", pErr);
+            }
+          }
+        });
+      }
+
       const publicUrl = await uploadFileToServer(file, "videos");
       setVideoForm((prev) => ({ ...prev, videoUrl: publicUrl }));
     } catch (err: any) {
@@ -563,13 +926,30 @@ export default function AdminDashboardPage() {
       const publicUrl = await uploadFileToServer(file, "videos");
       if (!publicUrl) throw new Error("Video upload failed");
 
+      // Auto-extract thumbnail poster from video if none was previously set
+      let autoPosterUrl: string | undefined;
+      const videoToUpdate = instagramVideosList.find((v) => String(v.id) === String(videoId));
+      if (!videoToUpdate?.poster) {
+        try {
+          const posterFile = await generateVideoPoster(file);
+          if (posterFile) {
+            autoPosterUrl = await uploadFileToServer(posterFile, "images");
+          }
+        } catch (pErr) {
+          console.warn("Auto-poster upload skipped:", pErr);
+        }
+      }
+
       // Update state locally
       setInstagramVideosList((prev) =>
-        prev.map((v) => (String(v.id) === String(videoId) ? { ...v, videoUrl: publicUrl } : v))
+        prev.map((v) =>
+          String(v.id) === String(videoId)
+            ? { ...v, videoUrl: publicUrl, ...(autoPosterUrl ? { poster: autoPosterUrl } : {}) }
+            : v
+        )
       );
 
       // Persist to DB via PUT /api/reviews
-      const videoToUpdate = instagramVideosList.find((v) => String(v.id) === String(videoId));
       await fetch("/api/reviews", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -578,6 +958,7 @@ export default function AdminDashboardPage() {
           id: videoId,
           type: "instagramVideo",
           videoUrl: publicUrl,
+          ...(autoPosterUrl ? { poster: autoPosterUrl } : {}),
         }),
       });
 
@@ -661,6 +1042,22 @@ export default function AdminDashboardPage() {
     }
 
     try {
+      // Auto-extract thumbnail poster from video if none is set
+      if (!instaVideoForm.poster) {
+        generateVideoPoster(file).then(async (posterFile) => {
+          if (posterFile) {
+            try {
+              const posterUrl = await uploadFileToServer(posterFile, "images");
+              if (posterUrl) {
+                setInstaVideoForm((prev) => ({ ...prev, poster: prev.poster || posterUrl }));
+              }
+            } catch (pErr) {
+              console.warn("Auto-poster upload skipped:", pErr);
+            }
+          }
+        });
+      }
+
       const publicUrl = await uploadFileToServer(file, "videos");
       setInstaVideoForm((prev) => ({ ...prev, videoUrl: publicUrl }));
     } catch (err: any) {
@@ -2622,14 +3019,23 @@ export default function AdminDashboardPage() {
                     <ImageIcon className="w-3.5 h-3.5 text-primary" />
                     <span>Product Image *</span>
                   </label>
-                  <span className="text-[11px] text-muted-foreground">Device upload or URL</span>
+                  <span className="text-[11px] text-muted-foreground">Auto-compressed to fast web format</span>
                 </div>
+
+                {isUploading && (
+                  <div className="p-2.5 rounded-lg bg-primary/10 border border-primary/20 text-primary text-xs font-medium flex items-center gap-2 animate-pulse">
+                    <Clock className="w-3.5 h-3.5 animate-spin shrink-0" />
+                    <span>{uploadProgressText || "Optimizing and uploading photo..."}</span>
+                  </div>
+                )}
 
                 {/* File picker */}
                 <div>
                   <label
                     htmlFor="admin-file-upload"
-                    className="w-full px-3 py-2.5 rounded-lg border border-dashed border-border hover:border-primary bg-background hover:bg-muted/40 cursor-pointer flex items-center justify-center gap-2 text-xs font-medium text-foreground transition-colors"
+                    className={`w-full px-3 py-2.5 rounded-lg border border-dashed border-border hover:border-primary bg-background hover:bg-muted/40 cursor-pointer flex items-center justify-center gap-2 text-xs font-medium text-foreground transition-colors ${
+                      isUploading ? "opacity-50 pointer-events-none" : ""
+                    }`}
                   >
                     <Upload className="w-4 h-4 text-primary" />
                     <span>Choose Photo from Device / Phone</span>
@@ -3601,8 +4007,15 @@ export default function AdminDashboardPage() {
                     <Camera className="w-3.5 h-3.5 text-primary" />
                     <span>Card Photo *</span>
                   </label>
-                  <span className="text-[11px] text-muted-foreground">High-res vertical image</span>
+                  <span className="text-[11px] text-muted-foreground">Auto-compressed to fast web format</span>
                 </div>
+
+                {isUploading && (
+                  <div className="p-2.5 rounded-lg bg-primary/10 border border-primary/20 text-primary text-xs font-medium flex items-center gap-2 animate-pulse">
+                    <Clock className="w-3.5 h-3.5 animate-spin shrink-0" />
+                    <span>{uploadProgressText || "Optimizing and uploading photo..."}</span>
+                  </div>
+                )}
 
                 <div>
                   <label
@@ -3674,6 +4087,23 @@ export default function AdminDashboardPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Global Real-Time Media Processing & Upload Status Floating Banner */}
+      {isUploading && (
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3.5 px-4 py-3 bg-neutral-900/95 text-white rounded-2xl shadow-2xl border border-[#C5A059]/50 backdrop-blur-md transition-all animate-in fade-in slide-in-from-bottom-3">
+          <div className="relative w-5 h-5 shrink-0">
+            <div className="w-5 h-5 rounded-full border-2 border-[#C5A059]/30 border-t-[#C5A059] animate-spin" />
+          </div>
+          <div>
+            <p className="text-xs font-semibold text-[#F7EEDD] flex items-center gap-1.5">
+              <span>Optimizing Media</span>
+            </p>
+            <p className="text-[11px] text-stone-300 font-mono mt-0.5 max-w-[320px] truncate">
+              {uploadProgressText || "Compressing to lightweight web format..."}
+            </p>
           </div>
         </div>
       )}
