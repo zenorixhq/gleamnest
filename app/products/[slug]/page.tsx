@@ -50,6 +50,28 @@ export default function ProductDetailPage({
 
   const product = products.find((p) => p.slug === params.slug);
 
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [quantity, setQuantity] = useState(1);
+  const [selectedOptions, setSelectedOptions] = useState<{ [key: string]: string }>({});
+  const [copiedLink, setCopiedLink] = useState(false);
+  const [isAdded, setIsAdded] = useState(false);
+  const [selectedSize, setSelectedSize] = useState<string>("");
+
+  const addItem = useCartStore((s) => s.addItem);
+  const openCart = useCartStore((s) => s.openCart);
+  const toggleWishlist = useCartStore((s) => s.toggleWishlist);
+  const isInWishlist = useCartStore((s) => product ? s.wishlist.includes(product.id) : false);
+  const selectedCurrency = useCartStore((s) => s.selectedCurrency);
+
+  useEffect(() => {
+    if (product) {
+      const info = getProductSizeInfo(product);
+      if (info) {
+        setSelectedSize(info.defaultSize);
+      }
+    }
+  }, [product?.id]);
+
   if (!product && hasAttemptedFetch) {
     notFound();
   }
@@ -65,26 +87,7 @@ export default function ProductDetailPage({
     );
   }
 
-  const [activeImageIndex, setActiveImageIndex] = useState(0);
-  const [quantity, setQuantity] = useState(1);
-  const [selectedOptions, setSelectedOptions] = useState<{ [key: string]: string }>({});
-  const [copiedLink, setCopiedLink] = useState(false);
-  const [isAdded, setIsAdded] = useState(false);
-
   const sizeInfo = getProductSizeInfo(product);
-  const [selectedSize, setSelectedSize] = useState<string>(() => sizeInfo?.defaultSize || "");
-
-  useEffect(() => {
-    if (sizeInfo) {
-      setSelectedSize(sizeInfo.defaultSize);
-    }
-  }, [product?.id]);
-
-  const addItem = useCartStore((s) => s.addItem);
-  const openCart = useCartStore((s) => s.openCart);
-  const toggleWishlist = useCartStore((s) => s.toggleWishlist);
-  const isInWishlist = useCartStore((s) => s.isInWishlist)(product.id);
-  const selectedCurrency = useCartStore((s) => s.selectedCurrency);
 
   // Initialize variant defaults if needed
   const currentOptions = { ...selectedOptions };
@@ -469,12 +472,12 @@ ${greetingMessage}
                     onClick={() => toggleWishlist(product.id)}
                     className={`p-3 rounded-xl border transition-all ${
                       isInWishlist
-                        ? "border-destructive bg-destructive/10 text-destructive"
+                        ? "border-rose-500 bg-rose-50 text-rose-600 dark:bg-rose-950/30"
                         : "border-border bg-card text-foreground hover:bg-muted"
                     }`}
                     aria-label="Add to wishlist"
                   >
-                    <Heart className={`w-5 h-5 ${isInWishlist ? "fill-current" : ""}`} />
+                    <Heart className={`w-5 h-5 ${isInWishlist ? "fill-current text-rose-600" : ""}`} />
                   </button>
                 </div>
 

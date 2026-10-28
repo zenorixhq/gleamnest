@@ -17,7 +17,7 @@ export function ProductCard({ product }: ProductCardProps) {
   const addItem = useCartStore((s) => s.addItem);
   const openCart = useCartStore((s) => s.openCart);
   const toggleWishlist = useCartStore((s) => s.toggleWishlist);
-  const isInWishlist = useCartStore((s) => s.isInWishlist)(product.id);
+  const isInWishlist = useCartStore((s) => s.wishlist.includes(product.id));
   const openQuickView = useCartStore((s) => s.openQuickView);
 
   const { regularPrice, salePrice, effectivePrice, discountPercent } = getProductPrices(
@@ -106,11 +106,11 @@ export function ProductCard({ product }: ProductCardProps) {
             aria-label="Save to Wishlist"
             className={`w-7 h-7 rounded-full flex items-center justify-center shadow-md backdrop-blur-md transition-all ${
               isInWishlist
-                ? "bg-destructive text-destructive-foreground"
-                : "bg-white/90 text-foreground hover:bg-white hover:text-destructive"
+                ? "bg-rose-600 text-white shadow-rose-200"
+                : "bg-white/90 text-foreground hover:bg-white hover:text-rose-600"
             }`}
           >
-            <Heart className={`w-3.5 h-3.5 ${isInWishlist ? "fill-current" : ""}`} />
+            <Heart className={`w-3.5 h-3.5 ${isInWishlist ? "fill-current text-white" : ""}`} />
           </button>
 
           <button
