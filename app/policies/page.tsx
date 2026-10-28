@@ -797,10 +797,10 @@ function PoliciesContent() {
       {/* Fullscreen Image Zoom Lightbox */}
       {zoomedImage && (
         <div
-          className="fixed inset-0 z-60 bg-black/90 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in-0"
+          className="fixed inset-0 z-[9999] bg-black/90 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto animate-in fade-in-0"
           onClick={() => setZoomedImage(null)}
         >
-          <div className="relative max-w-4xl max-h-[90vh] overflow-auto">
+          <div className="relative max-w-4xl my-auto max-h-[90vh] overflow-hidden flex items-center justify-center">
             <button
               onClick={() => setZoomedImage(null)}
               className="absolute top-3 right-3 p-2 rounded-full bg-black/60 text-white hover:bg-black transition-colors z-10"

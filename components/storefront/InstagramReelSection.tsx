@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import {
   Instagram,
   Play,
@@ -181,6 +182,27 @@ export function InstagramReelSection() {
   const carouselRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!activeVideo) return;
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setActiveVideo(null);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [activeVideo]);
 
   useEffect(() => {
     fetch(`/api/reviews?t=${Date.now()}`, { cache: "no-store" })
@@ -311,37 +333,41 @@ export function InstagramReelSection() {
       </div>
 
       {/* Video Modal Player (Expanded View with Audio) */}
-      {activeVideo && (
+      {mounted && activeVideo && createPortal(
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200"
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-4 md:p-6 bg-black/85 backdrop-blur-md overflow-y-auto animate-in fade-in duration-200"
           onClick={() => setActiveVideo(null)}
+          role="dialog"
+          aria-modal="true"
         >
           <div
-            className="relative w-full max-w-sm sm:max-w-md bg-stone-950 rounded-2xl overflow-hidden shadow-2xl border border-stone-800 animate-in zoom-in-95 duration-200 flex flex-col"
+            className="relative w-full max-w-[360px] sm:max-w-[400px] bg-stone-950 rounded-2xl overflow-hidden shadow-2xl border border-stone-800 animate-in zoom-in-95 duration-200 flex flex-col my-auto max-h-[92vh] sm:max-h-[88vh]"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="px-4 py-3 bg-stone-900 border-b border-stone-800 flex items-center justify-between text-white">
-              <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-amber-500 to-rose-500 flex items-center justify-center">
+            <div className="flex-shrink-0 px-4 py-3 bg-stone-900 border-b border-stone-800 flex items-center justify-between text-white">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-amber-500 to-rose-500 flex items-center justify-center shrink-0">
                   <Instagram className="w-4 h-4 text-white" />
                 </div>
-                <div>
-                  <h4 className="text-xs font-bold truncate max-w-[200px]">{activeVideo.title}</h4>
-                  <p className="text-[10px] text-stone-400">{activeVideo.handle || "@gleamnest.in"}</p>
+                <div className="min-w-0">
+                  <h4 className="text-xs font-bold truncate max-w-[180px] sm:max-w-[220px]">{activeVideo.title}</h4>
+                  <p className="text-[10px] text-stone-400 truncate">{activeVideo.handle || "@gleamnest.in"}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 shrink-0">
                 <button
+                  type="button"
                   onClick={() => setIsMuted(!isMuted)}
-                  className="p-1.5 rounded-full hover:bg-stone-800 text-stone-300"
+                  className="p-1.5 rounded-full hover:bg-stone-800 text-stone-300 transition-colors cursor-pointer"
                   title={isMuted ? "Unmute" : "Mute"}
                 >
                   {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
                 </button>
                 <button
+                  type="button"
                   onClick={() => setActiveVideo(null)}
-                  className="p-1.5 rounded-full hover:bg-stone-800 text-stone-300"
+                  className="p-1.5 rounded-full hover:bg-stone-800 text-stone-300 transition-colors cursor-pointer"
                   aria-label="Close video player"
                 >
                   <X className="w-5 h-5" />
@@ -350,7 +376,7 @@ export function InstagramReelSection() {
             </div>
 
             {/* Video Player Display */}
-            <div className="relative aspect-[9/15] max-h-[68vh] bg-black flex items-center justify-center overflow-hidden">
+            <div className="relative flex-1 min-h-0 max-h-[58vh] sm:max-h-[64vh] bg-black flex items-center justify-center overflow-hidden">
               {activeVideo.embedUrl ? (
                 <iframe
                   src={activeVideo.embedUrl}
@@ -367,14 +393,14 @@ export function InstagramReelSection() {
                   loop
                   playsInline
                   muted={isMuted}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full max-h-[58vh] sm:max-h-[64vh] object-contain"
                 />
               )}
             </div>
 
             {/* Caption & Instagram CTA Bar */}
-            <div className="p-4 bg-stone-900 border-t border-stone-800 flex items-center justify-between gap-3 text-white">
-              <div className="space-y-0.5 max-w-[65%]">
+            <div className="flex-shrink-0 p-3.5 sm:p-4 bg-stone-900 border-t border-stone-800 flex items-center justify-between gap-3 text-white">
+              <div className="space-y-0.5 min-w-0 max-w-[65%]">
                 <p className="text-xs font-semibold truncate">{activeVideo.title}</p>
                 <p className="text-[11px] text-stone-400 line-clamp-1">{activeVideo.caption}</p>
               </div>
@@ -384,7 +410,7 @@ export function InstagramReelSection() {
                   href={activeVideo.instagramLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-3.5 py-1.5 rounded-full bg-[#E1306C] text-white text-xs font-semibold hover:bg-[#C1275B] transition-colors flex items-center gap-1.5 shrink-0"
+                  className="px-3.5 py-1.5 rounded-full bg-[#E1306C] text-white text-xs font-semibold hover:bg-[#C1275B] transition-colors flex items-center gap-1.5 shrink-0 shadow-sm"
                 >
                   <Instagram className="w-3.5 h-3.5" />
                   <span>View Post</span>
@@ -392,7 +418,8 @@ export function InstagramReelSection() {
               )}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </section>
   );

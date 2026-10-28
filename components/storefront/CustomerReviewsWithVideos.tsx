@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import {
   Play,
@@ -218,6 +219,28 @@ export function CustomerReviewsWithVideos() {
 
   const [selectedVideo, setSelectedVideo] = useState<VideoReel | null>(null);
   const [selectedScreenshot, setSelectedScreenshot] = useState<FeedbackScreenshot | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!selectedVideo && !selectedScreenshot) return;
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setSelectedVideo(null);
+        setSelectedScreenshot(null);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [selectedVideo, selectedScreenshot]);
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [isLeftDisabled, setIsLeftDisabled] = useState(true);
@@ -684,27 +707,29 @@ export function CustomerReviewsWithVideos() {
       </div>
 
       {/* Screenshot Lightbox Modal (Clickable with Full Details revealed on click, Anonymous) */}
-      {selectedScreenshot && (
+      {mounted && selectedScreenshot && createPortal(
         <div
-          className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200"
+          className="fixed inset-0 z-[9999] bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 overflow-y-auto animate-in fade-in duration-200"
           onClick={() => setSelectedScreenshot(null)}
+          role="dialog"
+          aria-modal="true"
         >
           <div
-            className="relative max-w-lg w-full bg-[#FFFDF9] rounded-2xl overflow-hidden shadow-2xl border border-[#EADBBE] animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]"
+            className="relative max-w-md sm:max-w-lg w-full bg-[#FFFDF9] rounded-2xl overflow-hidden shadow-2xl border border-[#EADBBE] animate-in zoom-in-95 duration-200 flex flex-col my-auto max-h-[92vh] sm:max-h-[88vh]"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header: Anonymous Verified Feedback */}
-            <div className="px-4 sm:px-5 py-3.5 bg-[#FAF5EB] border-b border-[#EADBBE] flex items-center justify-between flex-shrink-0">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-full bg-[#25D366]/20 text-[#25D366] flex items-center justify-center">
+            <div className="px-4 sm:px-5 py-3 bg-[#FAF5EB] border-b border-[#EADBBE] flex items-center justify-between flex-shrink-0">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="w-8 h-8 rounded-full bg-[#25D366]/20 text-[#25D366] flex items-center justify-center shrink-0">
                   <MessageCircle className="w-4 h-4 fill-current" />
                 </div>
-                <div>
-                  <h4 className="text-sm font-bold text-[#1C1917] flex items-center gap-1.5">
+                <div className="min-w-0">
+                  <h4 className="text-sm font-bold text-[#1C1917] flex items-center gap-1.5 truncate">
                     <span>Verified Customer Review</span>
-                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                   </h4>
-                  <p className="text-[11px] text-stone-500">
+                  <p className="text-[11px] text-stone-500 truncate">
                     {selectedScreenshot.location || "Real Customer Conversation"}
                   </p>
                 </div>
@@ -712,7 +737,7 @@ export function CustomerReviewsWithVideos() {
               <button
                 type="button"
                 onClick={() => setSelectedScreenshot(null)}
-                className="p-1.5 rounded-full hover:bg-stone-200 text-stone-600 hover:text-stone-900 transition-colors cursor-pointer"
+                className="p-1.5 rounded-full hover:bg-stone-200 text-stone-600 hover:text-stone-900 transition-colors cursor-pointer shrink-0"
                 aria-label="Close preview"
               >
                 <X className="w-5 h-5" />
@@ -720,16 +745,16 @@ export function CustomerReviewsWithVideos() {
             </div>
 
             {/* Enlarged Screenshot Image */}
-            <div className="p-3 bg-stone-950 overflow-y-auto flex items-center justify-center max-h-[55vh]">
+            <div className="p-2 sm:p-3 bg-stone-950 flex-1 min-h-0 flex items-center justify-center overflow-hidden max-h-[48vh] sm:max-h-[54vh]">
               <img
                 src={selectedScreenshot.imageUrl}
                 alt="Customer feedback screenshot"
-                className="w-auto h-auto max-w-full max-h-[50vh] object-contain rounded-xl shadow-md"
+                className="w-auto h-auto max-w-full max-h-[46vh] sm:max-h-[52vh] object-contain rounded-xl shadow-md"
               />
             </div>
 
             {/* Modal Footer with Full Details Revealed on Click */}
-            <div className="p-4 sm:p-5 bg-white border-t border-[#EADBBE] space-y-2.5 flex-shrink-0 overflow-y-auto max-h-[30vh]">
+            <div className="p-4 sm:p-5 bg-white border-t border-[#EADBBE] space-y-2.5 flex-shrink-0 overflow-y-auto max-h-[26vh]">
               {selectedScreenshot.piece && (
                 <span className="inline-block px-2.5 py-0.5 rounded-full bg-[#FAF5EB] text-[#8F7234] text-xs font-semibold">
                   Verified Piece: {selectedScreenshot.piece}
@@ -754,59 +779,70 @@ export function CustomerReviewsWithVideos() {
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Video Modal Player (Plays with sound when clicked) */}
-      {selectedVideo && (
+      {mounted && selectedVideo && createPortal(
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200"
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-4 md:p-6 bg-black/85 backdrop-blur-md overflow-y-auto animate-in fade-in duration-200"
           onClick={() => setSelectedVideo(null)}
+          role="dialog"
+          aria-modal="true"
         >
           <div
-            className="relative w-full max-w-sm sm:max-w-md bg-stone-900 rounded-2xl overflow-hidden shadow-2xl border border-stone-700 animate-in zoom-in-95 duration-200"
+            className="relative w-full max-w-[360px] sm:max-w-[400px] bg-stone-900 rounded-2xl overflow-hidden shadow-2xl border border-stone-700 animate-in zoom-in-95 duration-200 flex flex-col my-auto max-h-[92vh] sm:max-h-[88vh]"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Close Button */}
-            <button
-              type="button"
-              onClick={() => setSelectedVideo(null)}
-              className="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-black/90 transition-colors"
-              aria-label="Close video player"
-            >
-              <X className="w-5 h-5" />
-            </button>
+            {/* Header with Title and Close Button */}
+            <div className="flex-shrink-0 px-4 py-3 bg-stone-950/95 border-b border-stone-800 flex items-center justify-between text-white">
+              <div className="min-w-0 pr-2">
+                <h4 className="text-xs font-bold truncate">{selectedVideo.productTitle || "Client Reel"}</h4>
+                <p className="text-[10px] text-stone-400 truncate">{selectedVideo.influencer || "Verified Client Video"}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelectedVideo(null)}
+                className="p-1.5 rounded-full hover:bg-stone-800 text-stone-300 transition-colors cursor-pointer shrink-0"
+                aria-label="Close video player"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
 
             {/* Video Player */}
-            <div className="relative aspect-[9/16] bg-black flex items-center justify-center">
+            <div className="relative flex-1 min-h-0 max-h-[58vh] sm:max-h-[64vh] bg-black flex items-center justify-center overflow-hidden">
               <video
                 src={selectedVideo.videoUrl}
                 poster={selectedVideo.poster}
                 autoPlay
                 controls
                 playsInline
-                className="w-full h-full object-cover"
+                className="w-full h-full max-h-[58vh] sm:max-h-[64vh] object-contain"
               />
             </div>
 
             {/* Product Tag Bar */}
-            <div className="p-4 bg-stone-950 flex items-center justify-between text-white border-t border-stone-800">
-              <div>
-                <p className="text-xs font-semibold">{selectedVideo.productTitle}</p>
+            <div className="flex-shrink-0 p-3.5 sm:p-4 bg-stone-950 flex items-center justify-between text-white border-t border-stone-800">
+              <div className="min-w-0 pr-2">
+                <p className="text-xs font-semibold truncate">{selectedVideo.productTitle}</p>
                 <p className="text-[11px] text-amber-400 font-mono">₹{selectedVideo.productPrice}</p>
               </div>
 
               {selectedVideo.productSlug && selectedVideo.productSlug !== "all" && (
                 <Link
                   href={`/products/${selectedVideo.productSlug}`}
-                  className="px-4 py-1.5 rounded-full bg-white text-stone-900 text-xs font-semibold hover:bg-stone-200 transition-colors"
+                  className="px-4 py-1.5 rounded-full bg-white text-stone-900 text-xs font-semibold hover:bg-stone-200 transition-colors shrink-0 shadow-sm"
+                  onClick={() => setSelectedVideo(null)}
                 >
                   Shop Piece
                 </Link>
               )}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </section>
   );
