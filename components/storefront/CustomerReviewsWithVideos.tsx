@@ -15,7 +15,18 @@ import {
   Maximize2,
   ShieldCheck,
   Heart,
+  Star,
+  Quote,
 } from "lucide-react";
+
+export interface ReviewQuote {
+  id: string | number;
+  author: string;
+  location: string;
+  piece: string;
+  rating?: number;
+  quote: string;
+}
 
 export interface FeedbackScreenshot {
   id: string;
@@ -43,6 +54,7 @@ export interface VideoReel {
 
 import initialReviewData from "@/data/clientReviews.json";
 
+const defaultReviewQuotes: ReviewQuote[] = (initialReviewData.reviews || []) as ReviewQuote[];
 const defaultVideoReels: VideoReel[] = (initialReviewData.videoReels || []) as VideoReel[];
 const defaultScreenshots: FeedbackScreenshot[] = (initialReviewData.feedbackScreenshots || []) as FeedbackScreenshot[];
 
@@ -191,12 +203,29 @@ export function CustomerReviewsWithVideos() {
     return defaultScreenshots;
   });
 
+  const [reviewQuotes, setReviewQuotes] = useState<ReviewQuote[]>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const cached = sessionStorage.getItem("gleamnest_cached_quotes");
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch {}
+    }
+    return defaultReviewQuotes;
+  });
+
   const [selectedVideo, setSelectedVideo] = useState<VideoReel | null>(null);
   const [selectedScreenshot, setSelectedScreenshot] = useState<FeedbackScreenshot | null>(null);
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [isLeftDisabled, setIsLeftDisabled] = useState(true);
   const [isRightDisabled, setIsRightDisabled] = useState(false);
+
+  const quotesScrollRef = useRef<HTMLDivElement>(null);
+  const [isQuotesLeftDisabled, setIsQuotesLeftDisabled] = useState(true);
+  const [isQuotesRightDisabled, setIsQuotesRightDisabled] = useState(false);
 
   // Fetch fresh data from API and cache in sessionStorage for 0ms subsequent loads
   useEffect(() => {
@@ -215,18 +244,22 @@ export function CustomerReviewsWithVideos() {
             sessionStorage.setItem("gleamnest_cached_screenshots", JSON.stringify(data.feedbackScreenshots));
           } catch {}
         }
+        if (Array.isArray(data.reviews) && data.reviews.length > 0) {
+          setReviewQuotes(data.reviews);
+          try {
+            sessionStorage.setItem("gleamnest_cached_quotes", JSON.stringify(data.reviews));
+          } catch {}
+        }
       })
       .catch((e) => console.error("Could not fetch reviews data:", e));
   }, []);
 
-  // Update Left / Right Arrow states based on scroll position
+  // Update Left / Right Arrow states based on scroll position for Screenshots
   const updateScrollButtons = () => {
     const el = scrollContainerRef.current;
     if (!el) return;
     const { scrollLeft, scrollWidth, clientWidth } = el;
-    // Left arrow is disabled if scrollLeft is at or near 0
     setIsLeftDisabled(scrollLeft <= 6);
-    // Right arrow is disabled when scrolled to the end
     setIsRightDisabled(scrollLeft + clientWidth >= scrollWidth - 6);
   };
 
@@ -247,7 +280,7 @@ export function CustomerReviewsWithVideos() {
     };
   }, [feedbackScreenshots]);
 
-  // Scroll 2 cards at a time (scrolls by container clientWidth)
+  // Scroll screenshots 2 cards at a time (scrolls by container clientWidth)
   const scrollPrev = () => {
     const el = scrollContainerRef.current;
     if (!el) return;
@@ -258,6 +291,45 @@ export function CustomerReviewsWithVideos() {
     const el = scrollContainerRef.current;
     if (!el) return;
     el.scrollBy({ left: el.clientWidth, behavior: "smooth" });
+  };
+
+  // Update Left / Right Arrow states based on scroll position for Quotes
+  const updateQuotesScrollButtons = () => {
+    const el = quotesScrollRef.current;
+    if (!el) return;
+    const { scrollLeft, scrollWidth, clientWidth } = el;
+    setIsQuotesLeftDisabled(scrollLeft <= 6);
+    setIsQuotesRightDisabled(scrollLeft + clientWidth >= scrollWidth - 6);
+  };
+
+  useEffect(() => {
+    updateQuotesScrollButtons();
+    const el = quotesScrollRef.current;
+    if (!el) return;
+
+    el.addEventListener("scroll", updateQuotesScrollButtons, { passive: true });
+    window.addEventListener("resize", updateQuotesScrollButtons);
+
+    const timer = setTimeout(updateQuotesScrollButtons, 100);
+
+    return () => {
+      el.removeEventListener("scroll", updateQuotesScrollButtons);
+      window.removeEventListener("resize", updateQuotesScrollButtons);
+      clearTimeout(timer);
+    };
+  }, [reviewQuotes]);
+
+  // Scroll Quotes cards
+  const scrollQuotesPrev = () => {
+    const el = quotesScrollRef.current;
+    if (!el) return;
+    el.scrollBy({ left: -Math.max(280, el.clientWidth * 0.75), behavior: "smooth" });
+  };
+
+  const scrollQuotesNext = () => {
+    const el = quotesScrollRef.current;
+    if (!el) return;
+    el.scrollBy({ left: Math.max(280, el.clientWidth * 0.75), behavior: "smooth" });
   };
 
   // Lock body scroll when modal is open
@@ -299,12 +371,12 @@ export function CustomerReviewsWithVideos() {
 
         {/* Dual Showcase: Video Reels on Left + Verified Customer Feedback Screenshots on Right */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
-          {/* Left Side: Client & Influencer Video Reels */}
+          {/* Left Side: Client Reels */}
           <div className="lg:col-span-5 space-y-4">
             <div className="flex items-center justify-between pb-2 border-b border-stone-300/60">
               <span className="text-xs uppercase tracking-widest font-semibold text-stone-700 flex items-center gap-1.5">
                 <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-                <span>Influencer & Client Reels</span>
+                <span>Client Reels</span>
               </span>
               <span className="text-[11px] text-stone-500">Real wear tests</span>
             </div>
@@ -326,7 +398,7 @@ export function CustomerReviewsWithVideos() {
             <div className="flex items-center justify-between pb-2 border-b border-stone-300/60">
               <span className="text-xs uppercase tracking-widest font-semibold text-stone-700 flex items-center gap-1.5">
                 <MessageCircle className="w-3.5 h-3.5 text-[#25D366]" />
-                <span>Client Feedback & Screenshots</span>
+                <span>Client Feedback</span>
               </span>
               <span className="text-[11px] text-stone-500">Real WhatsApp & DM chats</span>
             </div>
@@ -427,6 +499,99 @@ export function CustomerReviewsWithVideos() {
             </div>
           </div>
         </div>
+
+        {/* Customer Review Quotes: Scrollable Cards (After the reels and screenshot proof) */}
+        {reviewQuotes.length > 0 && (
+          <div className="pt-8 sm:pt-10 border-t border-[#EADBBE]/80 space-y-4 sm:space-y-6">
+            <div className="flex items-center justify-between pb-2 border-b border-stone-300/60">
+              <div>
+                <span className="text-xs uppercase tracking-widest font-semibold text-stone-700 flex items-center gap-1.5">
+                  <Quote className="w-3.5 h-3.5 text-[#8F7234]" />
+                  <span>Customer Review Quotes</span>
+                </span>
+                <p className="text-[11px] text-stone-500">Verified client testimonials & reviews</p>
+              </div>
+
+              {/* Navigation Controls */}
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={scrollQuotesPrev}
+                  disabled={isQuotesLeftDisabled}
+                  className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full border flex items-center justify-center transition-all ${
+                    isQuotesLeftDisabled
+                      ? "border-stone-200 text-stone-300 bg-stone-100 cursor-not-allowed opacity-35"
+                      : "border-stone-300 hover:border-stone-900 text-stone-700 hover:text-stone-900 bg-white hover:bg-stone-50 active:scale-95 shadow-sm cursor-pointer"
+                  }`}
+                  aria-label="Previous review quotes"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={scrollQuotesNext}
+                  disabled={isQuotesRightDisabled}
+                  className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full border flex items-center justify-center transition-all ${
+                    isQuotesRightDisabled
+                      ? "border-stone-200 text-stone-300 bg-stone-100 cursor-not-allowed opacity-35"
+                      : "border-stone-300 hover:border-stone-900 text-stone-700 hover:text-stone-900 bg-white hover:bg-stone-50 active:scale-95 shadow-sm cursor-pointer"
+                  }`}
+                  aria-label="Next review quotes"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* Scrollable Container with Snap */}
+            <div
+              ref={quotesScrollRef}
+              className="flex gap-4 sm:gap-5 overflow-x-auto pb-4 no-scrollbar scroll-smooth snap-x snap-mandatory"
+            >
+              {reviewQuotes.map((item, idx) => (
+                <div
+                  key={item.id || idx}
+                  className="w-[280px] xs:w-[320px] sm:w-[380px] min-w-[280px] xs:min-w-[320px] sm:min-w-[380px] flex-shrink-0 snap-start bg-[#FFFDF9] border border-[#EADBBE] rounded-2xl p-5 sm:p-6 flex flex-col justify-between space-y-4 shadow-sm hover:shadow-md hover:border-[#8F7234]/50 transition-all"
+                >
+                  <div className="space-y-3">
+                    {/* Rating Stars & Quote Glyph */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex text-amber-500 gap-0.5">
+                        {[...Array(item.rating || 5)].map((_, i) => (
+                          <Star key={i} className="w-3.5 h-3.5 fill-current" />
+                        ))}
+                      </div>
+                      <span className="w-6 h-6 rounded-full bg-[#114E45]/10 text-[#114E45] flex items-center justify-center text-xs font-serif font-black">
+                        “
+                      </span>
+                    </div>
+
+                    {/* Quote Body */}
+                    <p className="text-xs sm:text-sm text-stone-800 leading-relaxed font-light italic">
+                      &ldquo;{item.quote}&rdquo;
+                    </p>
+                  </div>
+
+                  <div className="pt-3 border-t border-stone-200/70 flex items-center justify-between">
+                    <div>
+                      <p className="text-xs font-bold text-stone-900">{item.author}</p>
+                      <p className="text-[11px] text-stone-500 font-light">{item.location}</p>
+                      {item.piece && (
+                        <p className="text-[10px] text-[#8F7234] font-medium pt-0.5 truncate max-w-[200px]">
+                          Piece: {item.piece}
+                        </p>
+                      )}
+                    </div>
+                    <div className="text-[10px] text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-2 py-0.5 rounded-full font-medium flex items-center gap-1">
+                      <CheckCircle2 className="w-3 h-3" />
+                      <span>Verified</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Screenshot Lightbox Modal (Clickable with Full Details revealed on click, Anonymous) */}
