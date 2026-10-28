@@ -110,7 +110,6 @@ export default function AdminDashboardPage() {
     caption: "",
     videoUrl: "",
     poster: "",
-    views: "15.4K views",
     instagramLink: "",
   });
 
@@ -120,7 +119,6 @@ export default function AdminDashboardPage() {
     title: "",
     videoUrl: "",
     poster: "",
-    views: "18.4K views",
     productTitle: "",
     productSlug: "",
     productPrice: 150,
@@ -819,7 +817,6 @@ export default function AdminDashboardPage() {
         title: "",
         videoUrl: "",
         poster: "",
-        views: "18.4K views",
         productTitle: "",
         productSlug: "",
         productPrice: 150,
@@ -1012,7 +1009,6 @@ export default function AdminDashboardPage() {
       caption: "",
       videoUrl: "",
       poster: "",
-      views: "28.4K",
       instagramLink: "https://www.instagram.com/gleamnest.in?igsh=c3I4M2h1YmprdXI5",
     });
     setIsInstaVideoModalOpen(true);
@@ -1026,7 +1022,6 @@ export default function AdminDashboardPage() {
       caption: video.caption || "",
       videoUrl: video.videoUrl || "",
       poster: video.poster || "",
-      views: video.views || "15.4K views",
       instagramLink: video.instagramLink || "",
     });
     setIsInstaVideoModalOpen(true);
@@ -1124,7 +1119,6 @@ export default function AdminDashboardPage() {
         caption: "",
         videoUrl: "",
         poster: "",
-        views: "15.4K views",
         instagramLink: "",
       });
       fetchReviewsAndVideos();
@@ -2268,10 +2262,7 @@ export default function AdminDashboardPage() {
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-black/30 flex flex-col justify-between p-3 text-white">
-                          <div className="flex items-center justify-between">
-                            <span className="text-[10px] bg-black/60 px-2 py-0.5 rounded-full font-medium">
-                              {video.views || "15K views"}
-                            </span>
+                          <div className="flex items-center justify-end">
                             <span className="text-[10px] bg-pink-600/80 px-2 py-0.5 rounded-full font-medium">
                               Reel
                             </span>
@@ -2418,9 +2409,7 @@ export default function AdminDashboardPage() {
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30 flex flex-col justify-between p-3 text-white">
-                        <span className="text-[10px] bg-black/60 px-2 py-0.5 rounded-full font-medium self-start">
-                          {video.views}
-                        </span>
+                        <div />
 
                         <a
                           href={video.videoUrl}
@@ -2713,9 +2702,6 @@ export default function AdminDashboardPage() {
                           <span className="px-2 py-0.5 rounded-md bg-black/60 backdrop-blur-sm text-[10px] font-semibold text-white/90 border border-white/10">
                             Reel #{index + 1}
                           </span>
-                          <span className="px-2 py-0.5 rounded-md bg-[#E1306C]/80 backdrop-blur-sm text-[10px] font-semibold text-white">
-                            {video.views || "28K views"}
-                          </span>
                         </div>
 
                         {/* Direct 1-Click Upload Buttons */}
@@ -2805,7 +2791,7 @@ export default function AdminDashboardPage() {
                             {video.title}
                           </span>
                           <span className="text-[10px] text-muted-foreground font-mono block truncate">
-                            {video.handle || "@gleamnest.in"} • {video.views || "28K"}
+                            {video.handle || "@gleamnest.in"}
                           </span>
                         </div>
 
@@ -3458,28 +3444,15 @@ export default function AdminDashboardPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-foreground">Product Slug</label>
-                  <input
-                    type="text"
-                    placeholder="clover-bracelet-gold"
-                    value={videoForm.productSlug}
-                    onChange={(e) => setVideoForm({ ...videoForm, productSlug: e.target.value })}
-                    className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none font-mono"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-foreground">Views Badge</label>
-                  <input
-                    type="text"
-                    placeholder="18.4K views"
-                    value={videoForm.views}
-                    onChange={(e) => setVideoForm({ ...videoForm, views: e.target.value })}
-                    className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none"
-                  />
-                </div>
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-foreground">Product Slug</label>
+                <input
+                  type="text"
+                  placeholder="clover-bracelet-gold"
+                  value={videoForm.productSlug}
+                  onChange={(e) => setVideoForm({ ...videoForm, productSlug: e.target.value })}
+                  className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none font-mono"
+                />
               </div>
 
               <div className="pt-4 border-t border-border flex items-center justify-end gap-3">
@@ -3603,11 +3576,10 @@ export default function AdminDashboardPage() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-foreground">Customer Name *</label>
+                  <label className="text-xs font-semibold text-foreground">Customer Name (Optional)</label>
                   <input
                     type="text"
-                    required
-                    placeholder="e.g. Sneha Thomas"
+                    placeholder="Leave blank for Anonymous"
                     value={screenshotForm.customerName}
                     onChange={(e) => setScreenshotForm({ ...screenshotForm, customerName: e.target.value })}
                     className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none"
@@ -3870,28 +3842,15 @@ export default function AdminDashboardPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-foreground">Views Badge</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. 28.4K"
-                    value={instaVideoForm.views}
-                    onChange={(e) => setInstaVideoForm({ ...instaVideoForm, views: e.target.value })}
-                    className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-foreground">Instagram Profile / Reel Link</label>
-                  <input
-                    type="text"
-                    placeholder="https://www.instagram.com/reel/..."
-                    value={instaVideoForm.instagramLink}
-                    onChange={(e) => setInstaVideoForm({ ...instaVideoForm, instagramLink: e.target.value })}
-                    className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none font-mono"
-                  />
-                </div>
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-foreground">Instagram Profile / Reel Link</label>
+                <input
+                  type="text"
+                  placeholder="https://www.instagram.com/reel/..."
+                  value={instaVideoForm.instagramLink}
+                  onChange={(e) => setInstaVideoForm({ ...instaVideoForm, instagramLink: e.target.value })}
+                  className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none font-mono"
+                />
               </div>
 
               <div className="space-y-1">
