@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
 import { put } from "@vercel/blob";
+import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -104,12 +105,53 @@ export async function POST(req: Request) {
       );
     }
 
-    // 4. If Vercel Blob was not reachable and filesystem is read-only
+    // 4. Database Cloud Fallback (Neon PostgreSQL):
+    // Save to MediaStorage table and serve via /api/media/[id] with native range streaming!
+    try {
+      const fileId = `${Date.now()}-${cleanBase}${ext}`;
+      const base64Data = buffer.toString("base64");
+      const mimeType = file.type || (safeFolder === "videos" ? "video/mp4" : "image/jpeg");
+
+      await prisma.mediaStorage.upsert({
+        where: { id: fileId },
+        create: {
+          id: fileId,
+          fileName,
+          mimeType,
+          data: base64Data,
+          size: buffer.length,
+        },
+        update: {
+          data: base64Data,
+          size: buffer.length,
+        },
+      });
+
+      const publicUrl = `/api/media/${encodeURIComponent(fileId)}`;
+      return NextResponse.json(
+        {
+          success: true,
+          url: publicUrl,
+          fileName,
+          size: file.size,
+          provider: "database",
+        },
+        {
+          headers: {
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+          },
+        }
+      );
+    } catch (dbErr: any) {
+      console.error("Database media storage fallback failed:", dbErr);
+    }
+
+    // 5. If everything failed
     return NextResponse.json(
       {
         error:
           safeFolder === "videos"
-            ? "Video upload requires Vercel Blob Storage. Please verify BLOB_READ_WRITE_TOKEN in Vercel settings, or paste a public video / Instagram Reel URL."
+            ? "Video upload failed. Please verify storage configuration or paste a public video / Instagram Reel URL."
             : "Image upload failed. Please verify storage configuration or paste an image URL.",
       },
       { status: 400 }

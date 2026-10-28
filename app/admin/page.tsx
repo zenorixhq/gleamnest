@@ -688,6 +688,12 @@ export default function AdminDashboardPage() {
         body: formData,
       });
 
+      if (res.status === 413) {
+        throw new Error(
+          "Video file exceeds the serverless limit. Please enable Vercel Blob in your Vercel Dashboard (Storage -> Create Blob) for unlimited uploads up to 150MB, or paste an Instagram / direct video URL."
+        );
+      }
+
       const data = await res.json();
       if (!res.ok || !data.success) {
         throw new Error(data.error || "Upload failed");
