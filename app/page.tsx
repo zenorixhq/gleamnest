@@ -10,7 +10,7 @@ import { BrandValueBadges } from "@/components/storefront/BrandValueBadges";
 import { CustomerReviewsWithVideos } from "@/components/storefront/CustomerReviewsWithVideos";
 import { InstagramReelSection } from "@/components/storefront/InstagramReelSection";
 import { ScrollReveal } from "@/components/common/ScrollReveal";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 export default function HomePage() {
   const [categoryItems, setCategoryItems] = useState<Category[]>(() => {
@@ -59,23 +59,13 @@ export default function HomePage() {
       <section className="w-full py-10 sm:py-12 md:py-14 border-t border-[#EADBBE]/60 bg-[#FAF7F2]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 sm:space-y-8">
           <ScrollReveal variant="fade-up">
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-              <div>
-                <div className="flex items-center gap-1.5 text-xs font-bold text-[#C5A059] uppercase tracking-widest">
-                  <Sparkles className="w-3.5 h-3.5" />
-                  <span>Curated Collections</span>
-                </div>
-                <h2 className="font-editorial text-3xl sm:text-4xl font-normal text-[#1C1917] mt-1 tracking-wide">
-                  Shop by Category
-                </h2>
-              </div>
-              <Link
-                href="/products"
-                className="text-xs sm:text-sm font-semibold text-[#8F7234] hover:text-[#1C1917] flex items-center gap-1 group transition-colors"
-              >
-                <span>View All Categories</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </Link>
+            <div className="text-center space-y-2">
+              <span className="text-[10px] sm:text-xs uppercase tracking-[0.25em] text-[#8F7234] font-medium block">
+                CURATED COLLECTIONS
+              </span>
+              <h2 className="font-editorial text-3xl sm:text-5xl font-normal tracking-tight text-[#1C1917]">
+                Shop by Category
+              </h2>
             </div>
           </ScrollReveal>
 
@@ -114,6 +104,17 @@ export default function HomePage() {
                 </Link>
               </ScrollReveal>
             ))}
+          </div>
+
+          {/* View All Categories CTA Button */}
+          <div className="text-center pt-2 sm:pt-4">
+            <Link
+              href="/products"
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full border border-[#1C1917] text-[#1C1917] hover:bg-[#1C1917] hover:text-white font-semibold text-xs tracking-wider uppercase transition-all shadow-sm group"
+            >
+              <span>View All Categories</span>
+              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+            </Link>
           </div>
         </div>
       </section>
