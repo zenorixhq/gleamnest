@@ -106,61 +106,62 @@ export function HeroEditorial() {
           </div>
         </div>
 
-        {/* 5. Bottom White Curved Dock / Floating Bar (Slim single-row with categories fully visible on screen) */}
+        {/* 5. Bottom Curved Dock / Floating Bar (Spacious luxury chip navigation on phone, minimalist underline on desktop) */}
         <div className="w-full bg-white rounded-t-2xl sm:rounded-t-[2.25rem] md:rounded-t-[2.75rem] shadow-[0_-6px_24px_rgba(0,0,0,0.03)] border-t border-[#E3D7C5]">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 sm:py-3 md:py-3.5 flex flex-row items-center justify-between gap-3 sm:gap-6">
+          <div className="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 py-2.5 sm:py-3.5 flex flex-row items-center gap-2.5 sm:gap-6">
             {/* Left: Scroll indicator button */}
             <a
               href="#about-us"
-              className="flex items-center gap-1.5 text-[9px] sm:text-[10px] uppercase tracking-[0.2em] text-[#7A7269] hover:text-[#1C1917] transition-colors group cursor-pointer"
+              className="shrink-0 flex items-center gap-1 text-[9px] sm:text-[10px] uppercase tracking-[0.18em] font-semibold text-[#8F7234] bg-[#FAF5EB] sm:bg-transparent px-2.5 py-1.5 sm:p-0 rounded-full sm:rounded-none border border-[#EADBBE] sm:border-0 transition-colors group cursor-pointer"
+              title="Scroll to About Us"
             >
               <span className="text-xs group-hover:translate-y-0.5 transition-transform animate-float-gentle inline-block">↓</span>
-              <span className="font-semibold tracking-[0.18em]">SCROLL</span>
+              <span className="hidden xs:inline sm:inline">SCROLL</span>
             </a>
 
-            {/* Right: Category navigation links */}
-            <div className="flex items-center gap-3 sm:gap-6 md:gap-8 text-xs sm:text-sm lowercase overflow-x-auto no-scrollbar py-0.5 whitespace-nowrap">
+            {/* Right: Category navigation links (Generous chip layout on mobile, clean tabs on desktop) */}
+            <div className="flex-1 flex items-center gap-2 sm:gap-6 md:gap-8 text-xs sm:text-sm overflow-x-auto no-scrollbar py-1 whitespace-nowrap scroll-smooth">
               <Link
                 href="/products?category=rings"
-                className="text-[#1C1917] font-semibold border-b-2 border-[#1C1917] pb-0.5 transition-colors shrink-0"
+                className="shrink-0 px-3 py-1.5 sm:px-0 sm:py-0.5 rounded-full sm:rounded-none bg-[#1C1917] text-white sm:bg-transparent sm:text-[#1C1917] sm:border-b-2 sm:border-[#1C1917] font-medium sm:font-semibold text-xs sm:text-sm transition-all shadow-xs"
               >
                 rings
               </Link>
               <Link
                 href="/products?category=earrings"
-                className="text-[#7A7269] hover:text-[#1C1917] hover:border-b-2 hover:border-[#7A7269] pb-0.5 transition-all shrink-0"
+                className="shrink-0 px-3 py-1.5 sm:px-0 sm:py-0.5 rounded-full sm:rounded-none bg-[#FAF7F2] text-stone-700 border border-[#EADBBE]/80 sm:bg-transparent sm:border-0 sm:border-b-2 sm:border-transparent sm:text-[#7A7269] hover:text-[#1C1917] sm:hover:border-[#7A7269] font-medium sm:font-normal text-xs sm:text-sm transition-all"
               >
                 earrings
               </Link>
               <Link
                 href="/products?category=necklaces-and-chains"
-                className="text-[#7A7269] hover:text-[#1C1917] hover:border-b-2 hover:border-[#7A7269] pb-0.5 transition-all shrink-0"
+                className="shrink-0 px-3 py-1.5 sm:px-0 sm:py-0.5 rounded-full sm:rounded-none bg-[#FAF7F2] text-stone-700 border border-[#EADBBE]/80 sm:bg-transparent sm:border-0 sm:border-b-2 sm:border-transparent sm:text-[#7A7269] hover:text-[#1C1917] sm:hover:border-[#7A7269] font-medium sm:font-normal text-xs sm:text-sm transition-all"
               >
                 necklaces & chains
               </Link>
               <Link
                 href="/products?category=bracelets"
-                className="text-[#7A7269] hover:text-[#1C1917] hover:border-b-2 hover:border-[#7A7269] pb-0.5 transition-all shrink-0"
+                className="shrink-0 px-3 py-1.5 sm:px-0 sm:py-0.5 rounded-full sm:rounded-none bg-[#FAF7F2] text-stone-700 border border-[#EADBBE]/80 sm:bg-transparent sm:border-0 sm:border-b-2 sm:border-transparent sm:text-[#7A7269] hover:text-[#1C1917] sm:hover:border-[#7A7269] font-medium sm:font-normal text-xs sm:text-sm transition-all"
               >
                 bracelets
               </Link>
               <Link
                 href="/products?category=bangles-kada"
-                className="text-[#7A7269] hover:text-[#1C1917] hover:border-b-2 hover:border-[#7A7269] pb-0.5 transition-all shrink-0"
+                className="shrink-0 px-3 py-1.5 sm:px-0 sm:py-0.5 rounded-full sm:rounded-none bg-[#FAF7F2] text-stone-700 border border-[#EADBBE]/80 sm:bg-transparent sm:border-0 sm:border-b-2 sm:border-transparent sm:text-[#7A7269] hover:text-[#1C1917] sm:hover:border-[#7A7269] font-medium sm:font-normal text-xs sm:text-sm transition-all"
               >
                 bangles kada
               </Link>
               <Link
                 href="/products?category=anklets"
-                className="text-[#7A7269] hover:text-[#1C1917] hover:border-b-2 hover:border-[#7A7269] pb-0.5 transition-all shrink-0"
+                className="shrink-0 px-3 py-1.5 sm:px-0 sm:py-0.5 rounded-full sm:rounded-none bg-[#FAF7F2] text-stone-700 border border-[#EADBBE]/80 sm:bg-transparent sm:border-0 sm:border-b-2 sm:border-transparent sm:text-[#7A7269] hover:text-[#1C1917] sm:hover:border-[#7A7269] font-medium sm:font-normal text-xs sm:text-sm transition-all"
               >
                 anklets
               </Link>
               <Link
                 href="/products?category=new-arrivals"
-                className="text-[#8F7234] font-medium hover:text-[#1C1917] hover:border-b-2 hover:border-[#8F7234] pb-0.5 transition-all shrink-0"
+                className="shrink-0 px-3 py-1.5 sm:px-0 sm:py-0.5 rounded-full sm:rounded-none bg-[#FAF5EB] text-[#8F7234] border border-[#EADBBE] sm:bg-transparent sm:border-0 sm:border-b-2 sm:border-transparent hover:text-[#1C1917] sm:hover:border-[#8F7234] font-medium text-xs sm:text-sm transition-all flex items-center gap-1"
               >
-                new arrivals
+                <span>✦ new arrivals</span>
               </Link>
             </div>
           </div>

@@ -287,13 +287,13 @@ export function CustomerReviewsWithVideos() {
   return (
     <section className="w-full bg-[#FAF7F2] py-10 sm:py-12 md:py-14 border-t border-[#EADBBE]/80 text-[#1C1917]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 sm:space-y-8">
-        {/* Header: Loved by you */}
+        {/* Header: The love we get */}
         <div className="text-center space-y-2">
           <span className="text-[10px] sm:text-xs uppercase tracking-[0.25em] text-[#8F7234] font-medium block">
             IN THEIR WORDS
           </span>
           <h2 className="font-editorial text-3xl sm:text-5xl font-normal tracking-tight text-[#1C1917]">
-            Loved by you
+            The love we get
           </h2>
         </div>
 
