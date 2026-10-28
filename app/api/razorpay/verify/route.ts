@@ -37,43 +37,31 @@ export async function POST(req: Request) {
       }
     }
 
-    let savedOrder: any = null;
-
-    // Save confirmed order to Prisma database if connected
-    try {
-      savedOrder = await prisma.order.create({
-        data: {
-          orderNumber: orderNumber || `ALN-${Math.floor(10000 + Math.random() * 90000)}`,
-          customerName: customer.firstName ? `${customer.firstName} ${customer.lastName || ""}`.trim() : (customer.fullName || "Customer"),
-          customerEmail: customer.email || "customer@alnaya.in",
-          customerPhone: customer.phone || "",
-          shippingAddress: `${customer.address || ""}, ${customer.city || ""}, ${customer.state || ""} ${customer.postalCode || ""}, ${customer.country || "India"}`,
-          itemsJson: JSON.stringify(items || []),
-          subtotal: parseFloat(subtotal || 0),
-          discountTotal: parseFloat(discountTotal || 0),
-          shippingFee: parseFloat(shippingFee || 0),
-          taxTotal: parseFloat(taxTotal || 0),
-          grandTotal: parseFloat(grandTotal || 0),
-          paymentMethod: "razorpay",
-          paymentStatus: "paid",
-          orderStatus: "processing",
-          razorpayOrderId: razorpay_order_id || null,
-          razorpayPaymentId: razorpay_payment_id || null,
-        },
-      });
-    } catch (dbErr) {
-      console.error("Prisma database fallback on order save:", dbErr);
-      // Fallback object so order confirmation flow completes cleanly
-      savedOrder = {
-        orderNumber: orderNumber || `ALN-${Date.now().toString().slice(-5)}`,
+    // Save confirmed order to Prisma database
+    const savedOrder = await prisma.order.create({
+      data: {
+        orderNumber: orderNumber || `RZP-${Math.floor(10000 + Math.random() * 90000)}`,
+        customerName: `${customer.firstName} ${customer.lastName}`,
+        customerEmail: customer.email,
+        customerPhone: customer.phone,
+        shippingAddress: `${customer.address}, ${customer.city}, ${customer.state} ${customer.postalCode}, ${customer.country}`,
+        itemsJson: JSON.stringify(items),
+        subtotal: parseFloat(subtotal),
+        discountTotal: parseFloat(discountTotal || 0),
+        shippingFee: parseFloat(shippingFee || 0),
+        taxTotal: parseFloat(taxTotal || 0),
+        grandTotal: parseFloat(grandTotal),
+        paymentMethod: "razorpay",
         paymentStatus: "paid",
-        grandTotal,
-      };
-    }
+        orderStatus: "processing",
+        razorpayOrderId: razorpay_order_id,
+        razorpayPaymentId: razorpay_payment_id,
+      },
+    });
 
     return NextResponse.json({
       success: true,
-      message: "Payment successfully verified and order confirmed",
+      message: "Payment successfully verified and order saved",
       order: savedOrder,
     });
   } catch (err: any) {

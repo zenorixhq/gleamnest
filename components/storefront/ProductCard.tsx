@@ -25,13 +25,9 @@ export function ProductCard({ product }: ProductCardProps) {
     selectedCurrency
   );
 
-  const isOutOfStock = !product.inStock || product.stockCount <= 0;
-  const isVeryFewLeft = !isOutOfStock && product.stockCount <= 3;
-
   const handleQuickAdd = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (isOutOfStock) return;
     addItem(product, 1);
     setIsAdded(true);
     setTimeout(() => setIsAdded(false), 2000);
@@ -66,37 +62,23 @@ export function ProductCard({ product }: ProductCardProps) {
             src={displayImage}
             alt={product.title}
             loading="lazy"
-            className={`w-full h-full object-contain object-center group-hover:scale-105 transition-transform duration-500 ease-out ${
-              isOutOfStock ? "opacity-60 grayscale-[35%]" : ""
-            }`}
+            className="w-full h-full object-contain object-center group-hover:scale-105 transition-transform duration-500 ease-out"
           />
         </Link>
 
         {/* Floating Badges */}
         <div className="absolute top-2 left-2 flex flex-col gap-1 z-10 pointer-events-none">
-          {/* Out of Stock & Low Stock Badges */}
-          {isOutOfStock ? (
-            <span className="bg-neutral-900/95 text-stone-100 border border-white/20 text-[10px] font-bold px-2 py-0.5 rounded-full shadow-md uppercase tracking-wider backdrop-blur-sm">
-              Out of Stock
-            </span>
-          ) : isVeryFewLeft ? (
-            <span className="bg-amber-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-md flex items-center gap-1 backdrop-blur-sm">
-              <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-              Only {product.stockCount} Left!
-            </span>
-          ) : null}
-
-          {discountPercent > 0 && !isOutOfStock && (
+          {discountPercent > 0 && (
             <span className="bg-destructive text-destructive-foreground text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-sm">
               -{discountPercent}%
             </span>
           )}
-          {product.isNewArrival && !isOutOfStock && (
+          {product.isNewArrival && (
             <span className="bg-primary text-primary-foreground text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-sm">
               NEW
             </span>
           )}
-          {product.isBestSeller && !product.isNewArrival && !isOutOfStock && (
+          {product.isBestSeller && !product.isNewArrival && (
             <span className="bg-accent text-accent-foreground text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-sm">
               BESTSELLER
             </span>
@@ -128,35 +110,26 @@ export function ProductCard({ product }: ProductCardProps) {
 
         {/* Quick Add To Cart Button (Desktop Hover) */}
         <div className="absolute inset-x-2 bottom-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10 hidden sm:block">
-          {isOutOfStock ? (
-            <button
-              disabled
-              className="w-full py-1.5 px-2.5 text-[11px] font-bold rounded-lg shadow-sm flex items-center justify-center gap-1.5 bg-stone-200 dark:bg-stone-800 text-stone-500 cursor-not-allowed border border-border"
-            >
-              <span>Out of Stock</span>
-            </button>
-          ) : (
-            <button
-              onClick={handleQuickAdd}
-              className={`w-full py-1.5 px-2.5 text-[11px] font-bold rounded-lg shadow-md flex items-center justify-center gap-1.5 backdrop-blur-sm transition-all active:scale-95 ${
-                isAdded
-                  ? "bg-emerald-600 text-white"
-                  : "bg-foreground/95 hover:bg-foreground text-background"
-              }`}
-            >
-              {isAdded ? (
-                <>
-                  <Check className="w-3 h-3" />
-                  <span>Added to Bag!</span>
-                </>
-              ) : (
-                <>
-                  <ShoppingBag className="w-3 h-3" />
-                  <span>Quick Add</span>
-                </>
-              )}
-            </button>
-          )}
+          <button
+            onClick={handleQuickAdd}
+            className={`w-full py-1.5 px-2.5 text-[11px] font-bold rounded-lg shadow-md flex items-center justify-center gap-1.5 backdrop-blur-sm transition-all active:scale-95 ${
+              isAdded
+                ? "bg-emerald-600 text-white"
+                : "bg-foreground/95 hover:bg-foreground text-background"
+            }`}
+          >
+            {isAdded ? (
+              <>
+                <Check className="w-3 h-3" />
+                <span>Added to Bag!</span>
+              </>
+            ) : (
+              <>
+                <ShoppingBag className="w-3 h-3" />
+                <span>Quick Add</span>
+              </>
+            )}
+          </button>
         </div>
       </div>
 
@@ -178,18 +151,6 @@ export function ProductCard({ product }: ProductCardProps) {
               {product.title}
             </h3>
           </Link>
-
-          {/* Stock Urgency Indicator */}
-          {isOutOfStock ? (
-            <p className="text-[10px] font-bold text-rose-600 dark:text-rose-400 mt-0.5">
-              Out of Stock
-            </p>
-          ) : isVeryFewLeft ? (
-            <p className="text-[10px] font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1 mt-0.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
-              Only {product.stockCount} left!
-            </p>
-          ) : null}
         </div>
 
         {/* Price & Mobile Add Button */}
@@ -206,24 +167,18 @@ export function ProductCard({ product }: ProductCardProps) {
           </div>
 
           {/* Mobile only add button with instant feedback */}
-          {isOutOfStock ? (
-            <span className="sm:hidden px-2 py-1 rounded text-[9px] font-bold uppercase tracking-wider bg-stone-200 dark:bg-stone-800 text-stone-500">
-              Sold Out
-            </span>
-          ) : (
-            <button
-              onClick={handleQuickAdd}
-              className={`sm:hidden min-w-[32px] min-h-[32px] p-1.5 rounded-lg flex items-center justify-center transition-all active:scale-90 ${
-                isAdded
-                  ? "bg-emerald-600 text-white"
-                  : "bg-primary text-primary-foreground hover:bg-primary/90"
-              }`}
-              aria-label="Add to cart"
-              title="Add to shopping bag"
-            >
-              {isAdded ? <Check className="w-3.5 h-3.5" /> : <ShoppingBag className="w-3.5 h-3.5" />}
-            </button>
-          )}
+          <button
+            onClick={handleQuickAdd}
+            className={`sm:hidden min-w-[32px] min-h-[32px] p-1.5 rounded-lg flex items-center justify-center transition-all active:scale-90 ${
+              isAdded
+                ? "bg-emerald-600 text-white"
+                : "bg-primary text-primary-foreground hover:bg-primary/90"
+            }`}
+            aria-label="Add to cart"
+            title="Add to shopping bag"
+          >
+            {isAdded ? <Check className="w-3.5 h-3.5" /> : <ShoppingBag className="w-3.5 h-3.5" />}
+          </button>
         </div>
       </div>
     </div>

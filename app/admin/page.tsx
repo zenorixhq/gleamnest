@@ -1380,10 +1380,6 @@ export default function AdminDashboardPage() {
         : Math.max(10, Math.round(parsedPriceInr / 20));
       const parsedSalePriceQar = formState.salePriceQatar ? parseFloat(formState.salePriceQatar) : null;
 
-      const parsedStockCount = formState.stockCount !== "" && !isNaN(parseInt(formState.stockCount))
-        ? Math.max(0, parseInt(formState.stockCount))
-        : 0;
-
       if (editingProduct) {
         // Update existing product in DB and Store
         await updateProduct(editingProduct.id, {
@@ -1393,8 +1389,7 @@ export default function AdminDashboardPage() {
           salePrice: parsedSalePriceInr,
           priceQatar: parsedPriceQar,
           salePriceQatar: parsedSalePriceQar,
-          stockCount: parsedStockCount,
-          inStock: parsedStockCount > 0,
+          stockCount: parseInt(formState.stockCount) || 0,
           shortDescription: formState.shortDescription || formState.title,
           description: formState.description || formState.title,
           imageUrl: formState.imageUrl,
@@ -1412,8 +1407,7 @@ export default function AdminDashboardPage() {
           salePrice: parsedSalePriceInr,
           priceQatar: parsedPriceQar,
           salePriceQatar: parsedSalePriceQar,
-          stockCount: parsedStockCount,
-          inStock: parsedStockCount > 0,
+          stockCount: parseInt(formState.stockCount) || 10,
           shortDescription: formState.shortDescription || formState.title,
           description: formState.description || formState.title,
           imageUrl: formState.imageUrl,
@@ -1750,24 +1744,13 @@ export default function AdminDashboardPage() {
                       </td>
                       <td className="py-3">
                         <span
-                          className={`font-bold px-2 py-0.5 rounded-full text-[11px] inline-flex items-center gap-1 ${
-                            product.stockCount <= 0
-                              ? "bg-rose-100 text-rose-800 border border-rose-200"
-                              : product.stockCount <= 3
-                              ? "bg-amber-100 text-amber-900 border border-amber-300 font-bold"
+                          className={`font-bold px-2 py-0.5 rounded-full text-[11px] ${
+                            product.stockCount < 10
+                              ? "bg-amber-100 text-amber-800"
                               : "bg-emerald-100 text-emerald-800"
                           }`}
                         >
-                          {product.stockCount <= 0 ? (
-                            "Out of Stock (0)"
-                          ) : product.stockCount <= 3 ? (
-                            <>
-                              <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
-                              Very Few Left ({product.stockCount})
-                            </>
-                          ) : (
-                            `${product.stockCount} units`
-                          )}
+                          {product.stockCount} units
                         </span>
                       </td>
                       <td className="py-3">

@@ -15,7 +15,6 @@ import {
   ShieldCheck,
   Tag,
   Sparkles,
-  Lock,
 } from "lucide-react";
 
 export default function CartPage() {
@@ -214,27 +213,30 @@ export default function CartPage() {
               </div>
             )}
             <div className="flex justify-between text-muted-foreground">
-              <span>Pan-India Shipping</span>
-              <span>{shipping === 0 ? "FREE" : formatPrice(shipping)}</span>
+              <span>Shipping</span>
+              <span>{shipping === 0 ? (isQatar ? "FREE (Qatar Express)" : "FREE") : formatPrice(shipping, selectedCurrency)}</span>
+            </div>
+            <div className="flex justify-between text-muted-foreground">
+              <span>Estimated Tax</span>
+              <span>{formatPrice(tax, selectedCurrency)}</span>
             </div>
             <div className="flex justify-between text-base font-black text-foreground pt-3 border-t border-border">
               <span>Estimated Total</span>
-              <span>{formatPrice(total)}</span>
+              <span>{formatPrice(total, selectedCurrency)}</span>
             </div>
           </div>
 
           <Link
             href="/checkout"
-            className="w-full py-4 px-6 rounded-xl bg-primary text-primary-foreground font-bold text-sm hover:bg-primary-hover flex items-center justify-center gap-2 shadow-lg transition-all active:scale-[0.99]"
+            className="w-full py-4 px-6 rounded-xl bg-[#25D366] text-white font-bold text-sm hover:bg-[#20ba59] flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/20 transition-all active:scale-[0.99]"
           >
-            <Lock className="w-4 h-4 text-accent" />
-            <span>Proceed to Secure Checkout</span>
+            <span>Proceed to WhatsApp Checkout</span>
             <ArrowRight className="w-4 h-4" />
           </Link>
 
           <div className="pt-2 flex items-center justify-center gap-2 text-xs text-muted-foreground">
-            <ShieldCheck className="w-4 h-4 text-emerald-600" />
-            <span>100% Secure Checkout via Razorpay (UPI, Cards, NetBanking)</span>
+            <ShieldCheck className="w-4 h-4 text-[#25D366]" />
+            <span>Direct WhatsApp Order • 100% Secure UPI / COD Confirmation</span>
           </div>
         </div>
       </div>

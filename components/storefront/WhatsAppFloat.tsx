@@ -11,7 +11,7 @@ export function WhatsAppFloat() {
 
   const phone = storeConfig.brand.contact.whatsappNumber;
   const message = encodeURIComponent(
-    "Hi Alnaya! ✨ I am browsing your jewelry collection and would love some assistance with styling & sizing."
+    "Hi GleamNest! ✨ I am browsing your jewelry collection on your website and would love some assistance with an order."
   );
   const waUrl = `https://wa.me/${phone}?text=${message}`;
 

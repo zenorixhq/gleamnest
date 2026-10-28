@@ -15,7 +15,6 @@ import {
   Tag,
   Truck,
   Sparkles,
-  Lock,
 } from "lucide-react";
 
 export function CartDrawer() {
@@ -197,7 +196,14 @@ export function CartDrawer() {
                       </div>
 
                       <span className="text-sm font-bold text-foreground">
-                        {formatPrice(item.price * item.quantity)}
+                        {formatPrice(
+                          (isQatar
+                            ? item.priceQatar !== undefined && item.priceQatar !== null
+                              ? item.priceQatar
+                              : Math.max(10, Math.round(item.price / 20))
+                            : item.price) * item.quantity,
+                          selectedCurrency
+                        )}
                       </span>
                     </div>
                   </div>
@@ -228,10 +234,10 @@ export function CartDrawer() {
                   <form onSubmit={handleApplyCoupon} className="flex gap-2">
                     <input
                       type="text"
-                      placeholder="Coupon (e.g. ALNAYA5, WELCOME5)"
+                      placeholder="Promo code (e.g. GLEAM5)"
                       value={couponCode}
                       onChange={(e) => {
-                        setCouponCode(e.target.value.toUpperCase());
+                        setCouponCode(e.target.value);
                         setCouponMsg(null);
                       }}
                       className="flex-1 px-3 py-1.5 text-xs rounded-md bg-muted/40 border border-border focus:outline-none focus:ring-1 focus:ring-primary uppercase"
@@ -259,21 +265,21 @@ export function CartDrawer() {
               <div className="space-y-1.5 text-xs">
                 <div className="flex justify-between text-muted-foreground">
                   <span>Subtotal</span>
-                  <span>{formatPrice(subtotal)}</span>
+                  <span>{formatPrice(subtotal, selectedCurrency)}</span>
                 </div>
                 {discount > 0 && (
                   <div className="flex justify-between text-emerald-600 font-medium">
                     <span>Coupon Discount</span>
-                    <span>-{formatPrice(discount)}</span>
+                    <span>-{formatPrice(discount, selectedCurrency)}</span>
                   </div>
                 )}
                 <div className="flex justify-between text-muted-foreground">
-                  <span>Pan-India Delivery</span>
-                  <span>{shipping === 0 ? "FREE" : formatPrice(shipping)}</span>
+                  <span>Estimated Shipping</span>
+                  <span>{shipping === 0 ? (isQatar ? "FREE (Within 14 Days)" : "FREE") : formatPrice(shipping, selectedCurrency)}</span>
                 </div>
                 <div className="flex justify-between text-base font-bold text-foreground pt-2 border-t border-border">
-                  <span>Total</span>
-                  <span>{formatPrice(total)}</span>
+                  <span>Estimated Total</span>
+                  <span>{formatPrice(total, selectedCurrency)}</span>
                 </div>
               </div>
 
@@ -281,10 +287,9 @@ export function CartDrawer() {
               <Link
                 href="/checkout"
                 onClick={closeCart}
-                className="w-full flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl bg-primary text-primary-foreground font-bold text-sm hover:bg-primary-hover transition-all shadow-md active:scale-[0.99]"
+                className="w-full flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl bg-[#25D366] text-white font-bold text-sm hover:bg-[#20ba59] transition-all shadow-md active:scale-[0.99]"
               >
-                <Lock className="w-4 h-4 text-accent" />
-                <span>Proceed to Secure Checkout</span>
+                <span>Proceed to WhatsApp Checkout</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
             </div>

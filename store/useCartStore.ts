@@ -52,11 +52,6 @@ export const useCartStore = create<CartStore>()(
       quickViewProduct: null,
 
       addItem: (product, quantity = 1, selectedVariant) => {
-        // Do not add items that are out of stock
-        if (!product.inStock || product.stockCount <= 0) {
-          return;
-        }
-
         const currentItems = get().items;
         // Normalize variant: if variant has empty options or default key, keep it standard
         const hasOptions =
@@ -72,6 +67,12 @@ export const useCartStore = create<CartStore>()(
         );
 
         const indiaPrice = product.salePrice || product.price;
+        const qatarPrice =
+          product.salePriceQatar !== undefined && product.salePriceQatar !== null
+            ? product.salePriceQatar
+            : product.priceQatar !== undefined && product.priceQatar !== null
+            ? product.priceQatar
+            : Math.max(10, Math.round(indiaPrice / 20));
 
         if (existingIndex > -1) {
           const updated = [...currentItems];
@@ -84,6 +85,7 @@ export const useCartStore = create<CartStore>()(
             title: product.title,
             slug: product.slug,
             price: indiaPrice,
+            priceQatar: qatarPrice,
             image: product.images[0],
             quantity,
             selectedVariant: normalizedVariant,
@@ -177,7 +179,15 @@ export const useCartStore = create<CartStore>()(
       closeQuickView: () => set({ quickViewProduct: null }),
 
       getSubtotal: () => {
-        return get().items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+        const isQatar = get().selectedCurrency === "QAR";
+        return get().items.reduce((sum, item) => {
+          const itemPrice = isQatar
+            ? item.priceQatar !== undefined && item.priceQatar !== null
+              ? item.priceQatar
+              : Math.max(10, Math.round(item.price / 20))
+            : item.price;
+          return sum + itemPrice * item.quantity;
+        }, 0);
       },
 
       getDiscountAmount: () => {
@@ -194,6 +204,8 @@ export const useCartStore = create<CartStore>()(
       getShippingFee: () => {
         const subtotal = get().getSubtotal();
         if (subtotal === 0) return 0;
+        // FREE Delivery anywhere in Qatar on all orders!
+        if (get().selectedCurrency === "QAR") return 0;
         const threshold = storeConfig.commerce.freeShippingThreshold;
         if (subtotal >= threshold) return 0;
         return storeConfig.commerce.flatShippingFee;
@@ -220,11 +232,11 @@ export const useCartStore = create<CartStore>()(
       },
     }),
     {
-      name: "alnaya-cart-storage",
+      name: "lumina-cart-storage",
       partialize: (state) => ({
         items: state.items,
         wishlist: state.wishlist,
-        selectedCurrency: "INR",
+        selectedCurrency: state.selectedCurrency,
         appliedCoupon: state.appliedCoupon,
       }),
     }
