@@ -108,7 +108,7 @@ export function HeroEditorial() {
 
         {/* 5. Bottom Curved Dock / Floating Bar (Spacious luxury chip navigation on phone, minimalist underline on desktop) */}
         <div className="w-full bg-white rounded-t-2xl sm:rounded-t-[2.25rem] md:rounded-t-[2.75rem] shadow-[0_-6px_24px_rgba(0,0,0,0.03)] border-t border-[#E3D7C5]">
-          <div className="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 py-2.5 sm:py-3.5 flex flex-row items-center gap-2.5 sm:gap-6">
+          <div className="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 py-2.5 sm:py-3.5 flex flex-row items-center justify-between gap-3 sm:gap-6">
             {/* Left: Scroll indicator button */}
             <a
               href="#about-us"
@@ -119,8 +119,8 @@ export function HeroEditorial() {
               <span className="hidden xs:inline sm:inline">SCROLL</span>
             </a>
 
-            {/* Right: Category navigation links (Generous chip layout on mobile, clean tabs on desktop) */}
-            <div className="flex-1 flex items-center gap-2 sm:gap-6 md:gap-8 text-xs sm:text-sm overflow-x-auto no-scrollbar py-1 whitespace-nowrap scroll-smooth">
+            {/* Right: Category navigation links (Right-aligned to balance with SCROLL on the left) */}
+            <div className="flex items-center justify-start sm:justify-end gap-2.5 sm:gap-6 md:gap-8 text-xs sm:text-sm overflow-x-auto no-scrollbar py-1 whitespace-nowrap scroll-smooth ml-auto min-w-0">
               <Link
                 href="/products?category=rings"
                 className="shrink-0 px-3 py-1.5 sm:px-0 sm:py-0.5 rounded-full sm:rounded-none bg-[#1C1917] text-white sm:bg-transparent sm:text-[#1C1917] sm:border-b-2 sm:border-[#1C1917] font-medium sm:font-semibold text-xs sm:text-sm transition-all shadow-xs"
