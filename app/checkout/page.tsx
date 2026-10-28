@@ -123,9 +123,12 @@ export default function CheckoutPage() {
 
     const itemsText = items
       .map((item, idx) => {
-        const variantInfo = item.selectedVariant
-          ? ` (${Object.values(item.selectedVariant.options).join(", ")})`
+        const variantDetails = item.selectedVariant?.options
+          ? Object.entries(item.selectedVariant.options)
+              .map(([k, v]) => `*${k}:* ${v}`)
+              .join(" | ")
           : "";
+        const variantInfo = variantDetails ? `\n   • ${variantDetails}` : "";
         const itemUnit = isQatar
           ? item.priceQatar !== undefined && item.priceQatar !== null
             ? item.priceQatar
@@ -548,8 +551,10 @@ ${greetingMessage}
                         {item.title}
                       </h4>
                       {item.selectedVariant && (
-                        <p className="text-[11px] text-muted-foreground">
-                          {Object.values(item.selectedVariant.options).join(" / ")}
+                        <p className="text-[11px] text-muted-foreground font-medium">
+                          {Object.entries(item.selectedVariant.options)
+                            .map(([k, v]) => `${k}: ${v}`)
+                            .join(" / ")}
                         </p>
                       )}
                       <p className="text-[11px] text-muted-foreground">Qty: {item.quantity}</p>

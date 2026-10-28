@@ -27,7 +27,9 @@ export function BrandLogo({
         <img
           src="/images/logo-mark.png"
           alt="GleamNest Emblem"
-          className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
+          className={`w-full h-full object-contain group-hover:scale-105 transition-transform duration-300 ${
+            theme === "dark" ? "brightness-0 invert opacity-95" : ""
+          }`}
         />
       </div>
 

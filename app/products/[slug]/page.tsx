@@ -18,6 +18,8 @@ import {
   ShoppingBag,
   Share2,
   ChevronRight,
+  ChevronDown,
+  ArrowRight,
   CheckCircle2,
   MessageCircle,
   Sparkles,
@@ -27,6 +29,7 @@ import {
 } from "lucide-react";
 import { storeConfig } from "@/config/store.config";
 import { PolicyModal, PolicyTab } from "@/components/storefront/PolicyModal";
+import { getProductSizeInfo } from "@/lib/productSizes";
 
 export default function ProductDetailPage({
   params,
@@ -68,6 +71,15 @@ export default function ProductDetailPage({
   const [copiedLink, setCopiedLink] = useState(false);
   const [isAdded, setIsAdded] = useState(false);
 
+  const sizeInfo = getProductSizeInfo(product);
+  const [selectedSize, setSelectedSize] = useState<string>(() => sizeInfo?.defaultSize || "");
+
+  useEffect(() => {
+    if (sizeInfo) {
+      setSelectedSize(sizeInfo.defaultSize);
+    }
+  }, [product?.id]);
+
   const addItem = useCartStore((s) => s.addItem);
   const openCart = useCartStore((s) => s.openCart);
   const toggleWishlist = useCartStore((s) => s.toggleWishlist);
@@ -90,15 +102,22 @@ export default function ProductDetailPage({
   );
 
   const handleAddToCart = () => {
-    const hasVariants =
-      product.variantAttributes && product.variantAttributes.length > 0;
+    // Combine standard variant options with selected size
+    const combinedOptions: { [key: string]: string } = { ...currentOptions };
+    if (sizeInfo && selectedSize) {
+      combinedOptions[sizeInfo.label] = selectedSize;
+    }
+
+    const hasVariants = Object.keys(combinedOptions).length > 0;
     const variantId = hasVariants
-      ? Object.entries(currentOptions)
-          .map(([k, v]) => `${k}-${v}`)
+      ? Object.entries(combinedOptions)
+          .map(([k, v]) => `${k}-${v.replace(/\s+/g, "_")}`)
           .join("_")
       : undefined;
     const variantName = hasVariants
-      ? Object.values(currentOptions).join(" / ")
+      ? Object.entries(combinedOptions)
+          .map(([k, v]) => `${k}: ${v}`)
+          .join(" / ")
       : undefined;
 
     addItem(
@@ -108,7 +127,7 @@ export default function ProductDetailPage({
         ? {
             id: variantId || "standard",
             name: variantName || "Standard",
-            options: currentOptions,
+            options: combinedOptions,
           }
         : undefined
     );
@@ -124,9 +143,14 @@ export default function ProductDetailPage({
   };
 
   const handleDirectWhatsAppOrder = () => {
-    const selectedVariantSummary = Object.entries(currentOptions)
-      .map(([k, v]) => `${k}: ${v}`)
-      .join(", ");
+    const combinedOptions: { [key: string]: string } = { ...currentOptions };
+    if (sizeInfo && selectedSize) {
+      combinedOptions[sizeInfo.label] = selectedSize;
+    }
+
+    const selectedVariantSummary = Object.entries(combinedOptions)
+      .map(([k, v]) => `• *${k}:* *${v}*`)
+      .join("\n");
 
     const phone = storeConfig.brand.contact.whatsappNumber;
     const itemTotalFormatted = formatPrice(effectivePrice * quantity, selectedCurrency);
@@ -142,7 +166,7 @@ _Instant Order Inquiry_
 
 💍 *SELECTED PIECE*
 • *Title:* *${product.title}*
-${selectedVariantSummary ? `• *Selection:* ${selectedVariantSummary}\n` : ""}• *Quantity:* ${quantity}
+${selectedVariantSummary ? `${selectedVariantSummary}\n` : ""}• *Quantity:* ${quantity}
 • *Item Total:* *${itemTotalFormatted}*
 • *Destination:* *${isQatar ? "Qatar (Complimentary Delivery)" : "India"}*
 
@@ -169,9 +193,14 @@ ${greetingMessage}
     }
   };
 
-  const relatedProducts = products
-    .filter((p) => p.id !== product.id && p.category === product.category)
-    .slice(0, 3);
+  // 6 pieces total: same category first, followed by catalog favorites (2 rows x 3 cols)
+  const categoryProducts = products.filter(
+    (p) => p.id !== product.id && p.category === product.category
+  );
+  const otherProducts = products.filter(
+    (p) => p.id !== product.id && p.category !== product.category
+  );
+  const relatedProducts = [...categoryProducts, ...otherProducts].slice(0, 6);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-12 space-y-12 sm:space-y-16 pb-24 sm:pb-12">
@@ -278,13 +307,14 @@ ${greetingMessage}
             {product.description}
           </p>
 
-          {/* Variant Selectors */}
-          {product.variantAttributes?.map((attr) => (
-            <div key={attr.name} className="space-y-2">
+          {/* Ring / Bangle Dedicated Size Dropdown */}
+          {sizeInfo && (
+            <div className="space-y-2 p-3 sm:p-3.5 rounded-xl bg-card border border-border/80 shadow-sm">
               <div className="flex justify-between items-center text-xs">
-                <span className="font-bold text-foreground">
-                  Select {attr.name}: <span className="font-normal text-muted-foreground">{currentOptions[attr.name]}</span>
-                </span>
+                <label htmlFor="product-size-select" className="font-bold text-foreground flex items-center gap-1.5">
+                  <span>{sizeInfo.label}:</span>
+                  <span className="font-semibold text-primary">{selectedSize}</span>
+                </label>
                 <button
                   type="button"
                   onClick={() => setPolicyModalTab("size-guide")}
@@ -294,25 +324,63 @@ ${greetingMessage}
                   <span>Size Guide</span>
                 </button>
               </div>
-              <div className="flex flex-wrap gap-2">
-                {attr.options.map((opt) => (
-                  <button
-                    key={opt}
-                    onClick={() =>
-                      setSelectedOptions({ ...currentOptions, [attr.name]: opt })
-                    }
-                    className={`px-4 py-2 text-xs font-semibold rounded-lg border transition-all ${
-                      currentOptions[attr.name] === opt
-                        ? "border-primary bg-primary text-primary-foreground shadow-sm"
-                        : "border-border bg-card text-foreground hover:bg-muted"
-                    }`}
-                  >
-                    {opt}
-                  </button>
-                ))}
+
+              <div className="relative">
+                <select
+                  id="product-size-select"
+                  value={selectedSize}
+                  onChange={(e) => setSelectedSize(e.target.value)}
+                  className="w-full appearance-none px-3.5 py-2.5 text-xs sm:text-sm font-semibold rounded-xl border border-border bg-background text-foreground focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all pr-10 cursor-pointer shadow-sm hover:border-primary/60"
+                >
+                  {sizeInfo.options.map((opt) => (
+                    <option key={opt} value={opt}>
+                      {opt}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="w-4 h-4 text-muted-foreground absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
               </div>
+
+              <p className="text-[11px] text-muted-foreground flex items-center gap-1 pt-0.5">
+                <Sparkles className="w-3 h-3 text-primary flex-shrink-0" />
+                <span>
+                  {sizeInfo.type === "ring"
+                    ? "Standard Indian Ring sizing. Need help? Open our interactive Size Guide."
+                    : "Standard Indian Bangle sizing (2-2 to 2-10). Check inner diameter in Size Guide."}
+                </span>
+              </p>
             </div>
-          ))}
+          )}
+
+          {/* Other Variant Selectors (Color, Finish, etc.) */}
+          {product.variantAttributes
+            ?.filter((attr) => !/size/i.test(attr.name))
+            .map((attr) => (
+              <div key={attr.name} className="space-y-2">
+                <div className="flex justify-between items-center text-xs">
+                  <span className="font-bold text-foreground">
+                    Select {attr.name}: <span className="font-normal text-muted-foreground">{currentOptions[attr.name]}</span>
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {attr.options.map((opt) => (
+                    <button
+                      key={opt}
+                      onClick={() =>
+                        setSelectedOptions({ ...currentOptions, [attr.name]: opt })
+                      }
+                      className={`px-4 py-2 text-xs font-semibold rounded-lg border transition-all ${
+                        currentOptions[attr.name] === opt
+                          ? "border-primary bg-primary text-primary-foreground shadow-sm"
+                          : "border-border bg-card text-foreground hover:bg-muted"
+                      }`}
+                    >
+                      {opt}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
 
           {/* Quantity & Stock Indicator */}
           <div className="space-y-3 pt-2">
@@ -509,14 +577,40 @@ ${greetingMessage}
         </div>
       </section>
 
-      {/* Related Products */}
+      {/* Related Products: 2 rows and 3 columns of cards on mobile & desktop with view more */}
       {relatedProducts.length > 0 && (
-        <section className="border-t border-border pt-12 space-y-6">
-          <h2 className="text-xl font-bold text-foreground">You May Also Appreciate</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        <section className="border-t border-border pt-10 sm:pt-14 space-y-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-lg sm:text-2xl font-bold text-foreground">You May Also Appreciate</h2>
+              <p className="text-xs text-muted-foreground hidden sm:block">
+                Matching waterproof & anti-tarnish everyday jewelry pieces.
+              </p>
+            </div>
+            <Link
+              href="/products"
+              className="text-xs sm:text-sm font-semibold text-primary hover:text-primary/80 flex items-center gap-1 group transition-colors"
+            >
+              <span>View All</span>
+              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+            </Link>
+          </div>
+
+          {/* 2 Rows x 3 Columns Grid */}
+          <div className="grid grid-cols-3 gap-2 sm:gap-4 md:gap-6">
             {relatedProducts.map((p) => (
               <ProductCard key={p.id} product={p} />
             ))}
+          </div>
+
+          <div className="pt-2 sm:pt-4 text-center">
+            <Link
+              href="/products"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground font-bold text-xs sm:text-sm transition-all shadow-sm active:scale-98"
+            >
+              <span>View More Jewelry ({products.length} Pieces)</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
           </div>
         </section>
       )}
