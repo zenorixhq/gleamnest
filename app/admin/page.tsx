@@ -194,6 +194,36 @@ export default function AdminDashboardPage() {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
+  // Lock body scroll and pause background smooth scroll whenever any admin modal is active
+  const isAnyAdminModalActive =
+    isModalOpen ||
+    isCategoryModalOpen ||
+    isReviewModalOpen ||
+    isVideoModalOpen ||
+    isScreenshotModalOpen ||
+    isInstaVideoModalOpen;
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (isAnyAdminModalActive) {
+      document.body.style.overflow = "hidden";
+      if ((window as any).__lenis) {
+        (window as any).__lenis.stop();
+      }
+    } else {
+      document.body.style.overflow = "";
+      if ((window as any).__lenis) {
+        (window as any).__lenis.start();
+      }
+    }
+    return () => {
+      document.body.style.overflow = "";
+      if ((window as any).__lenis) {
+        (window as any).__lenis.start();
+      }
+    };
+  }, [isAnyAdminModalActive]);
+
   // Form fields
   const [formState, setFormState] = useState<{
     title: string;
@@ -3198,7 +3228,7 @@ export default function AdminDashboardPage() {
 
       {/* Product Add / Edit Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+        <div data-lenis-prevent className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto overscroll-contain">
           <div
             className="fixed inset-0 bg-black/60 backdrop-blur-sm"
             onClick={() => setIsModalOpen(false)}
@@ -3222,7 +3252,7 @@ export default function AdminDashboardPage() {
               </button>
             </div>
 
-            <form onSubmit={handleSaveProduct} className="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+            <form data-lenis-prevent onSubmit={handleSaveProduct} className="p-6 space-y-4 max-h-[75vh] overflow-y-auto overscroll-contain">
               {/* Product Title */}
               <div className="space-y-1">
                 <label className="text-xs font-semibold text-foreground">Product Title *</label>
@@ -3784,7 +3814,7 @@ export default function AdminDashboardPage() {
 
       {/* Client Review Add Modal */}
       {isReviewModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+        <div data-lenis-prevent className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto overscroll-contain">
           <div
             className="fixed inset-0 bg-black/60 backdrop-blur-sm"
             onClick={() => setIsReviewModalOpen(false)}
@@ -3806,7 +3836,7 @@ export default function AdminDashboardPage() {
               </button>
             </div>
 
-            <form onSubmit={handleAddReview} className="p-6 space-y-4">
+            <form data-lenis-prevent onSubmit={handleAddReview} className="p-6 space-y-4 max-h-[75vh] overflow-y-auto overscroll-contain">
               <div className="space-y-1">
                 <label className="text-xs font-semibold text-foreground">Customer Name *</label>
                 <input
@@ -3890,7 +3920,7 @@ export default function AdminDashboardPage() {
 
       {/* Video Reel Add Modal */}
       {isVideoModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+        <div data-lenis-prevent className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto overscroll-contain">
           <div
             className="fixed inset-0 bg-black/60 backdrop-blur-sm"
             onClick={() => !isSavingItem && !isUploading && setIsVideoModalOpen(false)}
@@ -3914,7 +3944,7 @@ export default function AdminDashboardPage() {
               </button>
             </div>
 
-            <form onSubmit={handleAddVideo} className="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+            <form data-lenis-prevent onSubmit={handleAddVideo} className="p-6 space-y-4 max-h-[75vh] overflow-y-auto overscroll-contain">
               {isUploading && (
                 <div className="p-3 rounded-xl bg-primary/10 border border-primary/20 text-primary text-xs font-medium flex items-center gap-2 animate-pulse">
                   <Clock className="w-4 h-4 animate-spin shrink-0" />
@@ -4127,7 +4157,7 @@ export default function AdminDashboardPage() {
 
       {/* Client Feedback Screenshot Upload Modal */}
       {isScreenshotModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+        <div data-lenis-prevent className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto overscroll-contain">
           <div
             className="fixed inset-0 bg-black/60 backdrop-blur-sm"
             onClick={() => !isSavingItem && !isUploading && setIsScreenshotModalOpen(false)}
@@ -4151,7 +4181,7 @@ export default function AdminDashboardPage() {
               </button>
             </div>
 
-            <form onSubmit={handleAddScreenshot} className="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+            <form data-lenis-prevent onSubmit={handleAddScreenshot} className="p-6 space-y-4 max-h-[75vh] overflow-y-auto overscroll-contain">
               {isUploading && (
                 <div className="p-3 rounded-xl bg-primary/10 border border-primary/20 text-primary text-xs font-medium flex items-center gap-2 animate-pulse">
                   <Clock className="w-4 h-4 animate-spin shrink-0" />
@@ -4305,7 +4335,7 @@ export default function AdminDashboardPage() {
 
       {/* Instagram Video ("Follow The House") Modal */}
       {isInstaVideoModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+        <div data-lenis-prevent className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto overscroll-contain">
           <div
             className="fixed inset-0 bg-black/60 backdrop-blur-sm"
             onClick={() => !isSavingItem && !isUploading && setIsInstaVideoModalOpen(false)}
@@ -4333,7 +4363,7 @@ export default function AdminDashboardPage() {
               </button>
             </div>
 
-            <form onSubmit={handleAddInstaVideo} className="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+            <form data-lenis-prevent onSubmit={handleAddInstaVideo} className="p-6 space-y-4 max-h-[75vh] overflow-y-auto overscroll-contain">
               {isUploading && (
                 <div className="p-3 rounded-xl bg-primary/10 border border-primary/20 text-primary text-xs font-medium flex items-center gap-2 animate-pulse">
                   <Clock className="w-4 h-4 animate-spin shrink-0" />
@@ -4536,7 +4566,7 @@ export default function AdminDashboardPage() {
 
       {/* Category Card Add / Edit Modal */}
       {isCategoryModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+        <div data-lenis-prevent className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto overscroll-contain">
           <div
             className="fixed inset-0 bg-black/60 backdrop-blur-sm"
             onClick={() => setIsCategoryModalOpen(false)}
@@ -4561,7 +4591,7 @@ export default function AdminDashboardPage() {
               </button>
             </div>
 
-            <form onSubmit={handleSaveCategoryModal} className="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
+            <form data-lenis-prevent onSubmit={handleSaveCategoryModal} className="p-6 space-y-4 max-h-[80vh] overflow-y-auto overscroll-contain">
               <div className="space-y-1">
                 <label className="text-xs font-semibold text-foreground">Collection Name *</label>
                 <input
