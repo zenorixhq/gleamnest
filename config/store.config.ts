@@ -42,7 +42,7 @@ export interface StoreConfig {
     flatShippingFee: number;
     taxRatePercent: number;
     taxInclusive: boolean;
-    checkoutMode: "whatsapp" | "gateway"; // 'whatsapp' directed ordering
+    checkoutMode: "gateway" | "whatsapp"; // 'gateway' online checkout with Razorpay + WhatsApp assisted
     activeCoupons: {
       code: string;
       discountType: "percentage" | "fixed";
@@ -66,56 +66,54 @@ export interface StoreConfig {
 
 export const storeConfig: StoreConfig = {
   meta: {
-    name: "GleamNest",
-    tagline: "The place where elegance and sparkle come together.",
-    description: "Waterproof & Anti-Tarnish Everyday Luxury Jewellery crafted in Premium 304 & 306 Grade Stainless Steel. Wear it daily, anywhere.",
-    url: "https://gleamnest.in",
-    favicon: "/favicon.ico",
+    name: "Alnaya",
+    tagline: "Everyday & Ethnic Luxury Jewellery",
+    description: "Exquisite Handcrafted Jhumkas, Dainty Pendants & Everyday Luxury Jewellery. 1000+ Happy Customers with Worldwide Shipping.",
+    url: "https://alnaya.in",
+    favicon: "/alnaya-logo.png",
   },
   brand: {
     logo: {
-      text: "GleamNest",
-      subtext: "The place where elegance and sparkle come together.",
-      imageUrl: "",
+      text: "Alnaya",
+      subtext: "Everyday & Ethnic Luxury Jewellery",
+      imageUrl: "/alnaya-logo.png",
     },
     theme: {
-      // Warm Champagne Gold & Rich Espresso Luxury Palette
-      primary: "40 75% 38%",       // Elegant Royal Gold
-      primaryHover: "40 75% 30%",
+      // Royal Plum / Wine Velvet & Radiant Champagne Gold Palette inspired by Alnaya's brand logo
+      primary: "315 42% 22%",       // Deep Plum Wine #502146
+      primaryHover: "315 45% 17%",  // Rich Aubergine
       primaryForeground: "0 0% 100%",
-      accent: "158 64% 36%",        // Emerald Green accent
+      accent: "42 80% 50%",         // Radiant Gold #E5AD1B
       accentForeground: "0 0% 100%",
       borderRadius: "0.75rem",
       fontHeading: "var(--font-heading)",
       fontSans: "var(--font-sans)",
     },
     contact: {
-      email: "gleamnest.in@gmail.com",
-      phone: "+91 96339 56222",
-      whatsappNumber: "919633956222",
-      address: "Kerala, India • Pan-India Express Delivery",
+      email: "orders@alnaya.in",
+      phone: "+91 90370 75227",
+      whatsappNumber: "919037075227",
+      address: "India • Worldwide Express Shipping",
       hours: "Mon – Sat: 9:30 AM – 8:00 PM IST",
     },
     socials: {
-      instagram: "https://www.instagram.com/gleamnest.in?igsh=c3I4M2h1YmprdXI5",
-      whatsapp: "https://wa.me/919633956222",
-      facebook: "https://www.facebook.com/share/1DXg9Puzkj/",
+      instagram: "https://www.instagram.com/alnaya.in?psln=cDNzY3liNjltb203",
+      whatsapp: "https://wa.me/919037075227",
     },
   },
   commerce: {
     defaultCurrency: "INR",
     supportedCurrencies: [
       { code: "INR", symbol: "₹", name: "India (₹)", flag: "🇮🇳", rate: 1.0 },
-      { code: "QAR", symbol: "QAR", name: "Qatar (QAR)", flag: "🇶🇦", rate: 1.0 },
     ],
     freeShippingThreshold: 799,
     flatShippingFee: 40,
-    taxRatePercent: 0, // Direct chat pricing with inclusive pricing
+    taxRatePercent: 0,
     taxInclusive: true,
-    checkoutMode: "whatsapp",
+    checkoutMode: "gateway",
     activeCoupons: [
       {
-        code: "GLEAM5",
+        code: "ALNAYA5",
         discountType: "percentage",
         amount: 5,
         firstPurchaseOnly: true,
@@ -129,18 +127,11 @@ export const storeConfig: StoreConfig = {
         description: "5% off your first jewelry order",
       },
       {
-        code: "GLEAM10",
-        discountType: "percentage",
-        amount: 5,
-        firstPurchaseOnly: true,
-        description: "5% off your first jewelry order",
-      },
-      {
         code: "FREESHIP",
         discountType: "fixed",
         amount: 40,
-        minSpend: 500,
-        description: "Complimentary Pan-India shipping",
+        minSpend: 799,
+        description: "Complimentary express delivery on orders ₹799+",
       },
     ],
   },
@@ -150,8 +141,8 @@ export const storeConfig: StoreConfig = {
     enableQuickView: true,
     enableStockBadges: true,
     enableAnnouncementBar: true,
-    announcementText: "✨ 100% Anti-Tarnish & Waterproof Jewelry • Premium 304 & 306 Grade Stainless Steel • Free Delivery in Qatar (Within 14 Days) & Pan-India on Orders Above ₹799 • Shipping ₹40 • Order on WhatsApp",
+    announcementText: "✨ Handcrafted Jhumkas & Fine Jewellery • 1000+ Happy Customers • Pan-India Express Delivery • Free Shipping above ₹799 • Pay Securely via UPI / Cards",
     enableWhatsAppFloat: true,
-    enableCurrencySwitcher: true,
+    enableCurrencySwitcher: false,
   },
 };

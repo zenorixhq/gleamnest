@@ -78,7 +78,7 @@ export function PolicyModal({
     { id: "size-guide", label: "Size Guide", icon: Ruler, badge: "Bangles & Rings" },
     { id: "return-refund", label: "Return & Refund", icon: RotateCcw, badge: "Important" },
     { id: "ordering-instructions", label: "Before Ordering", icon: AlertCircle, badge: "Must Read" },
-    { id: "care-guide", label: "Jewelry Care", icon: Sparkles, badge: "304 & 306 Steel" },
+    { id: "care-guide", label: "Jewelry Care", icon: Sparkles, badge: "Care & Standards" },
     { id: "shipping", label: "Shipping Policy", icon: Truck, badge: "DTDC & India Post" },
   ];
 
@@ -101,7 +101,7 @@ export function PolicyModal({
             <span className="w-2.5 h-2.5 rounded-full bg-primary animate-pulse" />
             <div>
               <h3 className="text-base sm:text-lg font-bold text-foreground">
-                GleamNest Customer Care & Policy Guide
+                Alnaya Customer Care & Policy Guide
               </h3>
               <p className="text-[11px] text-muted-foreground">
                 Official specifications, sizing charts, and store policies
@@ -151,7 +151,7 @@ export function PolicyModal({
         </div>
 
         {/* Modal Scrollable Content Body */}
-        <div data-lenis-prevent className="p-5 sm:p-8 overflow-y-auto max-h-[calc(92vh-140px)] space-y-6 text-foreground">
+        <div className="p-5 sm:p-8 overflow-y-auto max-h-[calc(92vh-140px)] space-y-6 text-foreground">
           {/* ======================================================== */}
           {/* TAB 1: SIZE GUIDE                                        */}
           {/* ======================================================== */}
@@ -166,7 +166,7 @@ export function PolicyModal({
                     Ring & Bangle Size Guide
                   </h4>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    Official GleamNest size charts and easy measurement instructions.
+                    Official Alnaya size charts and easy measurement instructions.
                   </p>
                 </div>
 
@@ -200,15 +200,15 @@ export function PolicyModal({
               {/* ================= RING SIZE GUIDE ================= */}
               {sizeSubTab === "ring" && (
                 <div className="space-y-6 animate-in fade-in-50">
-                  {/* 1. SIZE CHART */}
+                  {/* 1. SIZE CHART FIRST */}
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
                       <h5 className="text-sm font-bold uppercase tracking-wider text-primary flex items-center gap-2">
                         <Ruler className="w-4 h-4" />
-                        <span>Official Ring Measurement Chart</span>
+                        <span>Official Ring Size Chart</span>
                       </h5>
                       <span className="text-[11px] font-semibold text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
-                        Adjustable bands fit sizes 5–10
+                        Adjustable bands fit sizes 5–9
                       </span>
                     </div>
 
@@ -216,77 +216,67 @@ export function PolicyModal({
                       <table className="w-full text-xs text-left">
                         <thead className="bg-muted/60 text-foreground font-bold border-b border-border">
                           <tr>
-                            <th className="p-3">Ring Size</th>
-                            <th className="p-3">Finger Circumference (cm)</th>
-                            <th className="p-3">Circumference (mm)</th>
+                            <th className="p-3">Indian Size</th>
+                            <th className="p-3">US / Standard Size</th>
+                            <th className="p-3">Inside Diameter (cm)</th>
+                            <th className="p-3">Inside Circumference (cm)</th>
                             <th className="p-3">Suggested Finger / Fit</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-border">
                           <tr className="hover:bg-muted/20">
-                            <td className="p-3 font-bold text-primary">Size 5</td>
-                            <td className="p-3 font-mono font-bold">5.0 cm</td>
-                            <td className="p-3 font-mono">50 mm</td>
-                            <td className="p-3 text-muted-foreground">Petite / Pinky Finger</td>
+                            <td className="p-3 font-bold text-primary">Size 7 – 8</td>
+                            <td className="p-3 font-semibold">US 4 – 4.5</td>
+                            <td className="p-3 font-mono">1.49 – 1.53 cm</td>
+                            <td className="p-3 font-mono">4.68 – 4.80 cm</td>
+                            <td className="p-3 text-muted-foreground">Pinky / Midi Ring</td>
                           </tr>
                           <tr className="hover:bg-muted/20">
-                            <td className="p-3 font-bold text-primary">Size 6</td>
-                            <td className="p-3 font-mono font-bold">5.5 cm</td>
-                            <td className="p-3 font-mono">55 mm</td>
+                            <td className="p-3 font-bold text-primary">Size 9 – 10</td>
+                            <td className="p-3 font-semibold">US 5 – 5.5</td>
+                            <td className="p-3 font-mono">1.57 – 1.61 cm</td>
+                            <td className="p-3 font-mono">4.93 – 5.06 cm</td>
                             <td className="p-3 text-muted-foreground">Petite Ring Finger</td>
                           </tr>
                           <tr className="bg-primary/5 hover:bg-primary/10">
                             <td className="p-3 font-bold text-primary flex items-center gap-1.5">
-                              <span>Size 7</span>
+                              <span>Size 11 – 12</span>
                               <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-primary text-primary-foreground">
                                 Most Popular
                               </span>
                             </td>
-                            <td className="p-3 font-mono font-bold text-foreground">6.0 cm</td>
-                            <td className="p-3 font-mono font-bold text-foreground">60 mm</td>
+                            <td className="p-3 font-bold text-foreground">US 6 – 6.5</td>
+                            <td className="p-3 font-mono font-bold">1.65 – 1.69 cm</td>
+                            <td className="p-3 font-mono font-bold">5.19 – 5.31 cm</td>
                             <td className="p-3 font-semibold text-foreground">Standard Ring Finger</td>
                           </tr>
                           <tr className="hover:bg-muted/20">
-                            <td className="p-3 font-bold text-primary">Size 8</td>
-                            <td className="p-3 font-mono font-bold">6.5 cm</td>
-                            <td className="p-3 font-mono">65 mm</td>
-                            <td className="p-3 text-muted-foreground">Medium / Middle Finger</td>
-                          </tr>
-                          <tr className="hover:bg-muted/20">
-                            <td className="p-3 font-bold text-primary">Size 9</td>
-                            <td className="p-3 font-mono font-bold">7.0 cm</td>
-                            <td className="p-3 font-mono">70 mm</td>
+                            <td className="p-3 font-bold text-primary">Size 13 – 14</td>
+                            <td className="p-3 font-semibold">US 7 – 7.5</td>
+                            <td className="p-3 font-mono">1.73 – 1.77 cm</td>
+                            <td className="p-3 font-mono">5.44 – 5.57 cm</td>
                             <td className="p-3 text-muted-foreground">Middle / Index Finger</td>
                           </tr>
                           <tr className="hover:bg-muted/20">
-                            <td className="p-3 font-bold text-primary">Size 10</td>
-                            <td className="p-3 font-mono font-bold">7.5 cm</td>
-                            <td className="p-3 font-mono">75 mm</td>
-                            <td className="p-3 text-muted-foreground">Index / Thumb Ring</td>
+                            <td className="p-3 font-bold text-primary">Size 15 – 16</td>
+                            <td className="p-3 font-semibold">US 8 – 8.5</td>
+                            <td className="p-3 font-mono">1.81 – 1.85 cm</td>
+                            <td className="p-3 font-mono">5.70 – 5.83 cm</td>
+                            <td className="p-3 text-muted-foreground">Index / Larger Fit</td>
                           </tr>
                           <tr className="hover:bg-muted/20">
-                            <td className="p-3 font-bold text-primary">Size 11</td>
-                            <td className="p-3 font-mono font-bold">8.0 cm</td>
-                            <td className="p-3 font-mono">80 mm</td>
-                            <td className="p-3 text-muted-foreground">Thumb / Statement Ring</td>
+                            <td className="p-3 font-bold text-primary">Size 17 – 18</td>
+                            <td className="p-3 font-semibold">US 9 – 9.5</td>
+                            <td className="p-3 font-mono">1.89 – 1.94 cm</td>
+                            <td className="p-3 font-mono">5.95 – 6.08 cm</td>
+                            <td className="p-3 text-muted-foreground">Statement / Thumb Ring</td>
                           </tr>
                           <tr className="hover:bg-muted/20">
-                            <td className="p-3 font-bold text-primary">Size 12</td>
-                            <td className="p-3 font-mono font-bold">8.5 cm</td>
-                            <td className="p-3 font-mono">85 mm</td>
-                            <td className="p-3 text-muted-foreground">Statement / Large Fit</td>
-                          </tr>
-                          <tr className="hover:bg-muted/20">
-                            <td className="p-3 font-bold text-primary">Size 13</td>
-                            <td className="p-3 font-mono font-bold">9.0 cm</td>
-                            <td className="p-3 font-mono">90 mm</td>
-                            <td className="p-3 text-muted-foreground">Extra Large Fit</td>
-                          </tr>
-                          <tr className="hover:bg-muted/20">
-                            <td className="p-3 font-bold text-primary">Size 14</td>
-                            <td className="p-3 font-mono font-bold">9.5 cm</td>
-                            <td className="p-3 font-mono">95 mm</td>
-                            <td className="p-3 text-muted-foreground">Extra Large / Thumb Fit</td>
+                            <td className="p-3 font-bold text-primary">Size 19 – 22</td>
+                            <td className="p-3 font-semibold">US 10 – 11</td>
+                            <td className="p-3 font-mono">1.98 – 2.06 cm</td>
+                            <td className="p-3 font-mono">6.21 – 6.46 cm</td>
+                            <td className="p-3 text-muted-foreground">Men&apos;s / Thumb Ring</td>
                           </tr>
                         </tbody>
                       </table>
@@ -295,42 +285,42 @@ export function PolicyModal({
                     <div className="p-3.5 rounded-xl bg-primary/5 border border-primary/20 text-xs text-foreground flex items-center gap-2">
                       <Sparkles className="w-4 h-4 text-primary flex-shrink-0" />
                       <span>
-                        <strong>Adjustable Comfort Bands:</strong> Rings labeled <em>Adjustable / Free Size</em> feature an open comfort band that effortlessly adjusts to fit sizes 5 through 10 without needing tools.
+                        <strong>Adjustable Rings:</strong> Most Alnaya statement and band rings feature an open-ended adjustable comfort band that fits sizes 5 through 9 seamlessly without needing tools.
                       </span>
                     </div>
                   </div>
 
-                  {/* 2. HOW TO MEASURE */}
+                  {/* 2. HOW TO MEASURE SECOND */}
                   <div className="space-y-3 pt-2">
                     <h5 className="text-sm font-bold uppercase tracking-wider text-foreground">
-                      How to Measure Your Ring Size (Simple 4-Step Method)
+                      How to Measure Your Ring Size
                     </h5>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                       <div className="p-3.5 rounded-xl bg-card border border-border/80 space-y-1">
                         <span className="font-bold text-primary">Step 1: Wrap Paper or String</span>
                         <p className="text-muted-foreground">
-                          Cut a thin strip of paper or string. Wrap it snugly around the base of the finger you plan to wear your ring on.
+                          Cut a thin strip of paper or non-stretchy string. Wrap it snugly around the base of the finger you plan to wear your ring on.
                         </p>
                       </div>
 
                       <div className="p-3.5 rounded-xl bg-card border border-border/80 space-y-1">
                         <span className="font-bold text-primary">Step 2: Mark the Overlap</span>
                         <p className="text-muted-foreground">
-                          With a pen, mark the exact spot where the paper strip meets and completes a full loop around your finger.
+                          Use a pen to mark exactly where the paper overlaps to form a complete circle around your finger.
                         </p>
                       </div>
 
                       <div className="p-3.5 rounded-xl bg-card border border-border/80 space-y-1">
-                        <span className="font-bold text-primary">Step 3: Measure Length in CM</span>
+                        <span className="font-bold text-primary">Step 3: Measure with Ruler</span>
                         <p className="text-muted-foreground">
-                          Lay the paper flat against a standard ruler and note the length in centimeters (e.g., 6.0 cm = Size 7).
+                          Lay the paper strip flat against a ruler and measure the length in centimeters (cm). This is your finger&apos;s Inside Circumference.
                         </p>
                       </div>
 
                       <div className="p-3.5 rounded-xl bg-card border border-border/80 space-y-1">
-                        <span className="font-bold text-primary">Step 4: Check Knuckle Fit</span>
+                        <span className="font-bold text-primary">Step 4: Check Knuckle Clearance</span>
                         <p className="text-muted-foreground">
-                          If your knuckle is larger than the base of your finger, measure your knuckle too. If in-between two sizes, always pick the larger size.
+                          If your knuckle is noticeably larger than your finger base, measure your knuckle too and choose a size halfway between the two measurements.
                         </p>
                       </div>
                     </div>
@@ -361,8 +351,14 @@ export function PolicyModal({
                           <tr className="hover:bg-muted/20">
                             <td className="p-3 font-bold text-primary">Size 2-2</td>
                             <td className="p-3">2.125 in (2 1/8&quot;)</td>
-                            <td className="p-3 font-mono">5.40 cm</td>
-                            <td className="p-3 text-muted-foreground">Petite / Small wrist fit</td>
+                            <td className="p-3 font-mono">5.4 cm</td>
+                            <td className="p-3 text-muted-foreground">Petite / Extra Small wrist</td>
+                          </tr>
+                          <tr className="hover:bg-muted/20">
+                            <td className="p-3 font-bold text-primary">Size 2-4</td>
+                            <td className="p-3">2.250 in (2 1/4&quot;)</td>
+                            <td className="p-3 font-mono">5.72 cm</td>
+                            <td className="p-3 text-muted-foreground">Small wrist fit</td>
                           </tr>
                           <tr className="bg-primary/5 hover:bg-primary/10">
                             <td className="p-3 font-bold text-primary flex items-center gap-1.5">
@@ -381,6 +377,12 @@ export function PolicyModal({
                             <td className="p-3 font-mono">6.35 cm</td>
                             <td className="p-3 text-muted-foreground">Large wrist fit</td>
                           </tr>
+                          <tr className="hover:bg-muted/20">
+                            <td className="p-3 font-bold text-primary">Size 2-10</td>
+                            <td className="p-3">2.625 in (2 5/8&quot;)</td>
+                            <td className="p-3 font-mono">6.67 cm</td>
+                            <td className="p-3 text-muted-foreground">Extra Large wrist fit</td>
+                          </tr>
                         </tbody>
                       </table>
                     </div>
@@ -396,7 +398,7 @@ export function PolicyModal({
                     <div className="relative group rounded-xl overflow-hidden border border-border bg-muted/20">
                       <img
                         src="/images/bangle-size-guide.jpg"
-                        alt="GleamNest Official Bangle Size Guide & Hand Measurement Steps"
+                        alt="Alnaya Official Bangle Size Guide & Hand Measurement Steps"
                         className="w-full h-auto max-h-[360px] object-contain mx-auto"
                       />
                       <button
@@ -464,7 +466,7 @@ export function PolicyModal({
                     Clear guidelines to protect both our valued customers and brand authenticity.
                   </p>
                 </div>
-                <span className="self-start sm:self-auto text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-amber-500/10 text-amber-600 border border-amber-500/20">
+                <span className="self-start sm:self-auto text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-purple-500/10 text-purple-700 border border-purple-500/20">
                   Strict Unboxing Video Required
                 </span>
               </div>
@@ -473,7 +475,7 @@ export function PolicyModal({
               <div className="relative group rounded-xl overflow-hidden border border-border bg-muted/20">
                 <img
                   src="/images/return-refund-policy.jpg"
-                  alt="GleamNest Official Return, Refund and Damage Replacement Policy"
+                  alt="Alnaya Official Return, Refund and Damage Replacement Policy"
                   className="w-full h-auto max-h-[380px] object-contain mx-auto"
                 />
                 <button
@@ -493,7 +495,7 @@ export function PolicyModal({
                     <span>No Cancellations, Returns or Refunds</span>
                   </div>
                   <p className="text-xs text-muted-foreground leading-relaxed">
-                    Once an order has been confirmed and placed with GleamNest, cancellations, returns, or refunds are strictly NOT accepted under any conditions. Please review your selected jewelry pieces, sizing, and shipping address carefully prior to confirming your order.
+                    Once an order has been confirmed and placed with Alnaya, cancellations, returns, or refunds are strictly NOT accepted under any conditions. Please review your selected jewelry pieces, sizing, and shipping address carefully prior to confirming your order.
                   </p>
                 </div>
 
@@ -562,7 +564,7 @@ export function PolicyModal({
                   <div className="flex items-center gap-2">
                     <a
                       href={`https://wa.me/${storeConfig.brand.contact.whatsappNumber}?text=${encodeURIComponent(
-                        "Hello GleamNest! I would like to report transit damage on my order. Here is my Order ID and unboxing video."
+                        "Hello Alnaya! I would like to report transit damage on my order. Here is my Order ID and unboxing video."
                       )}`}
                       target="_blank"
                       rel="noreferrer"
@@ -664,10 +666,10 @@ export function PolicyModal({
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-border pb-4">
                 <div>
                   <h4 className="text-xl font-bold text-foreground">
-                    Jewelry Care Guide (304 & 306 Grade Steel)
+                    Jewelry Care Guide
                   </h4>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    How to care for your anti-tarnish, waterproof everyday luxury pieces.
+                    How to care for your waterproof, skin-friendly everyday luxury pieces.
                   </p>
                 </div>
                 <span className="self-start sm:self-auto text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
@@ -679,13 +681,13 @@ export function PolicyModal({
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div className="p-4 rounded-xl bg-card border border-border text-center space-y-1">
                   <span className="text-xs font-bold text-primary uppercase">Base Material</span>
-                  <p className="text-sm font-black text-foreground">304 & 306 Stainless Steel</p>
+                  <p className="text-sm font-black text-foreground">Premium Stainless Steel</p>
                   <p className="text-[11px] text-muted-foreground">Surgical grade & non-corrosive</p>
                 </div>
 
                 <div className="p-4 rounded-xl bg-card border border-border text-center space-y-1">
                   <span className="text-xs font-bold text-primary uppercase">Gold Coating</span>
-                  <p className="text-sm font-black text-foreground">Real 18K PVD Gold</p>
+                  <p className="text-sm font-black text-foreground">Radiant 18K Gold Finish</p>
                   <p className="text-[11px] text-muted-foreground">10x more durable than electroplate</p>
                 </div>
 
@@ -707,7 +709,7 @@ export function PolicyModal({
                     <div>
                       <strong className="text-foreground">Waterproof & Shower Safe:</strong>
                       <p className="text-muted-foreground mt-0.5 leading-relaxed">
-                        You can wear your GleamNest pieces freely in the shower, gym, pool, ocean, or while washing hands. They will not rust, fade, or tarnish.
+                        You can wear your Alnaya pieces freely in the shower, gym, pool, ocean, or while washing hands. They will not rust, fade, or lose their luster.
                       </p>
                     </div>
                   </div>
@@ -717,7 +719,7 @@ export function PolicyModal({
                     <div>
                       <strong className="text-foreground">Perfumes & Lotions:</strong>
                       <p className="text-muted-foreground mt-0.5 leading-relaxed">
-                        While 304 and 306 steel does not oxidize, harsh chemicals in perfumes or body mists can leave a dull film over high-polish gold. We recommend applying cosmetics first, allowing them to dry, then putting on your jewelry.
+                        While our premium stainless steel does not oxidize, harsh chemicals in perfumes or body mists can leave a dull film over high-polish gold. We recommend applying cosmetics first, allowing them to dry, then putting on your jewelry.
                       </p>
                     </div>
                   </div>
@@ -737,7 +739,7 @@ export function PolicyModal({
                     <div>
                       <strong className="text-foreground">Proper Storage:</strong>
                       <p className="text-muted-foreground mt-0.5 leading-relaxed">
-                        When not in use, store each piece separately in your complimentary GleamNest zip pouch to prevent friction against hard surfaces.
+                        When not in use, store each piece separately in your complimentary Alnaya zip pouch to prevent friction against hard surfaces.
                       </p>
                     </div>
                   </div>
@@ -845,7 +847,7 @@ export function PolicyModal({
         <div className="flex items-center justify-between px-5 sm:px-6 py-3 border-t border-border bg-muted/20 text-xs">
           <div className="flex items-center gap-2 text-muted-foreground">
             <MessageCircle className="w-3.5 h-3.5 text-primary" />
-            <span>Need assistance? WhatsApp +91 96339 56222</span>
+            <span>Need assistance? WhatsApp +91 90370 75227</span>
           </div>
           <button
             onClick={onClose}
@@ -859,10 +861,10 @@ export function PolicyModal({
       {/* Fullscreen Image Zoom Lightbox */}
       {zoomedImage && (
         <div
-          className="fixed inset-0 z-[9999] bg-black/90 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto animate-in fade-in-0"
+          className="fixed inset-0 z-60 bg-black/90 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in-0"
           onClick={() => setZoomedImage(null)}
         >
-          <div className="relative max-w-4xl my-auto max-h-[90vh] overflow-hidden flex items-center justify-center">
+          <div className="relative max-w-4xl max-h-[90vh] overflow-auto">
             <button
               onClick={() => setZoomedImage(null)}
               className="absolute top-3 right-3 p-2 rounded-full bg-black/60 text-white hover:bg-black transition-colors z-10"

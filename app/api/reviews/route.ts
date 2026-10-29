@@ -23,13 +23,26 @@ function getInitialData() {
   };
 }
 
+function cleanContentString(raw: string): string {
+  return raw
+    .replace(/@?gleamnest\.in/gi, "@alnaya.in")
+    .replace(/gleamnest/gi, "alnaya")
+    .replace(/304\s*(&|and)\s*306(\s*grade)?\s*steel/gi, "radiant finish")
+    .replace(/304\s*(&|and)\s*306/gi, "hallmark")
+    .replace(/anti-?tarnish/gi, "waterproof")
+    .replace(/pvd\s*coating/gi, "radiant finish")
+    .replace(/pvd/gi, "radiant finish");
+}
+
 function sanitizeData(parsed: any) {
   if (!parsed || typeof parsed !== "object") return getInitialData();
-  if (!Array.isArray(parsed.reviews)) parsed.reviews = [];
-  if (!Array.isArray(parsed.videoReels)) parsed.videoReels = [];
-  if (!Array.isArray(parsed.feedbackScreenshots)) parsed.feedbackScreenshots = [];
-  if (!Array.isArray(parsed.instagramVideos)) parsed.instagramVideos = [];
-  return parsed;
+  const cleanedStr = cleanContentString(JSON.stringify(parsed));
+  const cleaned = JSON.parse(cleanedStr);
+  if (!Array.isArray(cleaned.reviews)) cleaned.reviews = [];
+  if (!Array.isArray(cleaned.videoReels)) cleaned.videoReels = [];
+  if (!Array.isArray(cleaned.feedbackScreenshots)) cleaned.feedbackScreenshots = [];
+  if (!Array.isArray(cleaned.instagramVideos)) cleaned.instagramVideos = [];
+  return cleaned;
 }
 
 async function readData() {
@@ -49,10 +62,19 @@ async function readData() {
       where: { key: "client_reviews" },
     });
     if (row?.value) {
-      const parsed = JSON.parse(row.value);
+      const originalVal = row.value;
+      const cleanedVal = cleanContentString(originalVal);
+      const parsed = JSON.parse(cleanedVal);
       const sanitized = sanitizeData(parsed);
       if (!Array.isArray(sanitized.instagramVideos)) {
         sanitized.instagramVideos = fileData.instagramVideos || [];
+      }
+      // If the database contained any stale references, update it asynchronously to heal permanently
+      if (originalVal !== cleanedVal) {
+        prisma.siteContent.update({
+          where: { key: "client_reviews" },
+          data: { value: JSON.stringify(sanitized) },
+        }).catch((err) => console.warn("Failed to auto-heal DB row:", err));
       }
       return sanitized;
     }
@@ -93,13 +115,9 @@ async function writeData(data: any) {
   }
 }
 
-const CACHE_HEADERS = {
-  "Cache-Control": "public, s-maxage=30, stale-while-revalidate=120",
-};
-
 export async function GET() {
   const data = await readData();
-  return NextResponse.json(data, { headers: CACHE_HEADERS });
+  return NextResponse.json(data, { headers: NO_CACHE_HEADERS });
 }
 
 export async function POST(req: Request) {
@@ -118,7 +136,7 @@ export async function POST(req: Request) {
         title: body.title || "WhatsApp / DM Customer Review",
         customerName: body.customerName || "Verified Buyer",
         location: body.location || "Kerala, India",
-        piece: body.piece || "Anti-Tarnish Fine Jewelry",
+        piece: body.piece || "Everyday Fine Jewelry",
         imageUrl: imageUrl,
         caption: body.caption || "",
         date: body.date || "Verified Recent Buyer",
@@ -169,13 +187,13 @@ export async function POST(req: Request) {
       const newInstaVideo = {
         id: `insta-${Date.now()}`,
         title: body.title || "Jewelry Styling Reel",
-        handle: body.handle || "@gleamnest.in",
-        caption: body.caption || "Everyday luxury waterproof jewelry in 304 & 306 steel",
+        handle: body.handle || "@alnaya.in",
+        caption: body.caption || "Everyday luxury waterproof jewelry in radiant finish",
         videoUrl: videoUrl,
         embedUrl: embedUrl,
         poster: body.poster || "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&q=80&w=700",
         views: body.views || "15.2K",
-        instagramLink: instagramLink || "https://www.instagram.com/gleamnest.in?igsh=c3I4M2h1YmprdXI5",
+        instagramLink: instagramLink || "https://www.instagram.com/alnaya.in?psln=cDNzY3liNjltb203",
       };
 
       if (!data.instagramVideos) data.instagramVideos = [];
@@ -200,13 +218,13 @@ export async function POST(req: Request) {
 
       const newVideo = {
         id: `vid-${Date.now()}`,
-        influencer: body.influencer || "GleamNest Client",
-        handle: body.handle || "@gleamnest.in",
+        influencer: body.influencer || "Alnaya Client",
+        handle: body.handle || "@alnaya.in",
         title: body.title || "Jewelry Styling Reel",
         poster: body.poster || "https://images.unsplash.com/photo-1611591475806-039775089201?auto=format&fit=crop&q=80&w=700",
         videoUrl: videoUrl,
         views: body.views || "1.2K views",
-        productTitle: body.productTitle || "GleamNest Jewelry",
+        productTitle: body.productTitle || "Alnaya Jewelry",
         productSlug: body.productSlug || "all",
         productPrice: Number(body.productPrice) || 150,
       };
@@ -221,7 +239,7 @@ export async function POST(req: Request) {
         id: `rev-${Date.now()}`,
         author: body.author || "Verified Customer",
         location: body.location || "Kerala, India",
-        piece: body.piece || "Anti-Tarnish Fine Jewelry",
+        piece: body.piece || "Everyday Fine Jewelry",
         rating: Number(body.rating) || 5,
         quote: body.quote || "",
       };
@@ -276,7 +294,7 @@ export async function PUT(req: Request) {
         data.instagramVideos.push({
           id: targetId,
           title: body.title || "Jewelry Styling Reel",
-          handle: body.handle || "@gleamnest.in",
+          handle: body.handle || "@alnaya.in",
           caption: body.caption || "",
           videoUrl: body.videoUrl,
           poster: body.poster || "",
@@ -329,20 +347,37 @@ export async function DELETE(req: Request) {
     }
 
     const data = await readData();
-    const targetId = String(id).trim();
+    const targetId = decodeURIComponent(String(id)).trim().toLowerCase();
 
     if (type === "screenshot") {
-      data.feedbackScreenshots = (data.feedbackScreenshots || []).filter((s: any) => String(s.id).trim() !== targetId);
-    } else if (type === "instagramVideo") {
-      data.instagramVideos = (data.instagramVideos || []).filter((v: any) => String(v.id).trim() !== targetId);
+      data.feedbackScreenshots = (data.feedbackScreenshots || []).filter(
+        (s: any) => decodeURIComponent(String(s.id)).trim().toLowerCase() !== targetId
+      );
+    } else if (type === "instagramVideo" || type === "reel" || type === "followHouse") {
+      data.instagramVideos = (data.instagramVideos || []).filter(
+        (v: any) => decodeURIComponent(String(v.id)).trim().toLowerCase() !== targetId
+      );
     } else if (type === "video") {
-      data.videoReels = (data.videoReels || []).filter((v: any) => String(v.id).trim() !== targetId);
+      data.videoReels = (data.videoReels || []).filter(
+        (v: any) => decodeURIComponent(String(v.id)).trim().toLowerCase() !== targetId
+      );
     } else {
-      data.reviews = (data.reviews || []).filter((r: any) => String(r.id).trim() !== targetId);
+      data.reviews = (data.reviews || []).filter(
+        (r: any) => decodeURIComponent(String(r.id)).trim().toLowerCase() !== targetId
+      );
     }
 
     await writeData(data);
-    return NextResponse.json({ success: true }, { headers: NO_CACHE_HEADERS });
+    return NextResponse.json(
+      {
+        success: true,
+        instagramVideos: data.instagramVideos,
+        videoReels: data.videoReels,
+        reviews: data.reviews,
+        feedbackScreenshots: data.feedbackScreenshots,
+      },
+      { headers: NO_CACHE_HEADERS }
+    );
   } catch (err: any) {
     console.error("Error in DELETE /api/reviews:", err);
     return NextResponse.json(

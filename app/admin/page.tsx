@@ -8,11 +8,6 @@ import { useProductStore } from "@/store/useProductStore";
 import { formatPrice } from "@/lib/utils";
 import { Order, OrderStatus, Product, Category } from "@/types/store";
 import { RING_SPECIFIC_SIZES, BANGLE_SPECIFIC_SIZES } from "@/lib/productSizes";
-
-const isRingCategory = (cat: string) => cat === "rings" || cat === "ring";
-const isBangleCategory = (cat: string) =>
-  cat === "bangles-kada" || cat === "bangles" || cat === "bangle" || cat === "kada" || cat === "kadas";
-const isSizableCategory = (cat: string) => isRingCategory(cat) || isBangleCategory(cat);
 import {
   TrendingUp,
   ShoppingBag,
@@ -60,7 +55,7 @@ export default function AdminDashboardPage() {
   const [orders, setOrders] = useState<Order[]>(() => {
     if (typeof window !== "undefined") {
       try {
-        const cached = sessionStorage.getItem("gleamnest_admin_orders");
+        const cached = sessionStorage.getItem("alnaya_admin_orders");
         if (cached) {
           const parsed = JSON.parse(cached);
           if (Array.isArray(parsed) && parsed.length > 0) return parsed;
@@ -84,7 +79,7 @@ export default function AdminDashboardPage() {
   const [categoriesList, setCategoriesList] = useState<Category[]>(() => {
     if (typeof window !== "undefined") {
       try {
-        const cached = sessionStorage.getItem("gleamnest_categories");
+        const cached = sessionStorage.getItem("alnaya_categories");
         if (cached) {
           const parsed = JSON.parse(cached);
           if (Array.isArray(parsed) && parsed.length > 0) return parsed;
@@ -108,7 +103,7 @@ export default function AdminDashboardPage() {
   const [reviewsList, setReviewsList] = useState<any[]>(() => {
     if (typeof window !== "undefined") {
       try {
-        const cached = sessionStorage.getItem("gleamnest_admin_reviews");
+        const cached = sessionStorage.getItem("alnaya_admin_reviews");
         if (cached) return JSON.parse(cached);
       } catch (e) {}
     }
@@ -117,7 +112,7 @@ export default function AdminDashboardPage() {
   const [videosList, setVideosList] = useState<any[]>(() => {
     if (typeof window !== "undefined") {
       try {
-        const cached = sessionStorage.getItem("gleamnest_admin_videos");
+        const cached = sessionStorage.getItem("alnaya_admin_videos");
         if (cached) return JSON.parse(cached);
       } catch (e) {}
     }
@@ -126,7 +121,7 @@ export default function AdminDashboardPage() {
   const [feedbackScreenshotsList, setFeedbackScreenshotsList] = useState<any[]>(() => {
     if (typeof window !== "undefined") {
       try {
-        const cached = sessionStorage.getItem("gleamnest_admin_screenshots");
+        const cached = sessionStorage.getItem("alnaya_admin_screenshots");
         if (cached) return JSON.parse(cached);
       } catch (e) {}
     }
@@ -135,8 +130,9 @@ export default function AdminDashboardPage() {
   const [instagramVideosList, setInstagramVideosList] = useState<any[]>(() => {
     if (typeof window !== "undefined") {
       try {
-        const cached = sessionStorage.getItem("gleamnest_admin_instavideos");
-        if (cached) return JSON.parse(cached);
+        const cached = sessionStorage.getItem("alnaya_admin_instavideos");
+        if (cached && !cached.toLowerCase().includes("gleamnest")) return JSON.parse(cached);
+        sessionStorage.removeItem("alnaya_admin_instavideos");
       } catch (e) {}
     }
     return [];
@@ -168,7 +164,7 @@ export default function AdminDashboardPage() {
 
   const [instaVideoForm, setInstaVideoForm] = useState({
     title: "Jewelry Styling Reel",
-    handle: "@gleamnest.in",
+    handle: "@alnaya.in",
     caption: "",
     videoUrl: "",
     poster: "",
@@ -229,24 +225,31 @@ export default function AdminDashboardPage() {
   });
 
   const fetchReviewsAndVideos = () => {
-    fetch("/api/reviews")
+    fetch(`/api/reviews?t=${Date.now()}`, { cache: "no-store" })
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data.reviews)) {
           setReviewsList(data.reviews);
-          try { sessionStorage.setItem("gleamnest_admin_reviews", JSON.stringify(data.reviews)); } catch (e) {}
+          try { sessionStorage.setItem("alnaya_admin_reviews", JSON.stringify(data.reviews)); } catch (e) {}
         }
         if (Array.isArray(data.videoReels)) {
           setVideosList(data.videoReels);
-          try { sessionStorage.setItem("gleamnest_admin_videos", JSON.stringify(data.videoReels)); } catch (e) {}
+          try { sessionStorage.setItem("alnaya_admin_videos", JSON.stringify(data.videoReels)); } catch (e) {}
         }
         if (Array.isArray(data.feedbackScreenshots)) {
           setFeedbackScreenshotsList(data.feedbackScreenshots);
-          try { sessionStorage.setItem("gleamnest_admin_screenshots", JSON.stringify(data.feedbackScreenshots)); } catch (e) {}
+          try { sessionStorage.setItem("alnaya_admin_screenshots", JSON.stringify(data.feedbackScreenshots)); } catch (e) {}
         }
         if (Array.isArray(data.instagramVideos)) {
-          setInstagramVideosList(data.instagramVideos);
-          try { sessionStorage.setItem("gleamnest_admin_instavideos", JSON.stringify(data.instagramVideos)); } catch (e) {}
+          const cleanInsta = data.instagramVideos.map((v: any) => ({
+            ...v,
+            handle: "@alnaya.in",
+            caption: (v.caption || "").replace(/gleamnest/gi, "alnaya").replace(/304\s*(&|and)\s*306/gi, "radiant finish"),
+            title: (v.title || "").replace(/gleamnest/gi, "alnaya"),
+            instagramLink: (v.instagramLink || "").replace(/gleamnest/gi, "alnaya"),
+          }));
+          setInstagramVideosList(cleanInsta);
+          try { sessionStorage.setItem("alnaya_admin_instavideos", JSON.stringify(cleanInsta)); } catch (e) {}
         }
       })
       .catch((err) => console.error("Error fetching reviews:", err));
@@ -258,7 +261,7 @@ export default function AdminDashboardPage() {
       .then((data) => {
         if (Array.isArray(data) && data.length > 0) {
           setCategoriesList(data);
-          try { sessionStorage.setItem("gleamnest_categories", JSON.stringify(data)); } catch (e) {}
+          try { sessionStorage.setItem("alnaya_categories", JSON.stringify(data)); } catch (e) {}
         }
       })
       .catch((err) => console.error("Error fetching categories:", err));
@@ -267,7 +270,7 @@ export default function AdminDashboardPage() {
   useEffect(() => {
     // Check if merchant is already authenticated
     if (typeof window !== "undefined") {
-      const auth = localStorage.getItem("gleamnest_admin_auth");
+      const auth = localStorage.getItem("alnaya_admin_auth");
       if (auth === "true") {
         setIsAuthenticated(true);
       } else {
@@ -282,13 +285,13 @@ export default function AdminDashboardPage() {
     const cleanPassword = loginPassword.trim();
 
     // Accepted Merchant Credentials:
-    // Username: admin@gleamnest.in or admin
-    // Password: gleamnest@2026 or GleamNest@2026
+    // Username: admin@alnaya.in or admin
+    // Password: alnaya@2026 or Alnaya@2026
     if (
-      (cleanEmail === "admin@gleamnest.in" || cleanEmail === "admin") &&
-      (cleanPassword === "gleamnest@2026" || cleanPassword === "GleamNest@2026")
+      (cleanEmail === "admin@alnaya.in" || cleanEmail === "admin" || cleanEmail === "alnaya") &&
+      (cleanPassword === "alnaya@2026" || cleanPassword === "Alnaya@2026" || cleanPassword === "alnaya2026")
     ) {
-      localStorage.setItem("gleamnest_admin_auth", "true");
+      localStorage.setItem("alnaya_admin_auth", "true");
       setIsAuthenticated(true);
       setLoginError("");
     } else {
@@ -297,7 +300,7 @@ export default function AdminDashboardPage() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("gleamnest_admin_auth");
+    localStorage.removeItem("alnaya_admin_auth");
     setIsAuthenticated(false);
     setLoginPassword("");
   };
@@ -313,7 +316,7 @@ export default function AdminDashboardPage() {
         .then((data) => {
           if (Array.isArray(data) && data.length > 0) {
             setOrders(data);
-            try { sessionStorage.setItem("gleamnest_admin_orders", JSON.stringify(data)); } catch (e) {}
+            try { sessionStorage.setItem("alnaya_admin_orders", JSON.stringify(data)); } catch (e) {}
           }
         })
         .catch((err) => console.error("Error fetching orders:", err));
@@ -829,14 +832,24 @@ export default function AdminDashboardPage() {
   const handleDeleteReview = async (id: string | number) => {
     if (!confirm("Are you sure you want to remove this client review?")) return;
     try {
-      // Optimistic update
-      setReviewsList((prev) => prev.filter((r) => String(r.id) !== String(id)));
-      const res = await fetch(`/api/reviews?type=review&id=${encodeURIComponent(id)}`, { method: "DELETE" });
+      const targetId = String(id).trim();
+      setReviewsList((prev) => {
+        const next = prev.filter((r) => String(r.id).trim() !== targetId);
+        try { sessionStorage.setItem("alnaya_admin_reviews", JSON.stringify(next)); } catch (e) {}
+        return next;
+      });
+      const res = await fetch(`/api/reviews?type=review&id=${encodeURIComponent(targetId)}`, {
+        method: "DELETE",
+        cache: "no-store",
+      });
       const data = await res.json();
       if (!res.ok || !data.success) {
         throw new Error(data.error || "Failed to delete review");
       }
-      fetchReviewsAndVideos();
+      if (Array.isArray(data.reviews)) {
+        setReviewsList(data.reviews);
+        try { sessionStorage.setItem("alnaya_admin_reviews", JSON.stringify(data.reviews)); } catch (e) {}
+      }
     } catch (err: any) {
       alert(err.message || "Error deleting review");
       fetchReviewsAndVideos();
@@ -932,13 +945,24 @@ export default function AdminDashboardPage() {
   const handleDeleteVideo = async (id: string | number) => {
     if (!confirm("Are you sure you want to remove this video reel?")) return;
     try {
-      setVideosList((prev) => prev.filter((v) => String(v.id) !== String(id)));
-      const res = await fetch(`/api/reviews?type=video&id=${encodeURIComponent(id)}`, { method: "DELETE" });
+      const targetId = String(id).trim();
+      setVideosList((prev) => {
+        const next = prev.filter((v) => String(v.id).trim() !== targetId);
+        try { sessionStorage.setItem("alnaya_admin_videos", JSON.stringify(next)); } catch (e) {}
+        return next;
+      });
+      const res = await fetch(`/api/reviews?type=video&id=${encodeURIComponent(targetId)}`, {
+        method: "DELETE",
+        cache: "no-store",
+      });
       const data = await res.json();
       if (!res.ok || !data.success) {
         throw new Error(data.error || "Failed to delete video reel");
       }
-      fetchReviewsAndVideos();
+      if (Array.isArray(data.videoReels)) {
+        setVideosList(data.videoReels);
+        try { sessionStorage.setItem("alnaya_admin_videos", JSON.stringify(data.videoReels)); } catch (e) {}
+      }
     } catch (err: any) {
       alert(err.message || "Error deleting video reel");
       fetchReviewsAndVideos();
@@ -1003,13 +1027,24 @@ export default function AdminDashboardPage() {
   const handleDeleteScreenshot = async (id: string | number) => {
     if (!confirm("Are you sure you want to remove this client feedback screenshot?")) return;
     try {
-      setFeedbackScreenshotsList((prev) => prev.filter((s) => String(s.id) !== String(id)));
-      const res = await fetch(`/api/reviews?type=screenshot&id=${encodeURIComponent(id)}`, { method: "DELETE" });
+      const targetId = String(id).trim();
+      setFeedbackScreenshotsList((prev) => {
+        const next = prev.filter((s) => String(s.id).trim() !== targetId);
+        try { sessionStorage.setItem("alnaya_admin_screenshots", JSON.stringify(next)); } catch (e) {}
+        return next;
+      });
+      const res = await fetch(`/api/reviews?type=screenshot&id=${encodeURIComponent(targetId)}`, {
+        method: "DELETE",
+        cache: "no-store",
+      });
       const data = await res.json();
       if (!res.ok || !data.success) {
         throw new Error(data.error || "Failed to delete feedback screenshot");
       }
-      fetchReviewsAndVideos();
+      if (Array.isArray(data.feedbackScreenshots)) {
+        setFeedbackScreenshotsList(data.feedbackScreenshots);
+        try { sessionStorage.setItem("alnaya_admin_screenshots", JSON.stringify(data.feedbackScreenshots)); } catch (e) {}
+      }
     } catch (err: any) {
       alert(err.message || "Error deleting feedback screenshot");
       fetchReviewsAndVideos();
@@ -1105,11 +1140,11 @@ export default function AdminDashboardPage() {
     setEditingInstaVideo(null);
     setInstaVideoForm({
       title: "",
-      handle: "@gleamnest.in",
+      handle: "@alnaya.in",
       caption: "",
       videoUrl: "",
       poster: "",
-      instagramLink: "https://www.instagram.com/gleamnest.in?igsh=c3I4M2h1YmprdXI5",
+      instagramLink: "https://www.instagram.com/alnaya.in?psln=cDNzY3liNjltb203",
     });
     setIsInstaVideoModalOpen(true);
   };
@@ -1118,7 +1153,7 @@ export default function AdminDashboardPage() {
     setEditingInstaVideo(video);
     setInstaVideoForm({
       title: video.title || "",
-      handle: video.handle || "@gleamnest.in",
+      handle: video.handle || "@alnaya.in",
       caption: video.caption || "",
       videoUrl: video.videoUrl || "",
       poster: video.poster || "",
@@ -1215,7 +1250,7 @@ export default function AdminDashboardPage() {
       setEditingInstaVideo(null);
       setInstaVideoForm({
         title: "Jewelry Styling Reel",
-        handle: "@gleamnest.in",
+        handle: "@alnaya.in",
         caption: "",
         videoUrl: "",
         poster: "",
@@ -1230,17 +1265,42 @@ export default function AdminDashboardPage() {
   };
 
   const handleDeleteInstaVideo = async (id: string | number) => {
-    if (!confirm("Are you sure you want to remove this Instagram video?")) return;
+    if (!confirm("Are you sure you want to remove this reel from Follow The House?")) return;
     try {
-      setInstagramVideosList((prev) => prev.filter((v) => String(v.id) !== String(id)));
-      const res = await fetch(`/api/reviews?type=instagramVideo&id=${encodeURIComponent(id)}`, { method: "DELETE" });
+      const targetId = String(id).trim();
+      const updatedList = instagramVideosList.filter((v) => String(v.id).trim() !== targetId);
+      setInstagramVideosList(updatedList);
+      try {
+        sessionStorage.setItem("alnaya_admin_instavideos", JSON.stringify(updatedList));
+        localStorage.setItem("alnaya_follow_house_updated", String(Date.now()));
+        window.dispatchEvent(new Event("storage"));
+      } catch (e) {}
+
+      const res = await fetch(`/api/reviews?type=instagramVideo&id=${encodeURIComponent(targetId)}`, {
+        method: "DELETE",
+        cache: "no-store",
+      });
       const data = await res.json();
       if (!res.ok || !data.success) {
-        throw new Error(data.error || "Failed to delete Instagram video");
+        throw new Error(data.error || "Failed to delete reel");
       }
-      fetchReviewsAndVideos();
+      if (Array.isArray(data.instagramVideos)) {
+        const cleanInsta = data.instagramVideos.map((v: any) => ({
+          ...v,
+          handle: "@alnaya.in",
+          caption: (v.caption || "").replace(/gleamnest/gi, "alnaya").replace(/304\s*(&|and)\s*306/gi, "radiant finish"),
+          title: (v.title || "").replace(/gleamnest/gi, "alnaya"),
+          instagramLink: (v.instagramLink || "").replace(/gleamnest/gi, "alnaya"),
+        }));
+        setInstagramVideosList(cleanInsta);
+        try {
+          sessionStorage.setItem("alnaya_admin_instavideos", JSON.stringify(cleanInsta));
+          localStorage.setItem("alnaya_follow_house_updated", String(Date.now()));
+          window.dispatchEvent(new Event("storage"));
+        } catch (e) {}
+      }
     } catch (err: any) {
-      alert(err.message || "Error deleting Instagram video");
+      alert(err.message || "Error deleting reel");
       fetchReviewsAndVideos();
     }
   };
@@ -1427,18 +1487,8 @@ export default function AdminDashboardPage() {
     const explicitSizeAttr = product.variantAttributes?.find((a) => /size/i.test(a.name));
     let detectedSizingType: "adjustable" | "sizes" = "adjustable";
 
-    const rawCat = (product.category || "").toLowerCase();
-    const titleLower = (product.title || "").toLowerCase();
-
-    const isRing = isRingCategory(rawCat) || titleLower.includes("ring");
-    const isBangle = isBangleCategory(rawCat) || titleLower.includes("bangle") || titleLower.includes("kada");
-
-    const normalizedCategory = isRing
-      ? "rings"
-      : isBangle
-      ? "bangles-kada"
-      : product.category;
-
+    const isRing = product.category === "rings";
+    const isBangle = product.category === "bangles-kada";
     const standardSizes = isRing ? RING_SPECIFIC_SIZES : isBangle ? BANGLE_SPECIFIC_SIZES : [];
 
     let selectedSizes: string[] = [];
@@ -1458,10 +1508,9 @@ export default function AdminDashboardPage() {
       if (explicitSizeAttr.sizeStock) {
         sizeStock = { ...explicitSizeAttr.sizeStock };
       } else {
-        const total = Math.max(0, product.stockCount ?? 1);
-        const countPerSize = Math.max(1, Math.floor(total / (selectedSizes.length || 1)));
+        const fallbackCount = Math.max(0, product.stockCount ?? 1);
         selectedSizes.forEach((s) => {
-          sizeStock[s] = countPerSize;
+          sizeStock[s] = fallbackCount;
         });
       }
     } else {
@@ -1471,10 +1520,9 @@ export default function AdminDashboardPage() {
         (product.tags && product.tags.some((t) => /\b(adjustable|free size)\b/i.test(t)));
       detectedSizingType = titleIndicatesAdjustable ? "adjustable" : "sizes";
       selectedSizes = [...standardSizes];
-      const total = Math.max(0, product.stockCount ?? 1);
-      const countPerSize = Math.max(1, Math.floor(total / (standardSizes.length || 1)));
+      const fallbackCount = Math.max(0, product.stockCount ?? 1);
       standardSizes.forEach((s) => {
-        sizeStock[s] = countPerSize;
+        sizeStock[s] = fallbackCount;
       });
     }
 
@@ -1487,7 +1535,7 @@ export default function AdminDashboardPage() {
 
     setFormState({
       title: product.title,
-      category: normalizedCategory,
+      category: product.category,
       price: product.price.toString(),
       salePrice: product.salePrice ? product.salePrice.toString() : "",
       priceQatar: suggestedQar,
@@ -1542,11 +1590,11 @@ export default function AdminDashboardPage() {
     setIsSaving(true);
     try {
       const parsedPriceInr = parseFloat(formState.price);
-      const parsedSalePriceInr = formState.salePrice ? parseFloat(formState.salePrice) : null;
+      const parsedSalePriceInr = formState.salePrice ? parseFloat(formState.salePrice) : undefined;
       const parsedPriceQar = formState.priceQatar
         ? parseFloat(formState.priceQatar)
         : Math.max(10, Math.round(parsedPriceInr / 20));
-      const parsedSalePriceQar = formState.salePriceQatar ? parseFloat(formState.salePriceQatar) : null;
+      const parsedSalePriceQar = formState.salePriceQatar ? parseFloat(formState.salePriceQatar) : undefined;
 
       // Construct sizing variants for rings or bangles
       let variantAttributes = editingProduct?.variantAttributes
@@ -1555,13 +1603,7 @@ export default function AdminDashboardPage() {
 
       let finalStockCount = Math.max(0, parseInt(formState.stockCount) || 0);
 
-      const savedCategory = isRingCategory(formState.category)
-        ? "rings"
-        : isBangleCategory(formState.category)
-        ? "bangles-kada"
-        : formState.category;
-
-      if (isRingCategory(formState.category)) {
+      if (formState.category === "rings") {
         variantAttributes = variantAttributes.filter((a) => !/size/i.test(a.name));
         if (formState.sizingType === "adjustable") {
           variantAttributes.push({
@@ -1586,7 +1628,7 @@ export default function AdminDashboardPage() {
             sizeStock: activeSizeStock,
           });
         }
-      } else if (isBangleCategory(formState.category)) {
+      } else if (formState.category === "bangles-kada") {
         variantAttributes = variantAttributes.filter((a) => !/size/i.test(a.name));
         if (formState.sizingType === "adjustable") {
           variantAttributes.push({
@@ -1617,26 +1659,6 @@ export default function AdminDashboardPage() {
         // Update existing product in DB and Store
         await updateProduct(editingProduct.id, {
           title: formState.title,
-          category: savedCategory,
-          price: parsedPriceInr,
-          salePrice: parsedSalePriceInr,
-          priceQatar: parsedPriceQar,
-          salePriceQatar: parsedSalePriceQar,
-          stockCount: finalStockCount,
-          inStock: finalStockCount > 0,
-          shortDescription: formState.shortDescription || formState.title,
-          description: formState.description || formState.title,
-          imageUrl: formState.imageUrl,
-          images: [formState.imageUrl],
-          featured: formState.featured,
-          isBestSeller: formState.isBestSeller,
-          isNewArrival: formState.isNewArrival,
-          variantAttributes,
-        });
-      } else {
-        // Create new product in DB and Store
-        await addProduct({
-          title: formState.title,
           category: formState.category,
           price: parsedPriceInr,
           salePrice: parsedSalePriceInr,
@@ -1646,9 +1668,39 @@ export default function AdminDashboardPage() {
           inStock: finalStockCount > 0,
           shortDescription: formState.shortDescription || formState.title,
           description: formState.description || formState.title,
-          imageUrl: formState.imageUrl,
+          images: [formState.imageUrl],
+          featured: formState.featured,
+          isBestSeller: formState.isBestSeller,
+          isNewArrival: formState.isNewArrival,
+          variantAttributes,
+        });
+      } else {
+        // Create new product in DB and Store
+        const generatedSlug =
+          formState.title
+            .toLowerCase()
+            .trim()
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/^-|-$/g, "") +
+          "-" +
+          Date.now().toString(36);
+
+        await addProduct({
+          title: formState.title,
+          slug: generatedSlug,
+          category: formState.category,
+          price: parsedPriceInr,
+          salePrice: parsedSalePriceInr,
+          priceQatar: parsedPriceQar,
+          salePriceQatar: parsedSalePriceQar,
+          stockCount: finalStockCount,
+          inStock: finalStockCount > 0,
+          shortDescription: formState.shortDescription || formState.title,
+          description: formState.description || formState.title,
           images: [formState.imageUrl],
           tags: [formState.category, "New"],
+          rating: 5,
+          reviewCount: 0,
           featured: formState.featured,
           isBestSeller: formState.isBestSeller,
           isNewArrival: formState.isNewArrival,
@@ -1710,14 +1762,14 @@ export default function AdminDashboardPage() {
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-foreground flex items-center justify-between">
                 <span>Admin Username or Email</span>
-                <span className="text-[10px] text-muted-foreground font-mono">admin@gleamnest.in</span>
+                <span className="text-[10px] text-muted-foreground font-mono">admin@alnaya.in</span>
               </label>
               <div className="relative">
                 <input
                   type="text"
                   required
                   autoFocus
-                  placeholder="admin@gleamnest.in"
+                  placeholder="admin@alnaya.in"
                   value={loginEmail}
                   onChange={(e) => setLoginEmail(e.target.value)}
                   className="w-full px-3.5 py-2.5 pl-10 text-xs rounded-xl bg-background border border-border focus:ring-1 focus:ring-primary outline-none transition-all"
@@ -1729,7 +1781,7 @@ export default function AdminDashboardPage() {
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-foreground flex items-center justify-between">
                 <span>Secret Password</span>
-                <span className="text-[10px] text-muted-foreground font-mono">gleamnest@2026</span>
+                <span className="text-[10px] text-muted-foreground font-mono">alnaya@2026</span>
               </label>
               <div className="relative">
                 <input
@@ -2292,7 +2344,7 @@ export default function AdminDashboardPage() {
                       rel="noreferrer"
                       className="text-primary hover:underline font-mono text-[11px]"
                     >
-                      @gleamnest.in ↗
+                      @alnaya.in ↗
                     </a>
                   </p>
                   <p>
@@ -2303,7 +2355,7 @@ export default function AdminDashboardPage() {
                       rel="noreferrer"
                       className="text-primary hover:underline font-mono text-[11px]"
                     >
-                      GleamNest Official Page ↗
+                      Alnaya Official Page ↗
                     </a>
                   </p>
                   <p>
@@ -2328,8 +2380,8 @@ export default function AdminDashboardPage() {
                 </div>
                 <div className="text-xs space-y-1.5 text-muted-foreground">
                   <p>Portal URL: <strong className="text-foreground font-mono">/admin</strong></p>
-                  <p>Username / Email: <strong className="text-foreground font-mono">admin@gleamnest.in</strong> (or <span className="font-mono">admin</span>)</p>
-                  <p>Default Password: <strong className="text-foreground font-mono">gleamnest@2026</strong></p>
+                  <p>Username / Email: <strong className="text-foreground font-mono">admin@alnaya.in</strong> (or <span className="font-mono">admin</span>)</p>
+                  <p>Default Password: <strong className="text-foreground font-mono">alnaya@2026</strong></p>
                   <p>Session Security: <strong className="text-emerald-700">Encrypted Local Storage Authentication</strong></p>
                 </div>
               </div>
@@ -2546,7 +2598,7 @@ export default function AdminDashboardPage() {
 
                           <div>
                             <p className="text-xs font-bold line-clamp-1 text-white">{video.title}</p>
-                            <p className="text-[10px] text-white/80">{video.handle || "@gleamnest.in"}</p>
+                            <p className="text-[10px] text-white/80">{video.handle || "@alnaya.in"}</p>
                           </div>
                         </div>
                       </div>
@@ -2889,13 +2941,13 @@ export default function AdminDashboardPage() {
 
               <div className="flex items-center gap-2.5 flex-wrap">
                 <a
-                  href="https://www.instagram.com/gleamnest.in?igsh=c3I4M2h1YmprdXI5"
+                  href="https://www.instagram.com/alnaya.in?psln=cDNzY3liNjltb203"
                   target="_blank"
                   rel="noreferrer"
                   className="px-3 py-2 rounded-xl border border-border hover:bg-muted text-xs font-semibold text-muted-foreground hover:text-foreground flex items-center gap-1.5 transition-colors"
                 >
                   <Instagram className="w-3.5 h-3.5 text-[#E1306C]" />
-                  <span>@gleamnest.in ↗</span>
+                  <span>@alnaya.in ↗</span>
                 </a>
                 <button
                   type="button"
@@ -3043,14 +3095,14 @@ export default function AdminDashboardPage() {
                         {/* Bottom Text Details */}
                         <div className="absolute bottom-3 left-3 right-3 text-white pointer-events-none space-y-0.5">
                           <p className="text-[10px] text-[#F3DFB0] font-mono tracking-wider">
-                            {video.handle || "@gleamnest.in"}
+                            {video.handle ? video.handle.replace(/@?gleamnest\.in/gi, "@alnaya.in").replace(/gleamnest/gi, "alnaya") : "@alnaya.in"}
                           </p>
                           <h4 className="text-xs sm:text-sm font-bold leading-tight text-white drop-shadow line-clamp-1">
                             {video.title}
                           </h4>
                           {video.caption && (
                             <p className="text-[11px] text-white/80 line-clamp-1 font-light drop-shadow-sm">
-                              {video.caption}
+                              {video.caption.replace(/gleamnest/gi, "alnaya").replace(/304\s*(&|and)\s*306/gi, "radiant finish")}
                             </p>
                           )}
                         </div>
@@ -3063,7 +3115,7 @@ export default function AdminDashboardPage() {
                             {video.title}
                           </span>
                           <span className="text-[10px] text-muted-foreground font-mono block truncate">
-                            {video.handle || "@gleamnest.in"}
+                            {video.handle ? video.handle.replace(/@?gleamnest\.in/gi, "@alnaya.in").replace(/gleamnest/gi, "alnaya") : "@alnaya.in"}
                           </span>
                         </div>
 
@@ -3152,32 +3204,7 @@ export default function AdminDashboardPage() {
                   <label className="text-xs font-semibold text-foreground">Category *</label>
                   <select
                     value={formState.category}
-                    onChange={(e) => {
-                      const newCat = e.target.value;
-                      const isRing = newCat === "rings";
-                      const isBangle = newCat === "bangles-kada";
-                      let newSizes = formState.selectedSizes;
-                      const newSizeStock = { ...formState.sizeStock };
-
-                      if (isRing && !formState.selectedSizes.some((s) => RING_SPECIFIC_SIZES.includes(s))) {
-                        newSizes = [...RING_SPECIFIC_SIZES];
-                        RING_SPECIFIC_SIZES.forEach((s) => {
-                          if (newSizeStock[s] === undefined) newSizeStock[s] = 1;
-                        });
-                      } else if (isBangle && !formState.selectedSizes.some((s) => BANGLE_SPECIFIC_SIZES.includes(s))) {
-                        newSizes = [...BANGLE_SPECIFIC_SIZES];
-                        BANGLE_SPECIFIC_SIZES.forEach((s) => {
-                          if (newSizeStock[s] === undefined) newSizeStock[s] = 1;
-                        });
-                      }
-
-                      setFormState({
-                        ...formState,
-                        category: newCat,
-                        selectedSizes: newSizes,
-                        sizeStock: newSizeStock,
-                      });
-                    }}
+                    onChange={(e) => setFormState({ ...formState, category: e.target.value })}
                     className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none"
                   >
                     <option value="necklaces-and-chains">Necklaces and Chains</option>
@@ -3197,7 +3224,7 @@ export default function AdminDashboardPage() {
                 <div className="space-y-1">
                   <div className="flex items-center justify-between">
                     <label className="text-xs font-semibold text-foreground">Inventory Units in Stock *</label>
-                    {isSizableCategory(formState.category) &&
+                    {(formState.category === "rings" || formState.category === "bangles-kada") &&
                       formState.sizingType === "sizes" && (
                         <span className="text-[10px] text-primary font-bold">
                           Sum of size units
@@ -3208,20 +3235,20 @@ export default function AdminDashboardPage() {
                     type="number"
                     required
                     readOnly={
-                      isSizableCategory(formState.category) &&
+                      (formState.category === "rings" || formState.category === "bangles-kada") &&
                       formState.sizingType === "sizes"
                     }
                     value={
-                      isSizableCategory(formState.category) &&
+                      (formState.category === "rings" || formState.category === "bangles-kada") &&
                       formState.sizingType === "sizes"
-                        ? (isRingCategory(formState.category) ? RING_SPECIFIC_SIZES : BANGLE_SPECIFIC_SIZES)
+                        ? (formState.category === "rings" ? RING_SPECIFIC_SIZES : BANGLE_SPECIFIC_SIZES)
                             .filter((s) => formState.selectedSizes.includes(s))
                             .reduce((sum, s) => sum + Math.max(0, formState.sizeStock[s] ?? 0), 0)
                         : formState.stockCount
                     }
                     onChange={(e) => setFormState({ ...formState, stockCount: e.target.value })}
                     className={`w-full px-3 py-2 text-xs rounded-lg border outline-none ${
-                      isSizableCategory(formState.category) &&
+                      (formState.category === "rings" || formState.category === "bangles-kada") &&
                       formState.sizingType === "sizes"
                         ? "bg-muted/40 border-border text-foreground font-bold cursor-not-allowed"
                         : "bg-background border-border focus:ring-1 focus:ring-primary"
@@ -3231,12 +3258,12 @@ export default function AdminDashboardPage() {
               </div>
 
               {/* Sizing Option Configuration for Rings & Bangles */}
-              {isSizableCategory(formState.category) && (
+              {(formState.category === "rings" || formState.category === "bangles-kada") && (
                 <div className="p-3.5 rounded-xl border border-primary/20 bg-primary/5 space-y-3">
                   <div className="flex items-center justify-between">
                     <label className="text-xs font-bold text-foreground flex items-center gap-1.5">
                       <Sparkles className="w-3.5 h-3.5 text-primary" />
-                      <span>{isRingCategory(formState.category) ? "Ring Sizing Setup" : "Bangle / Kada Sizing Setup"}</span>
+                      <span>{formState.category === "rings" ? "Ring Sizing Setup" : "Bangle / Kada Sizing Setup"}</span>
                     </label>
                     <span className="text-[10px] text-muted-foreground font-medium">Customer Selection Mode</span>
                   </div>
@@ -3262,7 +3289,7 @@ export default function AdminDashboardPage() {
                         )}
                       </div>
                       <p className="text-[11px] text-muted-foreground mt-1 leading-snug">
-                        {isRingCategory(formState.category)
+                        {formState.category === "rings"
                           ? "One-size adjustable comfort band. No size dropdown shown to buyers."
                           : "One-size open flex-cuff. No size dropdown shown to buyers."}
                       </p>
@@ -3284,9 +3311,9 @@ export default function AdminDashboardPage() {
                         )}
                       </div>
                       <p className="text-[11px] text-muted-foreground mt-1 leading-snug">
-                        {isRingCategory(formState.category)
-                          ? "Manage inventory per ring size (Sizes 5–14 based on finger circumference in cm). Set 0 for out of stock sizes."
-                          : "Manage inventory per bangle size (Sizes 2-2, 2-6, 2-8). Set 0 for out of stock sizes."}
+                        {formState.category === "rings"
+                          ? "Manage inventory per ring size (Sizes 10–20). Set 0 for out of stock sizes."
+                          : "Manage inventory per bangle size (Sizes 2-2 to 2-10). Set 0 for out of stock sizes."}
                       </p>
                     </button>
                   </div>
@@ -3307,7 +3334,7 @@ export default function AdminDashboardPage() {
                         <div className="flex items-center gap-2">
                           <span className="text-[11px] font-semibold text-muted-foreground">Total:</span>
                           <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
-                            {(isRingCategory(formState.category) ? RING_SPECIFIC_SIZES : BANGLE_SPECIFIC_SIZES)
+                            {(formState.category === "rings" ? RING_SPECIFIC_SIZES : BANGLE_SPECIFIC_SIZES)
                               .filter((s) => formState.selectedSizes.includes(s))
                               .reduce((sum, s) => sum + Math.max(0, formState.sizeStock[s] ?? 0), 0)}{" "}
                             Units
@@ -3320,7 +3347,7 @@ export default function AdminDashboardPage() {
                         <button
                           type="button"
                           onClick={() => {
-                            const allSizes = isRingCategory(formState.category) ? RING_SPECIFIC_SIZES : BANGLE_SPECIFIC_SIZES;
+                            const allSizes = formState.category === "rings" ? RING_SPECIFIC_SIZES : BANGLE_SPECIFIC_SIZES;
                             setFormState((prev) => ({ ...prev, selectedSizes: [...allSizes] }));
                           }}
                           className="text-primary hover:underline font-semibold"
@@ -3331,7 +3358,7 @@ export default function AdminDashboardPage() {
                         <button
                           type="button"
                           onClick={() => {
-                            const allSizes = isRingCategory(formState.category) ? RING_SPECIFIC_SIZES : BANGLE_SPECIFIC_SIZES;
+                            const allSizes = formState.category === "rings" ? RING_SPECIFIC_SIZES : BANGLE_SPECIFIC_SIZES;
                             const updatedStock = { ...formState.sizeStock };
                             allSizes.forEach((s) => {
                               if ((updatedStock[s] ?? 0) <= 0) updatedStock[s] = 1;
@@ -3350,7 +3377,7 @@ export default function AdminDashboardPage() {
                         <button
                           type="button"
                           onClick={() => {
-                            const allSizes = isRingCategory(formState.category) ? RING_SPECIFIC_SIZES : BANGLE_SPECIFIC_SIZES;
+                            const allSizes = formState.category === "rings" ? RING_SPECIFIC_SIZES : BANGLE_SPECIFIC_SIZES;
                             const updatedStock = { ...formState.sizeStock };
                             allSizes.forEach((s) => {
                               updatedStock[s] = 0;
@@ -3368,7 +3395,7 @@ export default function AdminDashboardPage() {
 
                       {/* Size List */}
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
-                        {(isRingCategory(formState.category) ? RING_SPECIFIC_SIZES : BANGLE_SPECIFIC_SIZES).map((sizeName) => {
+                        {(formState.category === "rings" ? RING_SPECIFIC_SIZES : BANGLE_SPECIFIC_SIZES).map((sizeName) => {
                           const isEnabled = formState.selectedSizes.includes(sizeName);
                           const count = formState.sizeStock[sizeName] ?? 0;
                           const isSizeOut = count <= 0;
@@ -3655,7 +3682,7 @@ export default function AdminDashboardPage() {
                 <label className="text-xs font-semibold text-foreground">Short Summary</label>
                 <input
                   type="text"
-                  placeholder="e.g. 304 & 306 Grade Steel • Waterproof • Hypoallergenic"
+                  placeholder="e.g. Waterproof • Hypoallergenic • Everyday Luxury"
                   value={formState.shortDescription}
                   onChange={(e) => setFormState({ ...formState, shortDescription: e.target.value })}
                   className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none"
@@ -3666,7 +3693,7 @@ export default function AdminDashboardPage() {
                 <label className="text-xs font-semibold text-foreground">Full Description & Story</label>
                 <textarea
                   rows={3}
-                  placeholder="Crafted with premium 304 & 306 grade stainless steel with high-grade PVD plating. 100% waterproof, sweatproof, and hypoallergenic."
+                  placeholder="Crafted with premium stainless steel in radiant gold finish. 100% waterproof, sweatproof, and hypoallergenic."
                   value={formState.description}
                   onChange={(e) => setFormState({ ...formState, description: e.target.value })}
                   className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none"
@@ -4208,7 +4235,7 @@ export default function AdminDashboardPage() {
                 <label className="text-xs font-semibold text-foreground">Customer Message / Note</label>
                 <textarea
                   rows={3}
-                  placeholder="e.g. Arrived in 2 days via DTDC. The 304 steel mirror finish is so luxurious!"
+                  placeholder="e.g. Arrived in 2 days via DTDC. The mirror finish is so luxurious!"
                   value={screenshotForm.caption}
                   onChange={(e) => setScreenshotForm({ ...screenshotForm, caption: e.target.value })}
                   className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none resize-none"
@@ -4416,7 +4443,7 @@ export default function AdminDashboardPage() {
                   <label className="text-xs font-semibold text-foreground">Instagram Handle</label>
                   <input
                     type="text"
-                    placeholder="@gleamnest.in"
+                    placeholder="@alnaya.in"
                     value={instaVideoForm.handle}
                     onChange={(e) => setInstaVideoForm({ ...instaVideoForm, handle: e.target.value })}
                     className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none font-mono"
@@ -4439,7 +4466,7 @@ export default function AdminDashboardPage() {
                 <label className="text-xs font-semibold text-foreground">Caption / Description</label>
                 <textarea
                   rows={2}
-                  placeholder="Waterproof & anti-tarnish everyday luxury crafted in 304 & 306 steel ✨"
+                  placeholder="Waterproof everyday luxury crafted with radiant finish ✨"
                   value={instaVideoForm.caption}
                   onChange={(e) => setInstaVideoForm({ ...instaVideoForm, caption: e.target.value })}
                   className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none resize-none"

@@ -1,38 +1,32 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { storeConfig } from "@/config/store.config";
 import { X, Sparkles } from "lucide-react";
-import { useCartStore } from "@/store/useCartStore";
 
 export function AnnouncementBar() {
   const pathname = usePathname();
   const [visible, setVisible] = useState(true);
-  const selectedCurrency = useCartStore((s) => s.selectedCurrency);
+  const [mounted, setMounted] = useState(false);
 
-  if (pathname?.startsWith("/admin") || !storeConfig.features.enableAnnouncementBar || !visible) {
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // On the homepage, do not render announcement bar so the transparent navbar floats seamlessly over the full-bleed video hero
+  if (!mounted || !storeConfig.features.enableAnnouncementBar || !visible || pathname === "/") {
     return null;
   }
 
-  const isQatar = selectedCurrency === "QAR";
-
-  const tickerItems = isQatar
-    ? [
-        "100% Anti-Tarnish & Waterproof",
-        "Premium 304 & 306 Grade Stainless Steel",
-        "Free Delivery Across Qatar (Within 14 Days)",
-        "Hypoallergenic & Shower Safe",
-        "Order Directly on WhatsApp",
-      ]
-    : [
-        "100% Anti-Tarnish & Waterproof",
-        "Premium 304 & 306 Grade Stainless Steel",
-        `Free Pan-India Delivery Above ₹${storeConfig.commerce.freeShippingThreshold}`,
-        `Express Shipping Only ₹${storeConfig.commerce.flatShippingFee}`,
-        "Hypoallergenic & Shower Safe",
-        "Order Directly on WhatsApp",
-      ];
+  const tickerItems = [
+    "100% Waterproof & Skin-Friendly",
+    "Handcrafted Ethnic & Daily Luxury",
+    `Free Pan-India Delivery Above ₹${storeConfig.commerce.freeShippingThreshold}`,
+    "Hypoallergenic & Shower Safe",
+    "Fast Dispatch Within 24-48 Hours",
+    "Secure UPI, Card & NetBanking Checkout",
+  ];
 
   return (
     <aside
@@ -44,22 +38,22 @@ export function AnnouncementBar() {
           {/* First sequence */}
           {tickerItems.map((item, idx) => (
             <div key={`ticker-a-${idx}`} className="flex items-center gap-2">
-              <Sparkles className="w-3 h-3 text-[#C5A059] flex-shrink-0 animate-pulse" />
+              <Sparkles className="w-3 h-3 text-purple-400 flex-shrink-0 animate-pulse" />
               <span className="tracking-wide uppercase text-[11px] sm:text-xs font-semibold text-[#F7EEDD]">
                 {item}
               </span>
-              <span className="text-[#C5A059]/50 text-xs ml-3 font-serif">✦</span>
+              <span className="text-purple-400/60 text-xs ml-3 font-serif">✦</span>
             </div>
           ))}
 
           {/* Duplicate sequence for continuous seamless scrolling */}
           {tickerItems.map((item, idx) => (
             <div key={`ticker-b-${idx}`} className="flex items-center gap-2">
-              <Sparkles className="w-3 h-3 text-[#C5A059] flex-shrink-0 animate-pulse" />
+              <Sparkles className="w-3 h-3 text-purple-400 flex-shrink-0 animate-pulse" />
               <span className="tracking-wide uppercase text-[11px] sm:text-xs font-semibold text-[#F7EEDD]">
                 {item}
               </span>
-              <span className="text-[#C5A059]/50 text-xs ml-3 font-serif">✦</span>
+              <span className="text-purple-400/60 text-xs ml-3 font-serif">✦</span>
             </div>
           ))}
         </div>

@@ -20,28 +20,30 @@ const ITEMS_PER_ROW = 4;
 const ROWS_PER_BATCH = 3;
 const BATCH_SIZE = ITEMS_PER_ROW * ROWS_PER_BATCH; // 12 items (3 rows of 4 items)
 
-function matchesCategory(
-  product: { category: string; isNewArrival?: boolean },
-  targetSlug: string
-): boolean {
-  if (targetSlug === "all") return true;
-  if (targetSlug === "new-arrivals") {
-    return Boolean(product.isNewArrival || product.category === "new-arrivals");
-  }
-  const pCat = (product.category || "").trim().toLowerCase();
-  const tSlug = (targetSlug || "").trim().toLowerCase();
-
-  if (tSlug === "necklaces-and-chains" || tSlug === "necklaces") {
-    return pCat === "necklaces-and-chains" || pCat === "necklaces";
-  }
-  if (tSlug === "bangles-kada" || tSlug === "bangles") {
-    return pCat === "bangles-kada" || pCat === "bangles";
-  }
-  if (tSlug === "kids-collection" || tSlug === "kids") {
-    return pCat === "kids-collection" || pCat === "kids";
-  }
-  return pCat === tSlug;
-}
+const categoryIconMap: Record<string, string> = {
+  all: "/images/category-cards/all.png",
+  necklace: "/images/category-cards/necklace.png",
+  necklaces: "/images/category-cards/necklace.png",
+  "minimal-chains": "/images/category-cards/necklace.png",
+  "hanging-chains": "/images/category-cards/necklace.png",
+  "necklaces-and-chains": "/images/category-cards/necklace.png",
+  "traditional-sets": "/images/category-cards/necklace.png",
+  ring: "/images/category-cards/ring.png",
+  rings: "/images/category-cards/ring.png",
+  bracelet: "/images/category-cards/bracelet.png",
+  bracelets: "/images/category-cards/bracelet.png",
+  bangles: "/images/category-cards/bracelet.png",
+  "bangles-kada": "/images/category-cards/bracelet.png",
+  earring: "/images/category-cards/earrings.png",
+  earrings: "/images/category-cards/earrings.png",
+  "stud-and-hoops": "/images/category-cards/earrings.png",
+  jhumkas: "/images/category-cards/earrings.png",
+  "traditional-earrings": "/images/category-cards/earrings.png",
+  anklet: "/images/category-cards/bracelet.png",
+  anklets: "/images/category-cards/bracelet.png",
+  nosepin: "/images/category-cards/ring.png",
+  "offer-products": "/images/category-cards/necklace.png",
+};
 
 function ProductCatalogContent() {
   const searchParams = useSearchParams();
@@ -54,7 +56,7 @@ function ProductCatalogContent() {
   const [categoryList, setCategoryList] = useState<Category[]>(() => {
     if (typeof window !== "undefined") {
       try {
-        const cached = sessionStorage.getItem("gleamnest_categories");
+        const cached = sessionStorage.getItem("alnaya_categories");
         if (cached) {
           const parsed = JSON.parse(cached);
           if (Array.isArray(parsed) && parsed.length > 0) return parsed;
@@ -73,7 +75,7 @@ function ProductCatalogContent() {
         if (Array.isArray(data) && data.length > 0) {
           setCategoryList(data);
           try {
-            sessionStorage.setItem("gleamnest_categories", JSON.stringify(data));
+            sessionStorage.setItem("alnaya_categories", JSON.stringify(data));
           } catch (e) {}
         }
       })
@@ -107,9 +109,45 @@ function ProductCatalogContent() {
   const filteredProducts = useMemo(() => {
     return products
       .filter((p) => {
-        // Category filter - strict 1-to-1 mapping
+        // Category filter
         if (selectedCategory !== "all") {
-          if (!matchesCategory(p, selectedCategory)) {
+          if (selectedCategory === "minimal-chains") {
+            const isMatch = p.category === "minimal-chains" || p.tags.some(t => /minimal/i.test(t)) || /chain|pendant/i.test(p.title);
+            if (!isMatch) return false;
+          } else if (selectedCategory === "hanging-chains") {
+            const isMatch = p.category === "hanging-chains" || p.tags.some(t => /hanging/i.test(t)) || /hanging|lariat|drop/i.test(p.title);
+            if (!isMatch) return false;
+          } else if (selectedCategory === "jhumkas") {
+            const isMatch = p.category === "jhumkas" || /jhumka|jhumki|temple/i.test(p.title);
+            if (!isMatch) return false;
+          } else if (selectedCategory === "stud-and-hoops") {
+            const isMatch = p.category === "stud-and-hoops" || /stud|hoop|huggie/i.test(p.title);
+            if (!isMatch) return false;
+          } else if (selectedCategory === "traditional-earrings") {
+            const isMatch = p.category === "traditional-earrings" || /chandbali|traditional|earring/i.test(p.title);
+            if (!isMatch) return false;
+          } else if (selectedCategory === "traditional-sets") {
+            const isMatch = p.category === "traditional-sets" || /set|bridal|necklace set/i.test(p.title);
+            if (!isMatch) return false;
+          } else if (selectedCategory === "offer-products") {
+            const isMatch = p.category === "offer-products" || p.tags.some(t => /offer/i.test(t)) || !!p.salePrice || p.isBestSeller;
+            if (!isMatch) return false;
+          } else if (selectedCategory === "anklets") {
+            const isMatch = p.category === "anklets" || /anklet|payal/i.test(p.title);
+            if (!isMatch) return false;
+          } else if (selectedCategory === "bangles") {
+            const isMatch = p.category === "bangles" || p.category === "bangles-kada" || /bangle|kada|chooda/i.test(p.title);
+            if (!isMatch) return false;
+          } else if (selectedCategory === "bracelet") {
+            const isMatch = p.category === "bracelet" || p.category === "bracelets" || /bracelet/i.test(p.title);
+            if (!isMatch) return false;
+          } else if (selectedCategory === "ring") {
+            const isMatch = p.category === "ring" || p.category === "rings" || /ring|band/i.test(p.title);
+            if (!isMatch) return false;
+          } else if (selectedCategory === "nosepin") {
+            const isMatch = p.category === "nosepin" || p.category === "charms" || /nosepin|nath|nose/i.test(p.title);
+            if (!isMatch) return false;
+          } else if (p.category !== selectedCategory) {
             return false;
           }
         }
@@ -196,7 +234,7 @@ function ProductCatalogContent() {
         <div>
           <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/10 text-primary text-[11px] font-semibold mb-1">
             <Sparkles className="w-3 h-3" />
-            <span>Anti-Tarnish • 304 & 306 Steel • Waterproof</span>
+            <span>Waterproof • Hypoallergenic • Everyday Luxury</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-black text-foreground">
             {selectedCategory === "all"
@@ -204,14 +242,7 @@ function ProductCatalogContent() {
               : categoryList.find((c) => c.slug === selectedCategory)?.name || "Jewelry Collection"}
           </h1>
           <p className="text-xs text-muted-foreground mt-0.5">
-            {!hasLoaded && products.length === 0 ? (
-              <span className="inline-flex items-center gap-1.5 text-primary font-medium">
-                <Sparkles className="w-3 h-3 animate-spin" />
-                <span>Loading catalog pieces...</span>
-              </span>
-            ) : (
-              `Showing ${displayedProducts.length} of ${filteredProducts.length} pieces • 4 items per row`
-            )}
+            Showing {displayedProducts.length} of {filteredProducts.length} pieces • 4 items per row
           </p>
         </div>
 
@@ -236,42 +267,101 @@ function ProductCatalogContent() {
         </div>
       </div>
 
-      {/* 2. Horizontal Category Filter Pills (All + 11 Categories) */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none pt-1 -mx-4 px-4 sm:mx-0 sm:px-0">
-        <button
-          onClick={() => setSelectedCategory("all")}
-          className={`px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 ${
-            selectedCategory === "all"
-              ? "bg-primary text-primary-foreground shadow-sm"
-              : "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground"
-          }`}
-        >
-          <span>All Pieces</span>
-          <span className="text-[10px] opacity-80">
-            {!hasLoaded && products.length === 0 ? "..." : `(${products.length})`}
-          </span>
-        </button>
-
-        {categoryList.map((cat) => {
-          const count = products.filter((p) => matchesCategory(p, cat.slug)).length;
-
-          return (
-            <button
-              key={cat.id}
-              onClick={() => setSelectedCategory(cat.slug)}
-              className={`px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 ${
-                selectedCategory === cat.slug
-                  ? "bg-primary text-primary-foreground shadow-sm"
-                  : "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground"
+      {/* 2. Visual Category Cards Bar (Matching user's reference) */}
+      <div className="bg-[#F3F4F6] sm:bg-[#F3F4F6]/90 p-3 sm:p-4 rounded-3xl border border-stone-200/70 shadow-sm">
+        <div className="flex items-start gap-3 sm:gap-4 md:gap-5 overflow-x-auto pb-1 scrollbar-none scroll-smooth -mx-1 px-1">
+          {/* "All Pieces" Card */}
+          <button
+            onClick={() => setSelectedCategory("all")}
+            className="flex flex-col items-center shrink-0 group focus:outline-none w-[72px] sm:w-[84px] md:w-[92px]"
+          >
+            <div
+              className={`w-16 h-16 sm:w-20 sm:h-20 rounded-2xl sm:rounded-3xl p-2 flex items-center justify-center transition-all duration-300 ${
+                selectedCategory === "all"
+                  ? "bg-white ring-2 ring-[#7E22CE] border-[#7E22CE] shadow-md -translate-y-0.5"
+                  : "bg-white border border-stone-200/90 shadow-sm hover:border-purple-300 hover:shadow-md hover:-translate-y-0.5"
               }`}
             >
-              <span>{cat.name}</span>
-              <span className="text-[10px] opacity-80">
-                {!hasLoaded && products.length === 0 ? "..." : `(${count})`}
-              </span>
-            </button>
-          );
-        })}
+              <img
+                src="/images/category-cards/all.png"
+                alt="All Pieces"
+                className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
+              />
+            </div>
+            <span
+              className={`text-xs sm:text-[13px] text-center whitespace-nowrap mt-2 transition-colors ${
+                selectedCategory === "all"
+                  ? "font-bold text-[#7E22CE]"
+                  : "font-medium text-stone-700 group-hover:text-stone-900"
+              }`}
+            >
+              All
+            </span>
+            <span className="text-[10px] text-stone-400 font-mono -mt-0.5">
+              ({products.length})
+            </span>
+          </button>
+
+          {/* Category Cards */}
+          {categoryList.map((cat) => {
+            const count = products.filter((p) => {
+              if (cat.slug === "new-arrivals") return p.isNewArrival || p.category === "new-arrivals";
+              if (cat.slug === "necklaces-and-chains" || cat.slug === "necklaces") return p.category === "necklaces-and-chains" || p.category === "necklaces" || /necklace|chain|pendant/i.test(p.title);
+              if (cat.slug === "bangles-kada") return p.category === "bangles-kada" || p.category === "bangles" || /bangle|kada|cuff/i.test(p.title);
+              if (cat.slug === "bracelets") return (p.category === "bracelets" && !/bangle|kada|cuff/i.test(p.title)) || /bracelet/i.test(p.title);
+              if (cat.slug === "watches") return p.category === "watches" || /watch/i.test(p.title);
+              if (cat.slug === "charms") return p.category === "charms" || /charm/i.test(p.title);
+              if (cat.slug === "hip-chains") return p.category === "hip-chains" || /hip chain|waist/i.test(p.title);
+              if (cat.slug === "kids-collection") return p.category === "kids-collection" || p.category === "kids" || /kid|child/i.test(p.title);
+              if (cat.slug === "anklets") return p.category === "anklets" || /anklet/i.test(p.title);
+              if (cat.slug === "rings") return p.category === "rings" || /ring/i.test(p.title);
+              if (cat.slug === "earrings") return p.category === "earrings" || /earring|stud|hoop/i.test(p.title);
+              return p.category === cat.slug;
+            }).length;
+
+            const iconSrc =
+              categoryIconMap[cat.slug] ||
+              cat.image ||
+              "/images/category-cards/necklace.png";
+
+            const displayName = cat.name.replace(/\s*Collection/gi, "").trim();
+
+            return (
+              <button
+                key={cat.id}
+                onClick={() => setSelectedCategory(cat.slug)}
+                className="flex flex-col items-center shrink-0 group focus:outline-none w-[72px] sm:w-[84px] md:w-[92px]"
+              >
+                <div
+                  className={`w-16 h-16 sm:w-20 sm:h-20 rounded-2xl sm:rounded-3xl p-2 flex items-center justify-center transition-all duration-300 ${
+                    selectedCategory === cat.slug
+                      ? "bg-white ring-2 ring-[#7E22CE] border-[#7E22CE] shadow-md -translate-y-0.5"
+                      : "bg-white border border-stone-200/90 shadow-sm hover:border-purple-300 hover:shadow-md hover:-translate-y-0.5"
+                  }`}
+                >
+                  <img
+                    src={iconSrc}
+                    alt={displayName}
+                    className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
+                <span
+                  className={`text-xs sm:text-[13px] text-center whitespace-nowrap mt-2 transition-colors truncate max-w-full ${
+                    selectedCategory === cat.slug
+                      ? "font-bold text-[#7E22CE]"
+                      : "font-medium text-stone-700 group-hover:text-stone-900"
+                  }`}
+                  title={displayName}
+                >
+                  {displayName}
+                </span>
+                <span className="text-[10px] text-stone-400 font-mono -mt-0.5">
+                  ({count})
+                </span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* 3. Filter Controls & Sort Bar */}

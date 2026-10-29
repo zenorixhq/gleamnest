@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { storeConfig } from "@/config/store.config";
 import {
   MessageCircle,
@@ -15,14 +14,9 @@ import { BrandLogo } from "@/components/storefront/BrandLogo";
 import { PolicyModal, PolicyTab } from "@/components/storefront/PolicyModal";
 
 export function Footer() {
-  const pathname = usePathname();
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
   const [policyModalTab, setPolicyModalTab] = useState<PolicyTab | null>(null);
-
-  if (pathname?.startsWith("/admin")) {
-    return null;
-  }
 
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,16 +36,16 @@ export function Footer() {
             <BrandLogo variant="full" showTagline={true} theme="dark" />
             
             <p className="text-xs sm:text-sm text-stone-400 font-light leading-relaxed max-w-sm">
-              Fine jewelry for the skin, not the vault. Handcrafted in 304 & 306 surgical-grade stainless steel with mirror PVD gold finish. 100% waterproof and anti-tarnish.
+              Fine jewelry for the skin, not the vault. Handcrafted in premium stainless steel with radiant mirror gold finish. 100% waterproof and skin-friendly.
             </p>
 
             {/* Social & WhatsApp Buttons */}
             <div className="flex items-center gap-3 pt-1">
               <a
-                href={storeConfig.brand.socials.instagram || "https://www.instagram.com/gleamnest.in?igsh=c3I4M2h1YmprdXI5"}
+                href={storeConfig.brand.socials.instagram || "https://www.instagram.com/alnaya.in?psln=cDNzY3liNjltb203"}
                 target="_blank"
                 rel="noreferrer"
-                className="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-stone-400 hover:text-[#C5A059] hover:border-[#C5A059]/60 hover:bg-[#C5A059]/10 transition-all"
+                className="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-stone-400 hover:text-purple-400 hover:border-purple-400/60 hover:bg-purple-500/10 transition-all"
                 aria-label="Instagram"
               >
                 <Instagram className="w-4 h-4" />
@@ -81,38 +75,38 @@ export function Footer() {
 
           {/* Column 2: Collections (2 cols) */}
           <div className="lg:col-span-2 space-y-3">
-            <h5 className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#C5A059]">
+            <h5 className="text-[11px] font-bold uppercase tracking-[0.2em] text-purple-300">
               Collections
             </h5>
             <ul className="space-y-2 text-xs sm:text-[13px] text-stone-400">
               <li>
-                <Link href="/products?category=new-arrivals" className="hover:text-white transition-colors text-white font-medium flex items-center gap-1">
-                  <span>✦ New Arrivals</span>
+                <Link href="/products?category=minimal-chains" className="hover:text-white transition-colors">
+                  Minimal Chains
                 </Link>
               </li>
               <li>
-                <Link href="/products?category=necklaces-and-chains" className="hover:text-white transition-colors">
-                  Necklaces & Chains
+                <Link href="/products?category=jhumkas" className="hover:text-white transition-colors">
+                  Ethnic Jhumkas
                 </Link>
               </li>
               <li>
-                <Link href="/products?category=rings" className="hover:text-white transition-colors">
-                  Rings & Bands
+                <Link href="/products?category=traditional-sets" className="hover:text-white transition-colors">
+                  Traditional Sets
                 </Link>
               </li>
               <li>
-                <Link href="/products?category=earrings" className="hover:text-white transition-colors">
-                  Earrings & Hoops
+                <Link href="/products?category=bangles" className="hover:text-white transition-colors">
+                  Bangles & Kada
                 </Link>
               </li>
               <li>
-                <Link href="/products?category=bracelets" className="hover:text-white transition-colors">
-                  Bracelets & Bangles
+                <Link href="/products?category=offer-products" className="text-purple-300 hover:text-white transition-colors flex items-center gap-1 font-semibold">
+                  <span>✦ Offer Products</span>
                 </Link>
               </li>
               <li>
-                <Link href="/products" className="text-[#C5A059] hover:underline transition-colors flex items-center gap-1 pt-1 font-medium">
-                  <span>All Collections</span>
+                <Link href="/products" className="text-purple-300 hover:underline transition-colors flex items-center gap-1 pt-1 font-medium">
+                  <span>All 12 Categories</span>
                   <span>→</span>
                 </Link>
               </li>
@@ -121,7 +115,7 @@ export function Footer() {
 
           {/* Column 3: Client Care & Policies (3 cols) */}
           <div className="lg:col-span-3 space-y-3">
-            <h5 className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#C5A059]">
+            <h5 className="text-[11px] font-bold uppercase tracking-[0.2em] text-purple-300">
               Client Concierge
             </h5>
             <ul className="space-y-2 text-xs sm:text-[13px] text-stone-400">
@@ -138,7 +132,7 @@ export function Footer() {
                   onClick={() => setPolicyModalTab("care-guide")}
                   className="hover:text-white transition-colors text-left"
                 >
-                  Jewelry Care (304 & 306 Steel)
+                  Jewelry Care Guide
                 </button>
               </li>
               <li>
@@ -175,7 +169,7 @@ export function Footer() {
 
           {/* Column 4: Newsletter / Stay Informed (3 cols) */}
           <div className="lg:col-span-3 space-y-3">
-            <h5 className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#C5A059]">
+            <h5 className="text-[11px] font-bold uppercase tracking-[0.2em] text-purple-300">
               Stay in Touch
             </h5>
             <p className="text-xs text-stone-400 leading-relaxed font-light">
@@ -183,9 +177,9 @@ export function Footer() {
             </p>
 
             {subscribed ? (
-              <div className="p-3 rounded-xl bg-[#C5A059]/10 border border-[#C5A059]/30 text-xs text-[#FAF7F2] font-medium flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-[#C5A059] flex-shrink-0" />
-                <span>Thank you! Your 5% first purchase voucher (GLEAM5) has been sent.</span>
+              <div className="p-3 rounded-xl bg-purple-900/30 border border-purple-400/30 text-xs text-[#FAF7F2] font-medium flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-purple-300 flex-shrink-0" />
+                <span>Thank you! Your 5% first purchase voucher (ALNAYA5) has been sent.</span>
               </div>
             ) : (
               <form onSubmit={handleSubscribe} className="relative flex items-center pt-1">
@@ -195,11 +189,11 @@ export function Footer() {
                   placeholder="Enter your email address"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-3.5 pr-20 py-2.5 text-xs rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-stone-500 focus:outline-none focus:border-[#C5A059] focus:ring-1 focus:ring-[#C5A059] transition-all font-light"
+                  className="w-full pl-3.5 pr-20 py-2.5 text-xs rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-stone-500 focus:outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-400 transition-all font-light"
                 />
                 <button
                   type="submit"
-                  className="absolute right-1 px-3.5 py-1.5 text-xs font-bold rounded-lg bg-[#C5A059] text-[#1C1917] hover:bg-[#D5B069] transition-all flex items-center gap-1 shadow-sm active:scale-95"
+                  className="absolute right-1 px-3.5 py-1.5 text-xs font-bold rounded-lg bg-[#7E22CE] text-white hover:bg-[#6B21A8] transition-all flex items-center gap-1 shadow-sm active:scale-95"
                 >
                   <span>Join</span>
                   <ArrowRight className="w-3 h-3" />
@@ -217,9 +211,9 @@ export function Footer() {
         <div className="mt-12 pt-8 border-t border-stone-800/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-stone-400">
           <p>© {new Date().getFullYear()} {storeConfig.meta.name}. Fine Everyday Jewelry. All rights reserved.</p>
           <div className="flex items-center gap-3 text-[11px] text-stone-400">
-            <span>304 & 306 Grade Steel</span>
+            <span>Waterproof & Sweat-Safe</span>
             <span className="text-stone-700">•</span>
-            <span>100% Anti-Tarnish</span>
+            <span>Hypoallergenic Comfort</span>
             <span className="text-stone-700">•</span>
             <span>Free Shipping Over ₹799</span>
           </div>
