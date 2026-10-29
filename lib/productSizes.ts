@@ -39,11 +39,15 @@ export const RING_ADJUSTABLE_OPTION = "Adjustable / Free Size";
 export const RING_SIZES = RING_SPECIFIC_SIZES;
 
 export const BANGLE_SPECIFIC_SIZES = [
-  "Size 2-2 (2.125\" - Petite)",
-  "Size 2-4 (2.25\" - Small)",
+  "Size 2-2 (2.125\" - Small)",
   "Size 2-6 (2.375\" - Standard)",
-  "Size 2-8 (2.50\" - Medium-Large)",
-  "Size 2-10 (2.625\" - Extra Large)",
+  "Size 2-8 (2.50\" - Large)",
+];
+
+export const BANGLE_SIZE_GUIDE_DATA = [
+  { size: "Size 2-2", inches: "2.125 in (2 1/8\")", cm: "5.40 cm", fit: "Petite / Small wrist fit" },
+  { size: "Size 2-6", inches: "2.375 in (2 3/8\")", cm: "6.03 cm", fit: "Standard Medium wrist fit (Most Popular)", popular: true },
+  { size: "Size 2-8", inches: "2.500 in (2 1/2\")", cm: "6.35 cm", fit: "Large wrist fit" },
 ];
 
 export const BANGLE_ADJUSTABLE_OPTION = "Adjustable / Openable Cuff";

@@ -204,7 +204,14 @@ function ProductCatalogContent() {
               : categoryList.find((c) => c.slug === selectedCategory)?.name || "Jewelry Collection"}
           </h1>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Showing {displayedProducts.length} of {filteredProducts.length} pieces • 4 items per row
+            {!hasLoaded && products.length === 0 ? (
+              <span className="inline-flex items-center gap-1.5 text-primary font-medium">
+                <Sparkles className="w-3 h-3 animate-spin" />
+                <span>Loading catalog pieces...</span>
+              </span>
+            ) : (
+              `Showing ${displayedProducts.length} of ${filteredProducts.length} pieces • 4 items per row`
+            )}
           </p>
         </div>
 
@@ -240,7 +247,9 @@ function ProductCatalogContent() {
           }`}
         >
           <span>All Pieces</span>
-          <span className="text-[10px] opacity-80">({products.length})</span>
+          <span className="text-[10px] opacity-80">
+            {!hasLoaded && products.length === 0 ? "..." : `(${products.length})`}
+          </span>
         </button>
 
         {categoryList.map((cat) => {
@@ -257,7 +266,9 @@ function ProductCatalogContent() {
               }`}
             >
               <span>{cat.name}</span>
-              <span className="text-[10px] opacity-80">({count})</span>
+              <span className="text-[10px] opacity-80">
+                {!hasLoaded && products.length === 0 ? "..." : `(${count})`}
+              </span>
             </button>
           );
         })}

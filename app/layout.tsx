@@ -7,6 +7,7 @@ import { Footer } from "@/components/storefront/Footer";
 import { CartDrawer } from "@/components/storefront/CartDrawer";
 import { QuickViewModal } from "@/components/storefront/QuickViewModal";
 import { WhatsAppFloat } from "@/components/storefront/WhatsAppFloat";
+import { SmoothScrollProvider } from "@/components/common/SmoothScrollProvider";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://gleamnest.in"),
@@ -64,17 +65,19 @@ export default function RootLayout({
   } as React.CSSProperties;
 
   return (
-    <html lang="en" className="scroll-smooth" style={dynamicThemeStyles}>
+    <html lang="en" style={dynamicThemeStyles}>
       <body className="min-h-screen flex flex-col font-sans bg-background text-foreground">
-        <AnnouncementBar />
-        <Header />
-        <main className="flex-1">{children}</main>
-        <Footer />
+        <SmoothScrollProvider>
+          <AnnouncementBar />
+          <Header />
+          <main className="flex-1">{children}</main>
+          <Footer />
 
-        {/* Global Slide-overs & Modals */}
-        <CartDrawer />
-        <QuickViewModal />
-        <WhatsAppFloat />
+          {/* Global Slide-overs & Modals */}
+          <CartDrawer />
+          <QuickViewModal />
+          <WhatsAppFloat />
+        </SmoothScrollProvider>
       </body>
     </html>
   );

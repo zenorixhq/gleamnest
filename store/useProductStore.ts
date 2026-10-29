@@ -18,7 +18,7 @@ if (typeof window !== "undefined") {
 function getInitialProducts(): { products: Product[]; hasLoaded: boolean } {
   if (typeof window !== "undefined") {
     try {
-      const cached = sessionStorage.getItem(STORAGE_KEY);
+      const cached = localStorage.getItem(STORAGE_KEY) || sessionStorage.getItem(STORAGE_KEY);
       if (cached) {
         const parsed = JSON.parse(cached);
         if (Array.isArray(parsed) && parsed.length > 0) {
@@ -35,6 +35,7 @@ function getInitialProducts(): { products: Product[]; hasLoaded: boolean } {
 function persistProducts(prods: Product[]) {
   if (typeof window !== "undefined") {
     try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(prods));
       sessionStorage.setItem(STORAGE_KEY, JSON.stringify(prods));
     } catch (e) {}
   }

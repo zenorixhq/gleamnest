@@ -23,11 +23,47 @@
   }
 }
 
-@layer base {
-  html {
-    scroll-behavior: smooth;
-  }
+/* ============================================================ */
+/* LENIS HIGH-FPS SMOOTH SCROLL & GPU ACCELERATION              */
+/* ============================================================ */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
 
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+
+/* High FPS Compositor Layers: Prevent scroll repaints */
+header,
+.sticky,
+.fixed,
+.whatsapp-float-btn {
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Prevent image layout thrashing during scroll */
+img {
+  content-visibility: auto;
+}
+
+@layer base {
   :root {
     /* GleamNest Warm Champagne Ivory & Gold Luxury Theme */
     --primary: 38 58% 46%;          /* Elegant Champagne Gold #BA9241 */

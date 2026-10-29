@@ -3129,7 +3129,32 @@ export default function AdminDashboardPage() {
                   <label className="text-xs font-semibold text-foreground">Category *</label>
                   <select
                     value={formState.category}
-                    onChange={(e) => setFormState({ ...formState, category: e.target.value })}
+                    onChange={(e) => {
+                      const newCat = e.target.value;
+                      const isRing = newCat === "rings";
+                      const isBangle = newCat === "bangles-kada";
+                      let newSizes = formState.selectedSizes;
+                      const newSizeStock = { ...formState.sizeStock };
+
+                      if (isRing && !formState.selectedSizes.some((s) => RING_SPECIFIC_SIZES.includes(s))) {
+                        newSizes = [...RING_SPECIFIC_SIZES];
+                        RING_SPECIFIC_SIZES.forEach((s) => {
+                          if (newSizeStock[s] === undefined) newSizeStock[s] = 1;
+                        });
+                      } else if (isBangle && !formState.selectedSizes.some((s) => BANGLE_SPECIFIC_SIZES.includes(s))) {
+                        newSizes = [...BANGLE_SPECIFIC_SIZES];
+                        BANGLE_SPECIFIC_SIZES.forEach((s) => {
+                          if (newSizeStock[s] === undefined) newSizeStock[s] = 1;
+                        });
+                      }
+
+                      setFormState({
+                        ...formState,
+                        category: newCat,
+                        selectedSizes: newSizes,
+                        sizeStock: newSizeStock,
+                      });
+                    }}
                     className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none"
                   >
                     <option value="necklaces-and-chains">Necklaces and Chains</option>

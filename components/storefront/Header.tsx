@@ -49,7 +49,7 @@ export function Header() {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
     };
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -264,7 +264,7 @@ export function Header() {
               </button>
             </div>
 
-            <nav className="flex-1 py-4 space-y-1.5 overflow-y-auto no-scrollbar">
+            <nav data-lenis-prevent className="flex-1 py-4 space-y-1.5 overflow-y-auto no-scrollbar">
               {allNavLinks.map((link) => (
                 <Link
                   key={link.href}
@@ -377,7 +377,7 @@ export function Header() {
 
             {/* Quick Live Results */}
             {searchQuery.trim() && (
-              <div className="p-4 max-h-96 overflow-y-auto">
+              <div data-lenis-prevent className="p-4 max-h-96 overflow-y-auto">
                 {searchResults.length > 0 ? (
                   <div className="space-y-3">
                     <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">

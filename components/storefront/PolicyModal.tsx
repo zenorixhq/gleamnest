@@ -151,7 +151,7 @@ export function PolicyModal({
         </div>
 
         {/* Modal Scrollable Content Body */}
-        <div className="p-5 sm:p-8 overflow-y-auto max-h-[calc(92vh-140px)] space-y-6 text-foreground">
+        <div data-lenis-prevent className="p-5 sm:p-8 overflow-y-auto max-h-[calc(92vh-140px)] space-y-6 text-foreground">
           {/* ======================================================== */}
           {/* TAB 1: SIZE GUIDE                                        */}
           {/* ======================================================== */}
@@ -200,22 +200,6 @@ export function PolicyModal({
               {/* ================= RING SIZE GUIDE ================= */}
               {sizeSubTab === "ring" && (
                 <div className="space-y-6 animate-in fade-in-50">
-                  {/* Graphic Banner & Diagram */}
-                  <div className="relative group rounded-xl overflow-hidden border border-border bg-muted/20">
-                    <img
-                      src="/images/ring-size-guide.jpg"
-                      alt="GleamNest Official Ring Measurement Guide"
-                      className="w-full h-auto max-h-[360px] object-contain mx-auto"
-                    />
-                    <button
-                      onClick={() => setZoomedImage("/images/ring-size-guide.jpg")}
-                      className="absolute bottom-3 right-3 px-3 py-1.5 rounded-lg bg-background/90 backdrop-blur border border-border shadow text-xs font-semibold flex items-center gap-1.5 text-foreground hover:bg-background"
-                    >
-                      <Maximize2 className="w-3.5 h-3.5" />
-                      <span>Click to Enlarge Guide</span>
-                    </button>
-                  </div>
-
                   {/* 1. SIZE CHART */}
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
@@ -377,14 +361,8 @@ export function PolicyModal({
                           <tr className="hover:bg-muted/20">
                             <td className="p-3 font-bold text-primary">Size 2-2</td>
                             <td className="p-3">2.125 in (2 1/8&quot;)</td>
-                            <td className="p-3 font-mono">5.4 cm</td>
-                            <td className="p-3 text-muted-foreground">Petite / Extra Small wrist</td>
-                          </tr>
-                          <tr className="hover:bg-muted/20">
-                            <td className="p-3 font-bold text-primary">Size 2-4</td>
-                            <td className="p-3">2.250 in (2 1/4&quot;)</td>
-                            <td className="p-3 font-mono">5.72 cm</td>
-                            <td className="p-3 text-muted-foreground">Small wrist fit</td>
+                            <td className="p-3 font-mono">5.40 cm</td>
+                            <td className="p-3 text-muted-foreground">Petite / Small wrist fit</td>
                           </tr>
                           <tr className="bg-primary/5 hover:bg-primary/10">
                             <td className="p-3 font-bold text-primary flex items-center gap-1.5">
@@ -402,12 +380,6 @@ export function PolicyModal({
                             <td className="p-3">2.500 in (2 1/2&quot;)</td>
                             <td className="p-3 font-mono">6.35 cm</td>
                             <td className="p-3 text-muted-foreground">Large wrist fit</td>
-                          </tr>
-                          <tr className="hover:bg-muted/20">
-                            <td className="p-3 font-bold text-primary">Size 2-10</td>
-                            <td className="p-3">2.625 in (2 5/8&quot;)</td>
-                            <td className="p-3 font-mono">6.67 cm</td>
-                            <td className="p-3 text-muted-foreground">Extra Large wrist fit</td>
                           </tr>
                         </tbody>
                       </table>
