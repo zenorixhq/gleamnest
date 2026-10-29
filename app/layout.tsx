@@ -9,13 +9,41 @@ import { QuickViewModal } from "@/components/storefront/QuickViewModal";
 import { WhatsAppFloat } from "@/components/storefront/WhatsAppFloat";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://gleamnest.in"),
   title: {
     default: `${storeConfig.meta.name} | ${storeConfig.meta.tagline}`,
     template: `%s | ${storeConfig.meta.name}`,
   },
   description: storeConfig.meta.description,
   icons: {
-    icon: storeConfig.meta.favicon,
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon.png", type: "image/png" },
+    ],
+    shortcut: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_IN",
+    url: "https://gleamnest.in",
+    siteName: "GleamNest",
+    title: `${storeConfig.meta.name} | ${storeConfig.meta.tagline}`,
+    description: storeConfig.meta.description,
+    images: [
+      {
+        url: "/images/brand-logo-mark-raw.png",
+        width: 1024,
+        height: 1024,
+        alt: "GleamNest Luxury Jewelry",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${storeConfig.meta.name} | ${storeConfig.meta.tagline}`,
+    description: storeConfig.meta.description,
+    images: ["/images/brand-logo-mark-raw.png"],
   },
 };
 
