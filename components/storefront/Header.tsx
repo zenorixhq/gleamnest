@@ -44,6 +44,20 @@ export function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  useEffect(() => {
+    if (mobileMenuOpen || searchOpen) {
+      document.body.style.overflow = "hidden";
+      if ((window as any).__lenis) (window as any).__lenis.stop();
+    } else {
+      document.body.style.overflow = "";
+      if ((window as any).__lenis) (window as any).__lenis.start();
+    }
+    return () => {
+      document.body.style.overflow = "";
+      if ((window as any).__lenis) (window as any).__lenis.start();
+    };
+  }, [mobileMenuOpen, searchOpen]);
+
   const searchResults = searchQuery.trim()
     ? products
         .filter(
@@ -262,12 +276,12 @@ export function Header() {
 
       {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden">
+        <div data-lenis-prevent className="fixed inset-0 z-50 lg:hidden overscroll-contain">
           <div
             className="fixed inset-0 bg-black/60 backdrop-blur-sm"
             onClick={() => setMobileMenuOpen(false)}
           />
-          <div className="fixed inset-y-0 left-0 w-full max-w-xs bg-background shadow-2xl flex flex-col p-6 z-10 animate-in slide-in-from-left duration-300">
+          <div data-lenis-prevent className="fixed inset-y-0 left-0 w-full max-w-xs bg-background shadow-2xl flex flex-col p-6 z-10 animate-in slide-in-from-left duration-300 overscroll-contain">
             <div className="flex items-center justify-between pb-6 border-b border-border">
               <BrandLogo variant="full" showTagline={false} />
               <button
@@ -278,7 +292,7 @@ export function Header() {
               </button>
             </div>
 
-            <nav className="flex-1 py-4 space-y-1 overflow-y-auto no-scrollbar">
+            <nav data-lenis-prevent className="flex-1 py-4 space-y-1 overflow-y-auto no-scrollbar overscroll-contain">
               <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider px-2 pb-1">
                 Categories
               </p>
@@ -329,8 +343,8 @@ export function Header() {
 
       {/* Global Quick Search Overlay */}
       {searchOpen && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-start justify-center pt-20 px-4">
-          <div className="bg-[#FFFDF9] border border-[#EADBBE] rounded-2xl w-full max-w-xl p-4 shadow-2xl space-y-4 animate-in fade-in-0 zoom-in-95">
+        <div data-lenis-prevent className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-start justify-center pt-20 px-4 overscroll-contain">
+          <div data-lenis-prevent className="bg-[#FFFDF9] border border-[#EADBBE] rounded-2xl w-full max-w-xl p-4 shadow-2xl space-y-4 animate-in fade-in-0 zoom-in-95 overscroll-contain">
             <div className="flex items-center gap-3 border-b border-[#EADBBE] pb-3">
               <Search className="w-5 h-5 text-muted-foreground" />
               <input

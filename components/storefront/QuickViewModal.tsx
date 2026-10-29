@@ -25,6 +25,20 @@ export function QuickViewModal() {
     }
   }, [product?.id]);
 
+  useEffect(() => {
+    if (product) {
+      document.body.style.overflow = "hidden";
+      if ((window as any).__lenis) (window as any).__lenis.stop();
+    } else {
+      document.body.style.overflow = "";
+      if ((window as any).__lenis) (window as any).__lenis.start();
+    }
+    return () => {
+      document.body.style.overflow = "";
+      if ((window as any).__lenis) (window as any).__lenis.start();
+    };
+  }, [product]);
+
   if (!product) return null;
 
   const effectiveSize = selectedSize || sizeInfo?.defaultSize || "";
@@ -104,13 +118,13 @@ export function QuickViewModal() {
   };
 
   return (
-    <div data-lenis-prevent className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+    <div data-lenis-prevent className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto overscroll-contain">
       <div
         className="fixed inset-0 bg-black/60 backdrop-blur-sm"
         onClick={closeQuickView}
       />
 
-      <div data-lenis-prevent className="relative w-full max-w-3xl bg-card border border-border rounded-2xl shadow-2xl overflow-hidden z-10 animate-in fade-in-0 zoom-in-95 my-auto max-h-[90vh] overflow-y-auto">
+      <div data-lenis-prevent className="relative w-full max-w-3xl bg-card border border-border rounded-2xl shadow-2xl overflow-hidden z-10 animate-in fade-in-0 zoom-in-95 my-auto max-h-[90vh] overflow-y-auto overscroll-contain">
         <button
           onClick={closeQuickView}
           className="absolute top-3 right-3 p-2 rounded-full bg-background/80 hover:bg-background border border-border text-foreground transition-colors z-20"

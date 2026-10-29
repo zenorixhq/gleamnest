@@ -201,7 +201,8 @@ export function ClientFeedbackScreenshots({ className = "" }: ClientFeedbackScre
       {/* Lightbox Modal for Fullscreen Screenshot Preview */}
       {zoomedScreenshot && (
         <div
-          className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in-0 duration-200"
+          data-lenis-prevent
+          className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in-0 duration-200 overscroll-contain"
           onClick={() => setZoomedScreenshot(null)}
         >
           <div

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useCartStore } from "@/store/useCartStore";
 import { storeConfig } from "@/config/store.config";
@@ -38,6 +38,20 @@ export function CartDrawer() {
     null
   );
 
+  useEffect(() => {
+    if (isCartOpen) {
+      document.body.style.overflow = "hidden";
+      if ((window as any).__lenis) (window as any).__lenis.stop();
+    } else {
+      document.body.style.overflow = "";
+      if ((window as any).__lenis) (window as any).__lenis.start();
+    }
+    return () => {
+      document.body.style.overflow = "";
+      if ((window as any).__lenis) (window as any).__lenis.start();
+    };
+  }, [isCartOpen]);
+
   if (!isCartOpen) return null;
 
   const isQatar = selectedCurrency === "QAR";
@@ -58,7 +72,7 @@ export function CartDrawer() {
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden">
+    <div data-lenis-prevent className="fixed inset-0 z-50 overflow-hidden overscroll-contain">
       {/* Backdrop */}
       <div
         className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
@@ -66,7 +80,7 @@ export function CartDrawer() {
       />
 
       <div className="fixed inset-y-0 right-0 max-w-full flex pl-0 sm:pl-10">
-        <div className="w-full sm:w-[420px] bg-card shadow-2xl flex flex-col border-l border-border animate-in slide-in-from-right duration-300">
+        <div data-lenis-prevent className="w-full sm:w-[420px] bg-card shadow-2xl flex flex-col border-l border-border animate-in slide-in-from-right duration-300 overscroll-contain">
           {/* Header */}
           <div className="px-4 sm:px-6 py-4 sm:py-5 border-b border-border flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -116,7 +130,7 @@ export function CartDrawer() {
           </div>
 
           {/* Items List */}
-          <div data-lenis-prevent className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 space-y-4 divide-y divide-border/60">
+          <div data-lenis-prevent className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 space-y-4 divide-y divide-border/60 overscroll-contain">
             {items.length === 0 ? (
               <div className="py-20 text-center flex flex-col items-center justify-center space-y-4">
                 <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center text-muted-foreground">

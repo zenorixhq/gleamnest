@@ -597,7 +597,8 @@ export function CustomerReviewsWithVideos() {
       {/* Screenshot Lightbox Modal (Clickable with Full Details revealed on click, Anonymous) */}
       {selectedScreenshot && (
         <div
-          className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200"
+          data-lenis-prevent
+          className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200 overscroll-contain"
           onClick={() => setSelectedScreenshot(null)}
         >
           <div
@@ -671,7 +672,8 @@ export function CustomerReviewsWithVideos() {
       {/* Video Modal Player (Plays with sound when clicked) */}
       {selectedVideo && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200"
+          data-lenis-prevent
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200 overscroll-contain"
           onClick={() => setSelectedVideo(null)}
         >
           <div

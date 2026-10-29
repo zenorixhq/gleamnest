@@ -184,6 +184,20 @@ export function InstagramReelSection() {
   const [canScrollRight, setCanScrollRight] = useState(true);
 
   useEffect(() => {
+    if (activeVideo) {
+      document.body.style.overflow = "hidden";
+      if ((window as any).__lenis) (window as any).__lenis.stop();
+    } else {
+      document.body.style.overflow = "";
+      if ((window as any).__lenis) (window as any).__lenis.start();
+    }
+    return () => {
+      document.body.style.overflow = "";
+      if ((window as any).__lenis) (window as any).__lenis.start();
+    };
+  }, [activeVideo]);
+
+  useEffect(() => {
     fetch(`/api/reviews?t=${Date.now()}`, { cache: "no-store" })
       .then((res) => res.json())
       .then((data) => {
@@ -314,7 +328,8 @@ export function InstagramReelSection() {
       {/* Video Modal Player (Expanded View with Audio) */}
       {activeVideo && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200"
+          data-lenis-prevent
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200 overscroll-contain"
           onClick={() => setActiveVideo(null)}
         >
           <div

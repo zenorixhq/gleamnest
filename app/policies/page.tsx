@@ -41,6 +41,20 @@ function PoliciesContent() {
     }
   }, [requestedTab]);
 
+  useEffect(() => {
+    if (zoomedImage) {
+      document.body.style.overflow = "hidden";
+      if ((window as any).__lenis) (window as any).__lenis.stop();
+    } else {
+      document.body.style.overflow = "";
+      if ((window as any).__lenis) (window as any).__lenis.start();
+    }
+    return () => {
+      document.body.style.overflow = "";
+      if ((window as any).__lenis) (window as any).__lenis.start();
+    };
+  }, [zoomedImage]);
+
   const tabs: { id: PolicyTab; label: string; icon: typeof Ruler; badge?: string }[] = [
     { id: "size-guide", label: "Size Guide", icon: Ruler, badge: "Bangles & Rings" },
     { id: "return-refund", label: "Return & Refund Policy", icon: RotateCcw, badge: "Important" },
@@ -795,7 +809,8 @@ function PoliciesContent() {
       {/* Fullscreen Image Zoom Lightbox */}
       {zoomedImage && (
         <div
-          className="fixed inset-0 z-[9999] bg-black/90 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto animate-in fade-in-0"
+          data-lenis-prevent
+          className="fixed inset-0 z-[9999] bg-black/90 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto animate-in fade-in-0 overscroll-contain"
           onClick={() => setZoomedImage(null)}
         >
           <div className="relative max-w-4xl my-auto max-h-[90vh] overflow-hidden flex items-center justify-center">

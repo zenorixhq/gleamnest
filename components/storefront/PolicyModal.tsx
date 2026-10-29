@@ -83,7 +83,7 @@ export function PolicyModal({
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+    <div data-lenis-prevent className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto overscroll-contain">
       {/* Backdrop */}
       <div
         className="fixed inset-0 bg-black/70 backdrop-blur-sm transition-opacity"
@@ -151,7 +151,7 @@ export function PolicyModal({
         </div>
 
         {/* Modal Scrollable Content Body */}
-        <div className="p-5 sm:p-8 overflow-y-auto max-h-[calc(92vh-140px)] space-y-6 text-foreground">
+        <div data-lenis-prevent className="p-5 sm:p-8 overflow-y-auto max-h-[calc(92vh-140px)] space-y-6 text-foreground overscroll-contain">
           {/* ======================================================== */}
           {/* TAB 1: SIZE GUIDE                                        */}
           {/* ======================================================== */}
