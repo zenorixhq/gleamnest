@@ -1,32 +1,41 @@
 import { create } from "zustand";
 import { Product } from "@/types/store";
-import { products as fallbackProducts } from "@/data/mockData";
 
-const STORAGE_KEY = "gleamnest_products_catalog_v3";
+const STORAGE_KEY = "gleamnest_catalog_live_v4";
 
-function getInitialProducts(): Product[] {
+// Auto-purge obsolete and legacy catalog cache keys from previous versions
+if (typeof window !== "undefined") {
+  try {
+    localStorage.removeItem("gleamnest_products_catalog");
+    localStorage.removeItem("gleamnest_products_catalog_v2");
+    localStorage.removeItem("gleamnest_products_catalog_v3");
+    sessionStorage.removeItem("gleamnest_products_catalog");
+    sessionStorage.removeItem("gleamnest_products_catalog_v2");
+    sessionStorage.removeItem("gleamnest_products_catalog_v3");
+  } catch (e) {}
+}
+
+function getInitialProducts(): { products: Product[]; hasLoaded: boolean } {
   if (typeof window !== "undefined") {
     try {
-      const cached = localStorage.getItem(STORAGE_KEY) || sessionStorage.getItem(STORAGE_KEY);
+      const cached = sessionStorage.getItem(STORAGE_KEY);
       if (cached) {
         const parsed = JSON.parse(cached);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed;
+          return { products: parsed, hasLoaded: true };
         }
       }
     } catch (e) {
       // Ignore if storage error
     }
   }
-  return fallbackProducts;
+  return { products: [], hasLoaded: false };
 }
 
 function persistProducts(prods: Product[]) {
   if (typeof window !== "undefined") {
     try {
-      const dataStr = JSON.stringify(prods);
-      localStorage.setItem(STORAGE_KEY, dataStr);
-      sessionStorage.setItem(STORAGE_KEY, dataStr);
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(prods));
     } catch (e) {}
   }
 }
@@ -45,19 +54,24 @@ interface ProductStore {
   getProductBySlug: (slug: string) => Product | undefined;
 }
 
+const initial = getInitialProducts();
+
 export const useProductStore = create<ProductStore>((set, get) => ({
-  products: getInitialProducts(),
-  isLoading: false,
-  hasLoaded: true,
+  products: initial.products,
+  isLoading: !initial.hasLoaded,
+  hasLoaded: initial.hasLoaded,
   error: null,
 
   fetchProducts: async () => {
     try {
-      const res = await fetch("/api/products");
+      if (get().products.length === 0) {
+        set({ isLoading: true });
+      }
+      const res = await fetch(`/api/products?t=${Date.now()}`, { cache: "no-store" });
       if (!res.ok) throw new Error("Failed to fetch products");
       const data = await res.json();
-      if (Array.isArray(data) && data.length > 0) {
-        set({ products: data, hasLoaded: true, isLoading: false });
+      if (Array.isArray(data)) {
+        set({ products: data, hasLoaded: true, isLoading: false, error: null });
         persistProducts(data);
       } else {
         set({ hasLoaded: true, isLoading: false });

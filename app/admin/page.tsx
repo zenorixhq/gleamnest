@@ -66,6 +66,8 @@ export default function AdminDashboardPage() {
   });
   const products = useProductStore((s) => s.products);
   const fetchProducts = useProductStore((s) => s.fetchProducts);
+  const hasLoaded = useProductStore((s) => s.hasLoaded);
+  const isLoading = useProductStore((s) => s.isLoading);
   const addProduct = useProductStore((s) => s.addProduct);
   const updateProduct = useProductStore((s) => s.updateProduct);
   const deleteProduct = useProductStore((s) => s.deleteProduct);
@@ -1803,7 +1805,7 @@ export default function AdminDashboardPage() {
             }`}
           >
             <Package className="w-4 h-4" />
-            <span>Product Catalog & Editing ({products.length})</span>
+            <span>Product Catalog & Editing {hasLoaded ? `(${products.length})` : "(...)"}</span>
           </button>
 
           <button
@@ -1884,8 +1886,17 @@ export default function AdminDashboardPage() {
           <div className="bg-card border border-border rounded-2xl p-6 shadow-sm space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <h3 className="text-base font-bold text-foreground">
-                  Product Catalog ({filteredInventory.length})
+                <h3 className="text-base font-bold text-foreground flex items-center gap-2">
+                  <span>Product Catalog</span>
+                  {hasLoaded ? (
+                    <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-primary/10 text-primary">
+                      {filteredInventory.length} Pieces
+                    </span>
+                  ) : (
+                    <span className="text-xs font-normal text-muted-foreground animate-pulse">
+                      Syncing catalog...
+                    </span>
+                  )}
                 </h3>
                 <p className="text-xs text-muted-foreground mt-0.5">
                   Add, edit prices, update stock levels, or remove pieces from your live catalog.
@@ -1905,7 +1916,26 @@ export default function AdminDashboardPage() {
               </div>
             </div>
 
-            <div className="overflow-x-auto">
+            {!hasLoaded && products.length === 0 ? (
+              <div className="py-20 text-center space-y-3 bg-muted/10 rounded-2xl border border-dashed border-border p-8">
+                <div className="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin mx-auto" />
+                <p className="text-xs font-bold text-foreground">Syncing Live Product Catalog...</p>
+                <p className="text-[11px] text-muted-foreground max-w-sm mx-auto">
+                  Connecting to database and loading real-time catalog items.
+                </p>
+              </div>
+            ) : filteredInventory.length === 0 ? (
+              <div className="py-16 text-center space-y-2 bg-muted/10 rounded-2xl border border-dashed border-border p-8">
+                <Package className="w-8 h-8 text-muted-foreground mx-auto" />
+                <p className="text-xs font-bold text-foreground">No products found</p>
+                <p className="text-[11px] text-muted-foreground">
+                  {searchQuery
+                    ? `No pieces match "${searchQuery}". Try a different search query.`
+                    : "Your live catalog is currently empty. Click 'Add New Product' to get started."}
+                </p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
                 <thead>
                   <tr className="border-b border-border text-muted-foreground">
@@ -2003,6 +2033,7 @@ export default function AdminDashboardPage() {
                 </tbody>
               </table>
             </div>
+            )}
           </div>
         )}
 
