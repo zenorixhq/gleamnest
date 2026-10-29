@@ -8,12 +8,29 @@ export interface ProductSizeInfo {
 }
 
 export const RING_SPECIFIC_SIZES = [
-  "Size 10 (15.9 mm)",
-  "Size 12 (16.5 mm)",
-  "Size 14 (17.2 mm - Standard)",
-  "Size 16 (17.9 mm)",
-  "Size 18 (18.6 mm)",
-  "Size 20 (19.2 mm)",
+  "Size 5 (5.0 cm)",
+  "Size 6 (5.5 cm)",
+  "Size 7 (6.0 cm)",
+  "Size 8 (6.5 cm)",
+  "Size 9 (7.0 cm)",
+  "Size 10 (7.5 cm)",
+  "Size 11 (8.0 cm)",
+  "Size 12 (8.5 cm)",
+  "Size 13 (9.0 cm)",
+  "Size 14 (9.5 cm)",
+];
+
+export const RING_SIZE_GUIDE_DATA = [
+  { size: "Size 5", cm: "5.0 cm", mm: "50 mm", fit: "Petite / Pinky Finger" },
+  { size: "Size 6", cm: "5.5 cm", mm: "55 mm", fit: "Petite Ring Finger" },
+  { size: "Size 7", cm: "6.0 cm", mm: "60 mm", fit: "Standard Ring Finger (Most Popular)", popular: true },
+  { size: "Size 8", cm: "6.5 cm", mm: "65 mm", fit: "Medium / Middle Finger" },
+  { size: "Size 9", cm: "7.0 cm", mm: "70 mm", fit: "Middle / Index Finger" },
+  { size: "Size 10", cm: "7.5 cm", mm: "75 mm", fit: "Index / Thumb Ring" },
+  { size: "Size 11", cm: "8.0 cm", mm: "80 mm", fit: "Thumb / Statement Ring" },
+  { size: "Size 12", cm: "8.5 cm", mm: "85 mm", fit: "Statement / Large Fit" },
+  { size: "Size 13", cm: "9.0 cm", mm: "90 mm", fit: "Extra Large Fit" },
+  { size: "Size 14", cm: "9.5 cm", mm: "95 mm", fit: "Extra Large / Thumb Fit" },
 ];
 
 export const RING_ADJUSTABLE_OPTION = "Adjustable / Free Size";
@@ -94,8 +111,10 @@ export function getProductSizeInfo(product?: {
         const sizeStock = explicitSizeAttr.sizeStock;
 
         // Choose first in-stock size as default, or standard size
-        let defaultSize = sizesToUse.includes("Size 14 (17.2 mm - Standard)")
-          ? "Size 14 (17.2 mm - Standard)"
+        let defaultSize = sizesToUse.includes("Size 7 (6.0 cm)")
+          ? "Size 7 (6.0 cm)"
+          : sizesToUse.includes("Size 6 (5.5 cm)")
+          ? "Size 6 (5.5 cm)"
           : sizesToUse[0];
 
         if (sizeStock) {
@@ -135,7 +154,7 @@ export function getProductSizeInfo(product?: {
     return {
       type: "ring",
       label: "Ring Size",
-      defaultSize: "Size 14 (17.2 mm - Standard)",
+      defaultSize: "Size 7 (6.0 cm)",
       options: RING_SPECIFIC_SIZES,
       isAdjustableOnly: false,
     };

@@ -3237,7 +3237,7 @@ export default function AdminDashboardPage() {
                       </div>
                       <p className="text-[11px] text-muted-foreground mt-1 leading-snug">
                         {formState.category === "rings"
-                          ? "Manage inventory per ring size (Sizes 10–20). Set 0 for out of stock sizes."
+                          ? "Manage inventory per ring size (Sizes 5–14 based on finger circumference in cm). Set 0 for out of stock sizes."
                           : "Manage inventory per bangle size (Sizes 2-2 to 2-10). Set 0 for out of stock sizes."}
                       </p>
                     </button>
