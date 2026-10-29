@@ -133,7 +133,24 @@ function AccountPageContent() {
       {/* Tab 1: Orders */}
       {activeTab === "orders" && (
         <div className="space-y-6">
-          {sampleOrders.map((order) => (
+          {sampleOrders.length === 0 ? (
+            <div className="py-20 text-center rounded-2xl border border-dashed border-border p-8 space-y-4">
+              <div className="w-12 h-12 rounded-full bg-muted mx-auto flex items-center justify-center text-muted-foreground">
+                <Package className="w-6 h-6" />
+              </div>
+              <h3 className="text-base font-bold text-foreground">No orders placed yet</h3>
+              <p className="text-xs text-muted-foreground max-w-sm mx-auto">
+                Explore our everyday waterproof luxury jewelry and place your first order today.
+              </p>
+              <Link
+                href="/products"
+                className="inline-block px-5 py-2.5 rounded-xl bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition-colors"
+              >
+                Browse Catalog
+              </Link>
+            </div>
+          ) : (
+            sampleOrders.map((order) => (
             <div
               key={order.id}
               className="bg-card border border-border rounded-2xl p-6 shadow-sm space-y-6"
@@ -190,7 +207,8 @@ function AccountPageContent() {
                 </div>
               )}
             </div>
-          ))}
+          ))
+          )}
         </div>
       )}
 

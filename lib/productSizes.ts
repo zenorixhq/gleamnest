@@ -3,6 +3,7 @@ export interface ProductSizeInfo {
   label: string;
   defaultSize: string;
   options: string[];
+  sizeStock?: Record<string, number>;
   isAdjustableOnly: boolean;
 }
 
@@ -39,7 +40,7 @@ export function getProductSizeInfo(product?: {
   title?: string;
   description?: string;
   tags?: string[];
-  variantAttributes?: { name: string; options: string[] }[];
+  variantAttributes?: { name: string; options: string[]; sizeStock?: Record<string, number> }[];
 }): ProductSizeInfo | null {
   if (!product) return null;
 
@@ -81,6 +82,7 @@ export function getProductSizeInfo(product?: {
           label: explicitSizeAttr.name || "Ring Size",
           defaultSize: explicitSizeAttr.options[0] || RING_ADJUSTABLE_OPTION,
           options: [explicitSizeAttr.options[0] || RING_ADJUSTABLE_OPTION],
+          sizeStock: explicitSizeAttr.sizeStock,
           isAdjustableOnly: true,
         };
       } else {
@@ -89,13 +91,26 @@ export function getProductSizeInfo(product?: {
           (o) => !/adjustable|free size/i.test(o)
         );
         const sizesToUse = cleanedSizes.length > 0 ? cleanedSizes : RING_SPECIFIC_SIZES;
+        const sizeStock = explicitSizeAttr.sizeStock;
+
+        // Choose first in-stock size as default, or standard size
+        let defaultSize = sizesToUse.includes("Size 14 (17.2 mm - Standard)")
+          ? "Size 14 (17.2 mm - Standard)"
+          : sizesToUse[0];
+
+        if (sizeStock) {
+          const firstInStock = sizesToUse.find((s) => (sizeStock[s] ?? 0) > 0);
+          if (firstInStock) {
+            defaultSize = firstInStock;
+          }
+        }
+
         return {
           type: "ring",
           label: explicitSizeAttr.name || "Ring Size",
-          defaultSize: sizesToUse.includes("Size 14 (17.2 mm - Standard)")
-            ? "Size 14 (17.2 mm - Standard)"
-            : sizesToUse[0],
+          defaultSize,
           options: sizesToUse,
+          sizeStock,
           isAdjustableOnly: false,
         };
       }
@@ -138,6 +153,7 @@ export function getProductSizeInfo(product?: {
           label: explicitSizeAttr.name || "Bangle Size",
           defaultSize: explicitSizeAttr.options[0] || BANGLE_ADJUSTABLE_OPTION,
           options: [explicitSizeAttr.options[0] || BANGLE_ADJUSTABLE_OPTION],
+          sizeStock: explicitSizeAttr.sizeStock,
           isAdjustableOnly: true,
         };
       } else {
@@ -146,13 +162,26 @@ export function getProductSizeInfo(product?: {
           (o) => !/adjustable|openable|cuff|free size/i.test(o)
         );
         const sizesToUse = cleanedSizes.length > 0 ? cleanedSizes : BANGLE_SPECIFIC_SIZES;
+        const sizeStock = explicitSizeAttr.sizeStock;
+
+        // Choose first in-stock size as default, or standard size
+        let defaultSize = sizesToUse.includes("Size 2-6 (2.375\" - Standard)")
+          ? "Size 2-6 (2.375\" - Standard)"
+          : sizesToUse[0];
+
+        if (sizeStock) {
+          const firstInStock = sizesToUse.find((s) => (sizeStock[s] ?? 0) > 0);
+          if (firstInStock) {
+            defaultSize = firstInStock;
+          }
+        }
+
         return {
           type: "bangle",
           label: explicitSizeAttr.name || "Bangle Size",
-          defaultSize: sizesToUse.includes("Size 2-6 (2.375\" - Standard)")
-            ? "Size 2-6 (2.375\" - Standard)"
-            : sizesToUse[0],
+          defaultSize,
           options: sizesToUse,
+          sizeStock,
           isAdjustableOnly: false,
         };
       }
@@ -192,6 +221,7 @@ export function getProductSizeInfo(product?: {
       label: explicitSizeAttr.name,
       defaultSize: explicitSizeAttr.options[0] || "",
       options: explicitSizeAttr.options,
+      sizeStock: explicitSizeAttr.sizeStock,
       isAdjustableOnly: isAdjustable,
     };
   }

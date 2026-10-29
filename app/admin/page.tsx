@@ -7,6 +7,7 @@ import { sampleOrders, categories as defaultCategories } from "@/data/mockData";
 import { useProductStore } from "@/store/useProductStore";
 import { formatPrice } from "@/lib/utils";
 import { Order, OrderStatus, Product, Category } from "@/types/store";
+import { RING_SPECIFIC_SIZES, BANGLE_SPECIFIC_SIZES } from "@/lib/productSizes";
 import {
   TrendingUp,
   ShoppingBag,
@@ -199,6 +200,8 @@ export default function AdminDashboardPage() {
     isBestSeller: boolean;
     isNewArrival: boolean;
     sizingType: "adjustable" | "sizes";
+    selectedSizes: string[];
+    sizeStock: Record<string, number>;
   }>({
     title: "",
     category: "necklaces-and-chains",
@@ -214,6 +217,8 @@ export default function AdminDashboardPage() {
     isBestSeller: false,
     isNewArrival: true,
     sizingType: "adjustable",
+    selectedSizes: [...RING_SPECIFIC_SIZES],
+    sizeStock: {},
   });
 
   const fetchReviewsAndVideos = () => {
@@ -1378,6 +1383,12 @@ export default function AdminDashboardPage() {
 
   const openAddModal = () => {
     setEditingProduct(null);
+    const initialRingSizes = [...RING_SPECIFIC_SIZES];
+    const initialSizeStock: Record<string, number> = {};
+    initialRingSizes.forEach((s) => {
+      initialSizeStock[s] = 1;
+    });
+
     setFormState({
       title: "",
       category: "necklaces-and-chains",
@@ -1393,6 +1404,8 @@ export default function AdminDashboardPage() {
       isBestSeller: false,
       isNewArrival: true,
       sizingType: "adjustable",
+      selectedSizes: initialRingSizes,
+      sizeStock: initialSizeStock,
     });
     setIsModalOpen(true);
   };
@@ -1407,18 +1420,51 @@ export default function AdminDashboardPage() {
     const explicitSizeAttr = product.variantAttributes?.find((a) => /size/i.test(a.name));
     let detectedSizingType: "adjustable" | "sizes" = "adjustable";
 
+    const isRing = product.category === "rings";
+    const isBangle = product.category === "bangles-kada";
+    const standardSizes = isRing ? RING_SPECIFIC_SIZES : isBangle ? BANGLE_SPECIFIC_SIZES : [];
+
+    let selectedSizes: string[] = [];
+    let sizeStock: Record<string, number> = {};
+
     if (explicitSizeAttr && explicitSizeAttr.options?.length > 0) {
       const isAdj =
         explicitSizeAttr.options.length === 1 &&
         /adjustable|free size|cuff|openable/i.test(explicitSizeAttr.options[0]);
       detectedSizingType = isAdj ? "adjustable" : "sizes";
+
+      const cleaned = explicitSizeAttr.options.filter(
+        (o) => !/adjustable|free size|cuff|openable/i.test(o)
+      );
+      selectedSizes = cleaned.length > 0 ? cleaned : [...standardSizes];
+
+      if (explicitSizeAttr.sizeStock) {
+        sizeStock = { ...explicitSizeAttr.sizeStock };
+      } else {
+        const fallbackCount = Math.max(0, product.stockCount ?? 1);
+        selectedSizes.forEach((s) => {
+          sizeStock[s] = fallbackCount;
+        });
+      }
     } else {
       const titleIndicatesAdjustable =
         /\b(adjustable|free size|openable|cuff)\b/i.test(product.title) ||
         /\b(adjustable|free size|openable|cuff)\b/i.test(product.description || "") ||
         (product.tags && product.tags.some((t) => /\b(adjustable|free size)\b/i.test(t)));
       detectedSizingType = titleIndicatesAdjustable ? "adjustable" : "sizes";
+      selectedSizes = [...standardSizes];
+      const fallbackCount = Math.max(0, product.stockCount ?? 1);
+      standardSizes.forEach((s) => {
+        sizeStock[s] = fallbackCount;
+      });
     }
+
+    // Ensure all standard sizes have a non-undefined entry in sizeStock
+    standardSizes.forEach((s) => {
+      if (sizeStock[s] === undefined) {
+        sizeStock[s] = 0;
+      }
+    });
 
     setFormState({
       title: product.title,
@@ -1435,6 +1481,8 @@ export default function AdminDashboardPage() {
       isBestSeller: !!product.isBestSeller,
       isNewArrival: !!product.isNewArrival,
       sizingType: detectedSizingType,
+      selectedSizes,
+      sizeStock,
     });
     setIsModalOpen(true);
   };
@@ -1486,35 +1534,58 @@ export default function AdminDashboardPage() {
         ? [...editingProduct.variantAttributes]
         : [];
 
+      let finalStockCount = Math.max(0, parseInt(formState.stockCount) || 0);
+
       if (formState.category === "rings") {
         variantAttributes = variantAttributes.filter((a) => !/size/i.test(a.name));
-        variantAttributes.push({
-          name: "Ring Size",
-          options: formState.sizingType === "adjustable"
-            ? ["Adjustable / Free Size"]
-            : [
-                "Size 10 (15.9 mm)",
-                "Size 12 (16.5 mm)",
-                "Size 14 (17.2 mm - Standard)",
-                "Size 16 (17.9 mm)",
-                "Size 18 (18.6 mm)",
-                "Size 20 (19.2 mm)",
-              ],
-        });
+        if (formState.sizingType === "adjustable") {
+          variantAttributes.push({
+            name: "Ring Size",
+            options: ["Adjustable / Free Size"],
+            sizeStock: { "Adjustable / Free Size": finalStockCount },
+          });
+        } else {
+          const enabledSizes =
+            formState.selectedSizes.length > 0 ? formState.selectedSizes : [...RING_SPECIFIC_SIZES];
+          const activeSizeStock: Record<string, number> = {};
+          let totalStockSum = 0;
+          enabledSizes.forEach((s) => {
+            const count = Math.max(0, formState.sizeStock[s] ?? 0);
+            activeSizeStock[s] = count;
+            totalStockSum += count;
+          });
+          finalStockCount = totalStockSum;
+          variantAttributes.push({
+            name: "Ring Size",
+            options: enabledSizes,
+            sizeStock: activeSizeStock,
+          });
+        }
       } else if (formState.category === "bangles-kada") {
         variantAttributes = variantAttributes.filter((a) => !/size/i.test(a.name));
-        variantAttributes.push({
-          name: "Bangle Size",
-          options: formState.sizingType === "adjustable"
-            ? ["Adjustable / Openable Cuff"]
-            : [
-                "Size 2-2 (2.125\" - Petite)",
-                "Size 2-4 (2.25\" - Small)",
-                "Size 2-6 (2.375\" - Standard)",
-                "Size 2-8 (2.50\" - Medium-Large)",
-                "Size 2-10 (2.625\" - Extra Large)",
-              ],
-        });
+        if (formState.sizingType === "adjustable") {
+          variantAttributes.push({
+            name: "Bangle Size",
+            options: ["Adjustable / Openable Cuff"],
+            sizeStock: { "Adjustable / Openable Cuff": finalStockCount },
+          });
+        } else {
+          const enabledSizes =
+            formState.selectedSizes.length > 0 ? formState.selectedSizes : [...BANGLE_SPECIFIC_SIZES];
+          const activeSizeStock: Record<string, number> = {};
+          let totalStockSum = 0;
+          enabledSizes.forEach((s) => {
+            const count = Math.max(0, formState.sizeStock[s] ?? 0);
+            activeSizeStock[s] = count;
+            totalStockSum += count;
+          });
+          finalStockCount = totalStockSum;
+          variantAttributes.push({
+            name: "Bangle Size",
+            options: enabledSizes,
+            sizeStock: activeSizeStock,
+          });
+        }
       }
 
       if (editingProduct) {
@@ -1526,7 +1597,8 @@ export default function AdminDashboardPage() {
           salePrice: parsedSalePriceInr,
           priceQatar: parsedPriceQar,
           salePriceQatar: parsedSalePriceQar,
-          stockCount: parseInt(formState.stockCount) || 0,
+          stockCount: finalStockCount,
+          inStock: finalStockCount > 0,
           shortDescription: formState.shortDescription || formState.title,
           description: formState.description || formState.title,
           imageUrl: formState.imageUrl,
@@ -1545,7 +1617,8 @@ export default function AdminDashboardPage() {
           salePrice: parsedSalePriceInr,
           priceQatar: parsedPriceQar,
           salePriceQatar: parsedSalePriceQar,
-          stockCount: parseInt(formState.stockCount) || 10,
+          stockCount: finalStockCount,
+          inStock: finalStockCount > 0,
           shortDescription: formState.shortDescription || formState.title,
           description: formState.description || formState.title,
           imageUrl: formState.imageUrl,
@@ -3043,20 +3116,44 @@ export default function AdminDashboardPage() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-foreground">Inventory Units in Stock *</label>
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-semibold text-foreground">Inventory Units in Stock *</label>
+                    {(formState.category === "rings" || formState.category === "bangles-kada") &&
+                      formState.sizingType === "sizes" && (
+                        <span className="text-[10px] text-primary font-bold">
+                          Sum of size units
+                        </span>
+                      )}
+                  </div>
                   <input
                     type="number"
                     required
-                    value={formState.stockCount}
+                    readOnly={
+                      (formState.category === "rings" || formState.category === "bangles-kada") &&
+                      formState.sizingType === "sizes"
+                    }
+                    value={
+                      (formState.category === "rings" || formState.category === "bangles-kada") &&
+                      formState.sizingType === "sizes"
+                        ? (formState.category === "rings" ? RING_SPECIFIC_SIZES : BANGLE_SPECIFIC_SIZES)
+                            .filter((s) => formState.selectedSizes.includes(s))
+                            .reduce((sum, s) => sum + Math.max(0, formState.sizeStock[s] ?? 0), 0)
+                        : formState.stockCount
+                    }
                     onChange={(e) => setFormState({ ...formState, stockCount: e.target.value })}
-                    className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none"
+                    className={`w-full px-3 py-2 text-xs rounded-lg border outline-none ${
+                      (formState.category === "rings" || formState.category === "bangles-kada") &&
+                      formState.sizingType === "sizes"
+                        ? "bg-muted/40 border-border text-foreground font-bold cursor-not-allowed"
+                        : "bg-background border-border focus:ring-1 focus:ring-primary"
+                    }`}
                   />
                 </div>
               </div>
 
               {/* Sizing Option Configuration for Rings & Bangles */}
               {(formState.category === "rings" || formState.category === "bangles-kada") && (
-                <div className="p-3.5 rounded-xl border border-primary/20 bg-primary/5 space-y-2.5">
+                <div className="p-3.5 rounded-xl border border-primary/20 bg-primary/5 space-y-3">
                   <div className="flex items-center justify-between">
                     <label className="text-xs font-bold text-foreground flex items-center gap-1.5">
                       <Sparkles className="w-3.5 h-3.5 text-primary" />
@@ -3109,11 +3206,209 @@ export default function AdminDashboardPage() {
                       </div>
                       <p className="text-[11px] text-muted-foreground mt-1 leading-snug">
                         {formState.category === "rings"
-                          ? "Shows Indian ring sizes (Size 10 - 20). Adjustable option is not shown."
-                          : "Shows Indian bangle sizes (Size 2-2 to 2-10). Adjustable option is not shown."}
+                          ? "Manage inventory per ring size (Sizes 10–20). Set 0 for out of stock sizes."
+                          : "Manage inventory per bangle size (Sizes 2-2 to 2-10). Set 0 for out of stock sizes."}
                       </p>
                     </button>
                   </div>
+
+                  {/* Specific Size Stock & Availability Management */}
+                  {formState.sizingType === "sizes" && (
+                    <div className="mt-3 p-3.5 rounded-xl border border-border bg-card shadow-xs space-y-3">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-border/70 pb-2.5">
+                        <div>
+                          <h4 className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                            <Package className="w-3.5 h-3.5 text-primary" />
+                            <span>Individual Size Inventory & Stock</span>
+                          </h4>
+                          <p className="text-[11px] text-muted-foreground mt-0.5">
+                            Set stock for each size. Any size with 0 units will be marked Out of Stock.
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[11px] font-semibold text-muted-foreground">Total:</span>
+                          <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+                            {(formState.category === "rings" ? RING_SPECIFIC_SIZES : BANGLE_SPECIFIC_SIZES)
+                              .filter((s) => formState.selectedSizes.includes(s))
+                              .reduce((sum, s) => sum + Math.max(0, formState.sizeStock[s] ?? 0), 0)}{" "}
+                            Units
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Quick Bulk Actions */}
+                      <div className="flex flex-wrap items-center gap-2 pt-0.5 text-[11px]">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const allSizes = formState.category === "rings" ? RING_SPECIFIC_SIZES : BANGLE_SPECIFIC_SIZES;
+                            setFormState((prev) => ({ ...prev, selectedSizes: [...allSizes] }));
+                          }}
+                          className="text-primary hover:underline font-semibold"
+                        >
+                          Select All
+                        </button>
+                        <span className="text-muted-foreground">•</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const allSizes = formState.category === "rings" ? RING_SPECIFIC_SIZES : BANGLE_SPECIFIC_SIZES;
+                            const updatedStock = { ...formState.sizeStock };
+                            allSizes.forEach((s) => {
+                              if ((updatedStock[s] ?? 0) <= 0) updatedStock[s] = 1;
+                            });
+                            setFormState((prev) => ({
+                              ...prev,
+                              selectedSizes: [...allSizes],
+                              sizeStock: updatedStock,
+                            }));
+                          }}
+                          className="text-primary hover:underline font-semibold"
+                        >
+                          Set In-Stock (1 unit each)
+                        </button>
+                        <span className="text-muted-foreground">•</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const allSizes = formState.category === "rings" ? RING_SPECIFIC_SIZES : BANGLE_SPECIFIC_SIZES;
+                            const updatedStock = { ...formState.sizeStock };
+                            allSizes.forEach((s) => {
+                              updatedStock[s] = 0;
+                            });
+                            setFormState((prev) => ({
+                              ...prev,
+                              sizeStock: updatedStock,
+                            }));
+                          }}
+                          className="text-amber-600 hover:underline font-semibold"
+                        >
+                          Mark All Out of Stock
+                        </button>
+                      </div>
+
+                      {/* Size List */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                        {(formState.category === "rings" ? RING_SPECIFIC_SIZES : BANGLE_SPECIFIC_SIZES).map((sizeName) => {
+                          const isEnabled = formState.selectedSizes.includes(sizeName);
+                          const count = formState.sizeStock[sizeName] ?? 0;
+                          const isSizeOut = count <= 0;
+
+                          return (
+                            <div
+                              key={sizeName}
+                              className={`p-2.5 rounded-xl border transition-all flex items-center justify-between gap-2.5 ${
+                                !isEnabled
+                                  ? "border-border/40 bg-muted/20 opacity-60"
+                                  : isSizeOut
+                                  ? "border-amber-500/30 bg-amber-500/5 shadow-xs"
+                                  : "border-border bg-background shadow-xs"
+                              }`}
+                            >
+                              <div className="flex items-center gap-2 min-w-0">
+                                <input
+                                  type="checkbox"
+                                  id={`size-toggle-${sizeName}`}
+                                  checked={isEnabled}
+                                  onChange={(e) => {
+                                    const checked = e.target.checked;
+                                    setFormState((prev) => {
+                                      const nextSelected = checked
+                                        ? [...prev.selectedSizes, sizeName]
+                                        : prev.selectedSizes.filter((s) => s !== sizeName);
+                                      return { ...prev, selectedSizes: nextSelected };
+                                    });
+                                  }}
+                                  className="w-4 h-4 rounded text-primary focus:ring-primary/40 cursor-pointer"
+                                />
+                                <label
+                                  htmlFor={`size-toggle-${sizeName}`}
+                                  className="cursor-pointer select-none min-w-0"
+                                >
+                                  <div className="text-xs font-bold text-foreground truncate">
+                                    {sizeName}
+                                  </div>
+                                  <div className="flex items-center gap-1 mt-0.5">
+                                    {!isEnabled ? (
+                                      <span className="text-[10px] text-muted-foreground font-medium">Offered: No</span>
+                                    ) : isSizeOut ? (
+                                      <span className="text-[10px] font-bold text-amber-600 bg-amber-500/10 px-1.5 py-0.5 rounded">
+                                        Out of Stock
+                                      </span>
+                                    ) : (
+                                      <span className="text-[10px] font-bold text-emerald-600 bg-emerald-500/10 px-1.5 py-0.5 rounded">
+                                        In Stock ({count})
+                                      </span>
+                                    )}
+                                  </div>
+                                </label>
+                              </div>
+
+                              {/* Unit Input and Quick Toggles */}
+                              {isEnabled && (
+                                <div className="flex items-center gap-1.5 shrink-0">
+                                  <div className="flex flex-col items-end">
+                                    <span className="text-[9px] text-muted-foreground font-medium">Stock</span>
+                                    <input
+                                      type="number"
+                                      min="0"
+                                      max="999"
+                                      value={count}
+                                      onChange={(e) => {
+                                        const val = Math.max(0, parseInt(e.target.value) || 0);
+                                        setFormState((prev) => ({
+                                          ...prev,
+                                          sizeStock: {
+                                            ...prev.sizeStock,
+                                            [sizeName]: val,
+                                          },
+                                        }));
+                                      }}
+                                      className={`w-14 px-1.5 py-1 text-xs text-center font-bold rounded-lg border outline-none ${
+                                        isSizeOut
+                                          ? "border-amber-400 bg-amber-50 text-amber-900"
+                                          : "border-border bg-background text-foreground focus:border-primary"
+                                      }`}
+                                    />
+                                  </div>
+
+                                  {count > 0 ? (
+                                    <button
+                                      type="button"
+                                      title="Mark size as Out of Stock"
+                                      onClick={() => {
+                                        setFormState((prev) => ({
+                                          ...prev,
+                                          sizeStock: { ...prev.sizeStock, [sizeName]: 0 },
+                                        }));
+                                      }}
+                                      className="px-1.5 py-1 text-[10px] font-semibold text-muted-foreground hover:text-amber-600 rounded bg-muted/40 hover:bg-amber-50 transition-colors"
+                                    >
+                                      Set 0
+                                    </button>
+                                  ) : (
+                                    <button
+                                      type="button"
+                                      title="Add 1 to stock"
+                                      onClick={() => {
+                                        setFormState((prev) => ({
+                                          ...prev,
+                                          sizeStock: { ...prev.sizeStock, [sizeName]: 1 },
+                                        }));
+                                      }}
+                                      className="px-1.5 py-1 text-[10px] font-bold text-primary rounded bg-primary/10 hover:bg-primary/20 transition-colors"
+                                    >
+                                      +1
+                                    </button>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 

@@ -27,13 +27,37 @@ export function QuickViewModal() {
 
   if (!product) return null;
 
+  const effectiveSize = selectedSize || sizeInfo?.defaultSize || "";
+
+  const hasSpecificSizeStock = Boolean(
+    sizeInfo &&
+    !sizeInfo.isAdjustableOnly &&
+    sizeInfo.sizeStock &&
+    effectiveSize &&
+    effectiveSize in sizeInfo.sizeStock
+  );
+
+  const selectedSizeInventory = hasSpecificSizeStock
+    ? Math.max(0, sizeInfo!.sizeStock![effectiveSize])
+    : undefined;
+
+  const isCurrentSizeOutOfStock = selectedSizeInventory !== undefined && selectedSizeInventory <= 0;
+
+  const overallStock = product.inStock !== false ? (product.stockCount !== undefined ? product.stockCount : 10) : 0;
+  const isOverallOutOfStock = overallStock <= 0;
+
+  const isOutOfStock = isOverallOutOfStock || isCurrentSizeOutOfStock;
+
+  const effectiveMaxStock = isOutOfStock
+    ? 0
+    : selectedSizeInventory !== undefined
+    ? selectedSizeInventory
+    : overallStock;
+
   const { regularPrice, salePrice, effectivePrice } = getProductPrices(
     product,
     selectedCurrency
   );
-
-  const maxStock = product.inStock !== false ? (product.stockCount !== undefined ? product.stockCount : 10) : 0;
-  const isOutOfStock = maxStock <= 0;
 
   // Initialize default options
   const currentOptions = { ...selectedOptions };
@@ -49,8 +73,8 @@ export function QuickViewModal() {
     if (isOutOfStock) return;
 
     const combinedOptions: { [key: string]: string } = { ...currentOptions };
-    if (sizeInfo && selectedSize) {
-      combinedOptions[sizeInfo.label] = selectedSize;
+    if (sizeInfo && effectiveSize) {
+      combinedOptions[sizeInfo.label] = effectiveSize;
     }
 
     const hasVariants = Object.keys(combinedOptions).length > 0;
@@ -116,9 +140,9 @@ export function QuickViewModal() {
                     <span className="bg-destructive/10 text-destructive border border-destructive/20 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">
                       Out of Stock
                     </span>
-                  ) : maxStock <= 3 ? (
+                  ) : effectiveMaxStock <= 3 ? (
                     <span className="bg-amber-500/10 text-amber-600 border border-amber-500/20 text-[10px] font-bold px-2 py-0.5 rounded-full">
-                      Only {maxStock} Left
+                      Only {effectiveMaxStock} Left
                     </span>
                   ) : null}
                 </div>
@@ -173,20 +197,39 @@ export function QuickViewModal() {
                       ✨ {sizeInfo.type === "ring" ? "Adjustable comfort band fits all finger sizes." : "Adjustable open cuff fits all wrist sizes."}
                     </p>
                   ) : (
-                    <div className="relative">
-                      <select
-                        id="quickview-size-select"
-                        value={selectedSize}
-                        onChange={(e) => setSelectedSize(e.target.value)}
-                        className="w-full appearance-none px-3 py-2 text-xs font-semibold rounded-lg border border-border bg-background text-foreground focus:ring-1 focus:ring-primary outline-none transition-all pr-8 cursor-pointer shadow-sm hover:border-primary/50"
-                      >
-                        {sizeInfo.options.map((opt) => (
-                          <option key={opt} value={opt}>
-                            {opt}
-                          </option>
-                        ))}
-                      </select>
-                      <ChevronDown className="w-3.5 h-3.5 text-muted-foreground absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <div className="space-y-1.5">
+                      <div className="relative">
+                        <select
+                          id="quickview-size-select"
+                          value={effectiveSize}
+                          onChange={(e) => {
+                            setSelectedSize(e.target.value);
+                            setQuantity(1);
+                          }}
+                          className="w-full appearance-none px-3 py-2 text-xs font-semibold rounded-lg border border-border bg-background text-foreground focus:ring-1 focus:ring-primary outline-none transition-all pr-8 cursor-pointer shadow-sm hover:border-primary/50"
+                        >
+                          {sizeInfo.options.map((opt) => {
+                            const optStock = sizeInfo.sizeStock?.[opt];
+                            const isOptOut = optStock !== undefined && optStock <= 0;
+                            return (
+                              <option key={opt} value={opt}>
+                                {opt} {isOptOut ? "— (Out of Stock)" : optStock !== undefined ? `(${optStock} in stock)` : ""}
+                              </option>
+                            );
+                          })}
+                        </select>
+                        <ChevronDown className="w-3.5 h-3.5 text-muted-foreground absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                      </div>
+
+                      {isCurrentSizeOutOfStock ? (
+                        <p className="text-[11px] text-amber-600 font-medium">
+                          ⚠️ {effectiveSize} is currently out of stock. Please select another size.
+                        </p>
+                      ) : selectedSizeInventory !== undefined && selectedSizeInventory <= 3 ? (
+                        <p className="text-[11px] text-amber-600 font-medium">
+                          ✨ Only {selectedSizeInventory} left in {effectiveSize}!
+                        </p>
+                      ) : null}
                     </div>
                   )}
                 </div>
@@ -224,8 +267,14 @@ export function QuickViewModal() {
               <div className="space-y-1.5 pt-2">
                 <div className="flex items-center justify-between text-xs">
                   <span className="font-semibold text-foreground">Quantity</span>
-                  {isOutOfStock && (
-                    <span className="text-destructive font-semibold text-[11px]">Currently Unavailable</span>
+                  {isCurrentSizeOutOfStock ? (
+                    <span className="text-amber-600 font-semibold text-[11px]">Size Out of Stock</span>
+                  ) : isOverallOutOfStock ? (
+                    <span className="text-destructive font-semibold text-[11px]">Out of Stock</span>
+                  ) : effectiveMaxStock <= 3 ? (
+                    <span className="text-amber-600 font-semibold text-[11px]">Only {effectiveMaxStock} left</span>
+                  ) : (
+                    <span className="text-emerald-600 font-semibold text-[11px]">In Stock ({effectiveMaxStock} units)</span>
                   )}
                 </div>
                 <div className="flex items-center w-28 border border-border rounded-lg bg-muted/20">
@@ -240,8 +289,8 @@ export function QuickViewModal() {
                     {isOutOfStock ? 0 : quantity}
                   </span>
                   <button
-                    disabled={isOutOfStock || quantity >= maxStock}
-                    onClick={() => setQuantity(Math.min(maxStock, quantity + 1))}
+                    disabled={isOutOfStock || quantity >= effectiveMaxStock}
+                    onClick={() => setQuantity(Math.min(effectiveMaxStock, quantity + 1))}
                     className="p-2 hover:bg-muted text-foreground transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                   >
                     <Plus className="w-3.5 h-3.5" />
@@ -262,7 +311,13 @@ export function QuickViewModal() {
                 }`}
               >
                 <ShoppingBag className="w-4 h-4" />
-                <span>{isOutOfStock ? "Out of Stock / Sold Out" : "Add to Bag"}</span>
+                <span>
+                  {isCurrentSizeOutOfStock
+                    ? `${effectiveSize} Out of Stock`
+                    : isOverallOutOfStock
+                    ? "Out of Stock / Sold Out"
+                    : "Add to Bag"}
+                </span>
               </button>
 
               <Link

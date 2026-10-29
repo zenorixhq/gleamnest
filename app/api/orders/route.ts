@@ -28,7 +28,7 @@ export async function GET(req: Request) {
     });
 
     if (dbOrders.length === 0) {
-      return NextResponse.json(sampleOrders);
+      return NextResponse.json([]);
     }
 
     const formatted = dbOrders.map((o) => {
@@ -82,7 +82,7 @@ export async function GET(req: Request) {
     return NextResponse.json(formatted);
   } catch (err) {
     console.error("GET /api/orders error:", err);
-    return NextResponse.json(sampleOrders);
+    return NextResponse.json([]);
   }
 }
 

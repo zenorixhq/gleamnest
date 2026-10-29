@@ -104,15 +104,39 @@ export default function ProductDetailPage({
     selectedCurrency
   );
 
-  const maxStock = product.inStock !== false ? (product.stockCount !== undefined ? product.stockCount : 10) : 0;
-  const isOutOfStock = maxStock <= 0;
+  const effectiveSize = selectedSize || sizeInfo?.defaultSize || "";
+
+  // Check if size inventory is explicitly defined
+  const hasSpecificSizeStock = Boolean(
+    sizeInfo &&
+    !sizeInfo.isAdjustableOnly &&
+    sizeInfo.sizeStock &&
+    effectiveSize &&
+    effectiveSize in sizeInfo.sizeStock
+  );
+
+  const selectedSizeInventory = hasSpecificSizeStock
+    ? Math.max(0, sizeInfo!.sizeStock![effectiveSize])
+    : undefined;
+
+  const isCurrentSizeOutOfStock = selectedSizeInventory !== undefined && selectedSizeInventory <= 0;
+
+  const overallStock = product.inStock !== false ? (product.stockCount !== undefined ? product.stockCount : 10) : 0;
+  const isOverallOutOfStock = overallStock <= 0;
+
+  const isOutOfStock = isOverallOutOfStock || isCurrentSizeOutOfStock;
+
+  const effectiveMaxStock = isOutOfStock
+    ? 0
+    : selectedSizeInventory !== undefined
+    ? selectedSizeInventory
+    : overallStock;
 
   const handleAddToCart = () => {
     if (isOutOfStock) return;
 
     // Combine standard variant options with selected size
     const combinedOptions: { [key: string]: string } = { ...currentOptions };
-    const effectiveSize = selectedSize || sizeInfo?.defaultSize;
     if (sizeInfo && effectiveSize) {
       combinedOptions[sizeInfo.label] = effectiveSize;
     }
@@ -153,9 +177,7 @@ export default function ProductDetailPage({
   };
 
   const handleDirectWhatsAppOrder = () => {
-    if (isOutOfStock) return;
     const combinedOptions: { [key: string]: string } = { ...currentOptions };
-    const effectiveSize = selectedSize || sizeInfo?.defaultSize;
     if (sizeInfo && effectiveSize) {
       combinedOptions[sizeInfo.label] = effectiveSize;
     }
@@ -167,20 +189,24 @@ export default function ProductDetailPage({
     const phone = storeConfig.brand.contact.whatsappNumber;
     const itemTotalFormatted = formatPrice(effectivePrice * quantity, selectedCurrency);
 
-    const greetingMessage = isQatar
-      ? "I want to order this piece from your website! Please confirm availability and share payment/delivery details for Qatar (Free Delivery). Thank you! 💖"
-      : "I want to order this piece from your website! Please confirm availability and share your *UPI QR code* so I can pay and confirm my delivery. Thank you! 💖";
+    let greetingMessage = "";
+    if (isOutOfStock) {
+      greetingMessage = `Hello GleamNest! I am inquiring about *${product.title}* in *${effectiveSize || "this size"}*, which is currently out of stock on your website. Could you please notify me when it's back in stock or if custom piece sizing is available? Thank you! 💖`;
+    } else {
+      greetingMessage = isQatar
+        ? "I want to order this piece from your website! Please confirm availability and share payment/delivery details for Qatar (Free Delivery). Thank you! 💖"
+        : "I want to order this piece from your website! Please confirm availability and share your *UPI QR code* so I can pay and confirm my delivery. Thank you! 💖";
+    }
 
     const message = `━━━━━━━━━━━━━━━━━━━━━
 ✨ *G L E A M N E S T* ✨
-_Instant Order Inquiry_
+_${isOutOfStock ? "Size Restock & Custom Inquiry" : "Instant Order Inquiry"}_
 ━━━━━━━━━━━━━━━━━━━━━
 
 💍 *SELECTED PIECE*
 • *Title:* *${product.title}*
 ${selectedVariantSummary ? `${selectedVariantSummary}\n` : ""}• *Quantity:* ${quantity}
-• *Item Total:* *${itemTotalFormatted}*
-• *Destination:* *${isQatar ? "Qatar (Complimentary Delivery)" : "India"}*
+${isOutOfStock ? `• *Status:* ⚠️ *Size Currently Out of Stock*\n` : `• *Item Total:* *${itemTotalFormatted}*\n`}• *Destination:* *${isQatar ? "Qatar (Complimentary Delivery)" : "India"}*
 
 💬 *Hello GleamNest Team!*
 ${greetingMessage}
@@ -358,22 +384,70 @@ ${greetingMessage}
                   </p>
                 </div>
               ) : (
-                <>
-                  <div className="relative">
-                    <select
-                      id="product-size-select"
-                      value={selectedSize}
-                      onChange={(e) => setSelectedSize(e.target.value)}
-                      className="w-full appearance-none px-3.5 py-2.5 text-xs sm:text-sm font-semibold rounded-xl border border-border bg-background text-foreground focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all pr-10 cursor-pointer shadow-sm hover:border-primary/60"
-                    >
-                      {sizeInfo.options.map((opt) => (
-                        <option key={opt} value={opt}>
-                          {opt}
-                        </option>
-                      ))}
-                    </select>
-                    <ChevronDown className="w-4 h-4 text-muted-foreground absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <div className="space-y-3">
+                  {/* Size chips */}
+                  <div className="flex flex-wrap gap-2">
+                    {sizeInfo.options.map((opt) => {
+                      const optStock = sizeInfo.sizeStock?.[opt];
+                      const isOptOut = optStock !== undefined && optStock <= 0;
+                      const isSelected = effectiveSize === opt;
+
+                      return (
+                        <button
+                          key={opt}
+                          type="button"
+                          onClick={() => {
+                            setSelectedSize(opt);
+                            setQuantity(1);
+                          }}
+                          className={`relative px-3 py-2 text-xs font-semibold rounded-xl border transition-all flex items-center gap-1.5 ${
+                            isSelected
+                              ? isOptOut
+                                ? "border-amber-500 bg-amber-500/10 text-amber-900 ring-2 ring-amber-500/30"
+                                : "border-primary bg-primary text-primary-foreground shadow-sm ring-2 ring-primary/20"
+                              : isOptOut
+                              ? "border-border/60 bg-muted/40 text-muted-foreground hover:bg-muted/60 opacity-60 line-through decoration-muted-foreground/60"
+                              : "border-border bg-background text-foreground hover:border-primary/60"
+                          }`}
+                        >
+                          <span>{opt}</span>
+                          {isOptOut && (
+                            <span className="no-underline text-[9px] font-bold px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-700">
+                              Out of Stock
+                            </span>
+                          )}
+                          {!isOptOut && optStock !== undefined && optStock <= 3 && (
+                            <span
+                              className={`text-[9px] font-bold px-1.5 py-0.2 rounded ${
+                                isSelected ? "bg-white/20 text-white" : "bg-primary/10 text-primary"
+                              }`}
+                            >
+                              {optStock} left
+                            </span>
+                          )}
+                        </button>
+                      );
+                    })}
                   </div>
+
+                  {/* Size Alert Message */}
+                  {isCurrentSizeOutOfStock ? (
+                    <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-900 text-xs space-y-1">
+                      <div className="flex items-center gap-1.5 font-bold">
+                        <span>⚠️ {effectiveSize} is Currently Out of Stock</span>
+                      </div>
+                      <p className="text-[11px] text-amber-800 leading-snug">
+                        We don't have units of this size in stock right now. Please select an available size above, or click below to chat with us on WhatsApp for size restock & custom orders.
+                      </p>
+                    </div>
+                  ) : (
+                    selectedSizeInventory !== undefined && selectedSizeInventory <= 3 && (
+                      <p className="text-[11px] text-amber-600 font-semibold flex items-center gap-1 pt-0.5">
+                        <Sparkles className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" />
+                        <span>Only {selectedSizeInventory} {selectedSizeInventory === 1 ? "unit" : "units"} remaining in {effectiveSize}!</span>
+                      </p>
+                    )
+                  )}
 
                   <p className="text-[11px] text-muted-foreground flex items-center gap-1 pt-0.5">
                     <Sparkles className="w-3 h-3 text-primary flex-shrink-0" />
@@ -383,7 +457,7 @@ ${greetingMessage}
                         : "Standard Indian Bangle sizing (2-2 to 2-10). Check inner diameter in Size Guide."}
                     </span>
                   </p>
-                </>
+                </div>
               )}
             </div>
           )}
@@ -419,112 +493,118 @@ ${greetingMessage}
             ))}
 
           {/* Quantity & Stock Indicator */}
-          {(() => {
-            const maxStock = product.inStock !== false ? Math.max(0, product.stockCount !== undefined ? product.stockCount : 10) : 0;
-            const isOutOfStock = maxStock <= 0;
+          <div className="space-y-3 pt-2">
+            <div className="flex items-center justify-between text-xs">
+              <span className="font-bold text-foreground">Quantity</span>
+              {isCurrentSizeOutOfStock ? (
+                <span className="text-amber-600 font-semibold">Size Out of Stock</span>
+              ) : isOverallOutOfStock ? (
+                <span className="text-destructive font-semibold">Out of Stock</span>
+              ) : effectiveMaxStock <= 3 ? (
+                <span className="text-amber-600 font-semibold flex items-center gap-1">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                  Very few left! ({effectiveMaxStock} units remaining)
+                </span>
+              ) : (
+                <span className="text-emerald-600 font-semibold flex items-center gap-1">
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  In Stock ({effectiveMaxStock} units ready)
+                </span>
+              )}
+            </div>
 
-            return (
-              <div className="space-y-3 pt-2">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="font-bold text-foreground">Quantity</span>
-                  {isOutOfStock ? (
-                    <span className="text-destructive font-semibold">Out of Stock</span>
-                  ) : maxStock <= 3 ? (
-                    <span className="text-amber-600 font-semibold flex items-center gap-1">
-                      <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-                      Very few left! ({maxStock} units remaining)
-                    </span>
-                  ) : (
-                    <span className="text-emerald-600 font-semibold flex items-center gap-1">
-                      <CheckCircle2 className="w-3.5 h-3.5" />
-                      In Stock ({maxStock} units ready)
-                    </span>
-                  )}
-                </div>
-
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center border border-border rounded-xl bg-card">
-                    <button
-                      type="button"
-                      disabled={isOutOfStock || quantity <= 1}
-                      onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                      className="p-3 hover:bg-muted text-foreground transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                      aria-label="Decrease quantity"
-                    >
-                      <Minus className="w-4 h-4" />
-                    </button>
-                    <span className="px-4 text-sm font-bold text-foreground">
-                      {isOutOfStock ? 0 : quantity}
-                    </span>
-                    <button
-                      type="button"
-                      disabled={isOutOfStock || quantity >= maxStock}
-                      onClick={() => setQuantity((q) => Math.min(maxStock, q + 1))}
-                      className="p-3 hover:bg-muted text-foreground transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                      aria-label="Increase quantity"
-                    >
-                      <Plus className="w-4 h-4" />
-                    </button>
-                  </div>
-
-                  {/* Wishlist toggle */}
-                  <button
-                    onClick={() => toggleWishlist(product.id)}
-                    className={`p-3 rounded-xl border transition-all ${
-                      isInWishlist
-                        ? "border-rose-500 bg-rose-50 text-rose-600 dark:bg-rose-950/30"
-                        : "border-border bg-card text-foreground hover:bg-muted"
-                    }`}
-                    aria-label="Add to wishlist"
-                  >
-                    <Heart className={`w-5 h-5 ${isInWishlist ? "fill-current text-rose-600" : ""}`} />
-                  </button>
-                </div>
-
-                {!isOutOfStock && quantity >= maxStock && (
-                  <p className="text-[11px] text-amber-600 font-medium">
-                    Maximum available stock reached for this piece ({maxStock} units).
-                  </p>
-                )}
-
-                {/* CTA Buttons */}
-                <div className="space-y-3 pt-4">
-                  <button
-                    type="button"
-                    disabled={isOutOfStock}
-                    onClick={handleDirectWhatsAppOrder}
-                    className="w-full py-4 px-6 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 transition-all active:scale-[0.99] disabled:opacity-40 disabled:cursor-not-allowed"
-                  >
-                    <MessageCircle className="w-5 h-5 fill-current" />
-                    <span>{isOutOfStock ? "Sold Out / Unavailable" : "Instant Order on WhatsApp"}</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    disabled={isOutOfStock}
-                    onClick={handleAddToCart}
-                    className={`w-full py-3.5 px-6 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.99] disabled:opacity-40 disabled:cursor-not-allowed ${
-                      isAdded
-                        ? "bg-emerald-600 text-white border-2 border-emerald-600 shadow-md"
-                        : "bg-card border-2 border-primary text-primary hover:bg-primary/5"
-                    }`}
-                  >
-                    {isAdded ? (
-                      <>
-                        <CheckCircle2 className="w-4 h-4" />
-                        <span>Added to Shopping Bag!</span>
-                      </>
-                    ) : (
-                      <>
-                        <ShoppingBag className="w-4 h-4" />
-                        <span>{isOutOfStock ? "Out of Stock" : "Add to Shopping Bag"}</span>
-                      </>
-                    )}
-                  </button>
-                </div>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center border border-border rounded-xl bg-card">
+                <button
+                  type="button"
+                  disabled={isOutOfStock || quantity <= 1}
+                  onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                  className="p-3 hover:bg-muted text-foreground transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                  aria-label="Decrease quantity"
+                >
+                  <Minus className="w-4 h-4" />
+                </button>
+                <span className="px-4 text-sm font-bold text-foreground">
+                  {isOutOfStock ? 0 : quantity}
+                </span>
+                <button
+                  type="button"
+                  disabled={isOutOfStock || quantity >= effectiveMaxStock}
+                  onClick={() => setQuantity((q) => Math.min(effectiveMaxStock, q + 1))}
+                  className="p-3 hover:bg-muted text-foreground transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                  aria-label="Increase quantity"
+                >
+                  <Plus className="w-4 h-4" />
+                </button>
               </div>
-            );
-          })()}
+
+              {/* Wishlist toggle */}
+              <button
+                onClick={() => toggleWishlist(product.id)}
+                className={`p-3 rounded-xl border transition-all ${
+                  isInWishlist
+                    ? "border-rose-500 bg-rose-50 text-rose-600 dark:bg-rose-950/30"
+                    : "border-border bg-card text-foreground hover:bg-muted"
+                }`}
+                aria-label="Add to wishlist"
+              >
+                <Heart className={`w-5 h-5 ${isInWishlist ? "fill-current text-rose-600" : ""}`} />
+              </button>
+            </div>
+
+            {!isOutOfStock && quantity >= effectiveMaxStock && (
+              <p className="text-[11px] text-amber-600 font-medium">
+                Maximum available stock reached for this piece ({effectiveMaxStock} units).
+              </p>
+            )}
+
+            {/* CTA Buttons */}
+            <div className="space-y-3 pt-4">
+              <button
+                type="button"
+                onClick={handleDirectWhatsAppOrder}
+                className="w-full py-4 px-6 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 transition-all active:scale-[0.99]"
+              >
+                <MessageCircle className="w-5 h-5 fill-current" />
+                <span>
+                  {isCurrentSizeOutOfStock
+                    ? `Inquire About ${effectiveSize} Restock on WhatsApp`
+                    : isOverallOutOfStock
+                    ? "Inquire Availability on WhatsApp"
+                    : "Instant Order on WhatsApp"}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                disabled={isOutOfStock}
+                onClick={handleAddToCart}
+                className={`w-full py-3.5 px-6 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.99] disabled:opacity-40 disabled:cursor-not-allowed ${
+                  isAdded
+                    ? "bg-emerald-600 text-white border-2 border-emerald-600 shadow-md"
+                    : "bg-card border-2 border-primary text-primary hover:bg-primary/5"
+                }`}
+              >
+                {isAdded ? (
+                  <>
+                    <CheckCircle2 className="w-4 h-4" />
+                    <span>Added to Shopping Bag!</span>
+                  </>
+                ) : (
+                  <>
+                    <ShoppingBag className="w-4 h-4" />
+                    <span>
+                      {isCurrentSizeOutOfStock
+                        ? `${effectiveSize} Out of Stock`
+                        : isOverallOutOfStock
+                        ? "Out of Stock"
+                        : "Add to Shopping Bag"}
+                    </span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
 
           {/* Jewelry Trust Value Badges with Direct Guide Triggers */}
           <div className="space-y-3 pt-6 border-t border-border">
