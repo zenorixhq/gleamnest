@@ -127,16 +127,20 @@ export const useCartStore = create<CartStore>()(
       closeCart: () => set({ isCartOpen: false }),
 
       toggleWishlist: (productId) => {
+        const clean = (productId || "").toString().trim();
+        if (!clean) return;
         const current = get().wishlist;
-        if (current.includes(productId)) {
-          set({ wishlist: current.filter((id) => id !== productId) });
+        const exists = current.some((id) => id.toLowerCase() === clean.toLowerCase());
+        if (exists) {
+          set({ wishlist: current.filter((id) => id.toLowerCase() !== clean.toLowerCase()) });
         } else {
-          set({ wishlist: [...current, productId] });
+          set({ wishlist: [...current, clean] });
         }
       },
 
       isInWishlist: (productId) => {
-        return get().wishlist.includes(productId);
+        const clean = (productId || "").toString().trim().toLowerCase();
+        return get().wishlist.some((id) => id.toLowerCase() === clean);
       },
 
       setCurrency: (code) => {

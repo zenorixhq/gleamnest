@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Product } from "@/types/store";
 import { useCartStore } from "@/store/useCartStore";
@@ -17,7 +17,24 @@ export function ProductCard({ product }: ProductCardProps) {
   const addItem = useCartStore((s) => s.addItem);
   const openCart = useCartStore((s) => s.openCart);
   const toggleWishlist = useCartStore((s) => s.toggleWishlist);
-  const isInWishlist = useCartStore((s) => s.wishlist.includes(product.id));
+  const isStoreInWishlist = useCartStore((s) =>
+    s.wishlist.includes(product.id) ||
+    (product.slug ? s.wishlist.includes(product.slug) : false) ||
+    s.wishlist.some(
+      (id) =>
+        Boolean(id) &&
+        (id.toLowerCase() === product.id.toLowerCase() ||
+          (product.slug && id.toLowerCase() === product.slug.toLowerCase()))
+    )
+  );
+
+  // Optimistic state for 0ms instantaneous visual feedback on click
+  const [optimisticWishlist, setOptimisticWishlist] = useState<boolean | null>(null);
+  const isInWishlist = optimisticWishlist !== null ? optimisticWishlist : isStoreInWishlist;
+
+  useEffect(() => {
+    setOptimisticWishlist(null);
+  }, [isStoreInWishlist]);
   const openQuickView = useCartStore((s) => s.openQuickView);
 
   const { regularPrice, salePrice, effectivePrice, discountPercent } = getProductPrices(
@@ -40,6 +57,8 @@ export function ProductCard({ product }: ProductCardProps) {
   const handleWishlistToggle = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    const nextVal = !isInWishlist;
+    setOptimisticWishlist(nextVal);
     toggleWishlist(product.id);
   };
 

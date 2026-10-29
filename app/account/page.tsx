@@ -43,7 +43,28 @@ function AccountPageContent() {
     if (tab) setActiveTab(tab);
   }, [searchParams]);
 
-  const wishlistProducts = products.filter((p) => wishlist.includes(p.id));
+  const isWishlisted = (p: (typeof products)[0]) => {
+    const pId = (p.id || "").toLowerCase().trim();
+    const pSlug = (p.slug || "").toLowerCase().trim();
+    return wishlist.some((w) => {
+      if (!w) return false;
+      const cleanW = String(w).toLowerCase().trim();
+      return (
+        cleanW === pId ||
+        cleanW === pSlug ||
+        cleanW === pSlug.replace(/s$/, "") ||
+        cleanW === pSlug + "s" ||
+        cleanW.replace(/[-_]/g, "") === pSlug.replace(/[-_]/g, "")
+      );
+    });
+  };
+
+  const wishlistProducts = products.filter(isWishlisted);
+  const isLoadingSavedPieces = (!hasLoadedProducts || products.length === 0) && wishlist.length > 0;
+  const displayWishlistCount =
+    hasLoadedProducts && products.length > 0
+      ? wishlistProducts.length
+      : wishlist.length;
 
   const handleMoveAllToCart = () => {
     wishlistProducts.forEach((p) => {
@@ -114,7 +135,7 @@ function AccountPageContent() {
           }`}
         >
           <Heart className="w-4 h-4" />
-          <span>Saved Wishlist ({wishlist.length})</span>
+          <span>Saved Wishlist ({displayWishlistCount})</span>
         </button>
 
         <button
@@ -227,12 +248,12 @@ function AccountPageContent() {
             </div>
           )}
 
-          {!hasLoadedProducts && products.length === 0 ? (
+          {isLoadingSavedPieces ? (
             <div className="py-20 text-center rounded-2xl border border-dashed border-border p-8 space-y-4">
               <div className="w-12 h-12 rounded-full bg-muted mx-auto flex items-center justify-center text-muted-foreground animate-pulse">
-                <Heart className="w-6 h-6" />
+                <Heart className="w-6 h-6 text-rose-500" />
               </div>
-              <p className="text-xs text-muted-foreground">Loading your saved pieces...</p>
+              <p className="text-xs text-muted-foreground font-medium">Retrieving your saved pieces...</p>
             </div>
           ) : wishlistProducts.length === 0 ? (
             <div className="py-20 text-center rounded-2xl border border-dashed border-border p-8 space-y-4">
@@ -251,7 +272,7 @@ function AccountPageContent() {
               </Link>
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5 md:gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
               {wishlistProducts.map((p) => (
                 <ProductCard key={p.id} product={p} />
               ))}

@@ -48,7 +48,28 @@ export default function ProductDetailPage({
     });
   }, [fetchProducts]);
 
-  const product = products.find((p) => p.slug === params.slug);
+  const rawSlug = (params?.slug || "").toString();
+  const cleanSlug = decodeURIComponent(rawSlug).toLowerCase().trim();
+
+  // Smart matching: exact slug, singular/plural variations, ID, or hyphen variations
+  const product = products.find((p) => {
+    const pSlug = (p.slug || "").toLowerCase().trim();
+    const pId = (p.id || "").toLowerCase().trim();
+    if (pSlug === cleanSlug || pId === cleanSlug) return true;
+    if (cleanSlug.endsWith("s") && pSlug === cleanSlug.slice(0, -1)) return true;
+    if (!cleanSlug.endsWith("s") && pSlug === cleanSlug + "s") return true;
+    if (pSlug.replace(/[-_]/g, "") === cleanSlug.replace(/[-_]/g, "")) return true;
+    return false;
+  });
+
+  // Keep address bar in sync if matched via plural alias (e.g. /flower-earrings -> /flower-earring)
+  useEffect(() => {
+    if (product && product.slug && product.slug !== rawSlug && typeof window !== "undefined") {
+      try {
+        window.history.replaceState(null, "", `/products/${product.slug}`);
+      } catch (e) {}
+    }
+  }, [product, rawSlug]);
 
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
@@ -60,7 +81,13 @@ export default function ProductDetailPage({
   const addItem = useCartStore((s) => s.addItem);
   const openCart = useCartStore((s) => s.openCart);
   const toggleWishlist = useCartStore((s) => s.toggleWishlist);
-  const isInWishlist = useCartStore((s) => product ? s.wishlist.includes(product.id) : false);
+  const isInWishlist = useCartStore((s) => {
+    if (!product) return false;
+    return (
+      s.wishlist.includes(product.id) ||
+      (product.slug ? s.wishlist.includes(product.slug) : false)
+    );
+  });
   const selectedCurrency = useCartStore((s) => s.selectedCurrency);
 
   useEffect(() => {
@@ -72,17 +99,59 @@ export default function ProductDetailPage({
     }
   }, [product?.id]);
 
-  if (!product && hasAttemptedFetch) {
-    notFound();
-  }
-
   if (!product) {
-    return (
-      <div className="max-w-7xl mx-auto px-4 py-24 text-center">
-        <div className="inline-block p-4 rounded-full bg-[#FAF5EB] text-[#C5A059] mb-4">
-          <Sparkles className="w-8 h-8 animate-pulse" />
+    if (!hasAttemptedFetch && products.length === 0) {
+      return (
+        <div className="max-w-7xl mx-auto px-4 py-24 text-center">
+          <div className="inline-block p-4 rounded-full bg-[#FAF5EB] text-[#C5A059] mb-4">
+            <Sparkles className="w-8 h-8 animate-pulse" />
+          </div>
+          <p className="font-editorial text-xl text-[#1C1917]">Loading piece details...</p>
         </div>
-        <p className="font-editorial text-xl text-[#1C1917]">Loading piece details...</p>
+      );
+    }
+
+    // Graceful, branded fallback UI when piece is not in the live catalog
+    return (
+      <div className="max-w-4xl mx-auto px-4 py-20 sm:py-28 text-center space-y-6">
+        <div className="w-16 h-16 rounded-full bg-[#FAF5EB] text-[#C5A059] mx-auto flex items-center justify-center border border-[#EADBBE]">
+          <Sparkles className="w-8 h-8" />
+        </div>
+        <div className="space-y-2">
+          <h1 className="font-editorial text-2xl sm:text-3xl text-foreground font-bold">
+            Piece Not Found
+          </h1>
+          <p className="text-sm text-muted-foreground max-w-md mx-auto">
+            The piece you requested is currently unavailable or may have been renamed in our live catalog.
+          </p>
+        </div>
+        <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+          <Link
+            href="/products"
+            className="px-6 py-3 rounded-xl bg-primary text-primary-foreground font-semibold text-xs tracking-wider uppercase hover:bg-primary/90 transition-all shadow-sm"
+          >
+            Explore All Jewelry
+          </Link>
+          <Link
+            href="/"
+            className="px-6 py-3 rounded-xl border border-border bg-card text-foreground font-semibold text-xs tracking-wider uppercase hover:bg-muted transition-all"
+          >
+            Return Home
+          </Link>
+        </div>
+
+        {products.length > 0 && (
+          <div className="pt-12 border-t border-border mt-12 text-left">
+            <h2 className="text-xs font-bold tracking-widest text-muted-foreground uppercase mb-6 text-center">
+              Popular Everyday Luxury Pieces
+            </h2>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+              {products.slice(0, 4).map((p) => (
+                <ProductCard key={p.id} product={p} />
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     );
   }

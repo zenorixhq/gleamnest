@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="gnGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#EADBBE"/>
+      <stop offset="35%" stop-color="#D4AF37"/>
+      <stop offset="70%" stop-color="#C5A059"/>
+      <stop offset="100%" stop-color="#9A7B38"/>
+    </linearGradient>
+    <linearGradient id="gnBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#24211D"/>
+      <stop offset="100%" stop-color="#141210"/>
+    </linearGradient>
+  </defs>
+  <!-- Rounded Luxury Tile -->
+  <rect width="64" height="64" rx="14" fill="url(#gnBg)"/>
+  <rect width="62" height="62" x="1" y="1" rx="13" fill="none" stroke="url(#gnGold)" stroke-width="1.2" stroke-opacity="0.45"/>
+  <!-- Classic Monogram GN -->
+  <text x="31" y="44" font-family="'Playfair Display', Didot, 'Cinzel', Georgia, serif" font-size="31" font-weight="700" fill="url(#gnGold)" text-anchor="middle" letter-spacing="-1">GN</text>
+  <!-- Brilliant 4-Point Diamond Sparkle -->
+  <path d="M49 13 C49 17.5 53.5 17.5 53.5 17.5 C53.5 17.5 49 17.5 49 22 C49 17.5 44.5 17.5 44.5 17.5 C44.5 17.5 49 17.5 49 13 Z" fill="#FFFDF9"/>
+</svg>
