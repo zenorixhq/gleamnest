@@ -114,7 +114,7 @@ function AutoPlayingReelCard({
   return (
     <div
       onClick={onClick}
-      className="group relative aspect-[9/15] rounded-xl sm:rounded-2xl overflow-hidden bg-stone-900 shadow-md cursor-pointer border border-stone-300/80 hover:shadow-xl hover:-translate-y-1 transition-all duration-500 ease-out"
+      className="group relative w-full aspect-[9/16] rounded-2xl sm:rounded-3xl overflow-hidden bg-stone-950 shadow-md cursor-pointer border border-[#EADBBE] hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 ease-out"
     >
       {/* Autoplaying live video element */}
       {isDirectVideo ? (
@@ -470,9 +470,9 @@ export function CustomerReviewsWithVideos() {
         </div>
 
         {/* Dual Showcase: Video Reels on Left + Verified Customer Feedback Screenshots on Right */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 items-start">
           {/* Left Side: Client Reels (Scrollable 2 cards at a time carousel) */}
-          <div className="lg:col-span-5 flex flex-col justify-between space-y-4 sm:space-y-6">
+          <div className="flex flex-col justify-between space-y-4 sm:space-y-6">
             <div className="flex items-center justify-between pb-2 border-b border-stone-300/60">
               <span className="text-xs uppercase tracking-widest font-semibold text-stone-700 flex items-center gap-1.5">
                 <Sparkles className="w-3.5 h-3.5 text-amber-600" />
@@ -539,7 +539,7 @@ export function CustomerReviewsWithVideos() {
           </div>
 
           {/* Right Side: Scrollable 2 Cards at a time Customer Feedback Screenshots */}
-          <div className="lg:col-span-7 flex flex-col justify-between space-y-4 sm:space-y-6">
+          <div className="flex flex-col justify-between space-y-4 sm:space-y-6">
             {/* Header for Screenshots */}
             <div className="flex items-center justify-between pb-2 border-b border-stone-300/60">
               <span className="text-xs uppercase tracking-widest font-semibold text-stone-700 flex items-center gap-1.5">
