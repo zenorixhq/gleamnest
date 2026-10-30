@@ -152,10 +152,10 @@ function AutoPlayingInstaCard({
             {vid.title}
           </p>
           <p className="text-[11px] text-white/85 line-clamp-1 font-light drop-shadow-sm">
-            {vid.caption}
+            {vid.caption?.replace(/alnaya\.in/gi, "gleamnest.in").replace(/alnaya/gi, "GleamNest")}
           </p>
           <span className="inline-block text-[10px] text-[#F3DFB0] font-mono tracking-wider">
-            {vid.handle || "@gleamnest.in"}
+            {vid.handle && !vid.handle.toLowerCase().includes("alnaya") ? vid.handle : "@gleamnest.in"}
           </span>
         </div>
       </div>
@@ -163,21 +163,41 @@ function AutoPlayingInstaCard({
   );
 }
 
+// Auto-purge obsolete Instagram cache keys from browser storage
+if (typeof window !== "undefined") {
+  try {
+    localStorage.removeItem("gleamnest_instagram_reels");
+    localStorage.removeItem("gleamnest_instagram_reels_v2");
+    sessionStorage.removeItem("gleamnest_instagram_reels");
+    sessionStorage.removeItem("gleamnest_instagram_reels_v2");
+  } catch (e) {}
+}
+
+const INSTA_STORAGE_KEY = "gleamnest_instagram_reels_v3";
+
 export function InstagramReelSection() {
   const [videos, setVideos] = useState<InstagramVideoItem[]>(() => {
     if (typeof window !== "undefined") {
       try {
-        const cached = localStorage.getItem("gleamnest_instagram_reels");
+        const cached = localStorage.getItem(INSTA_STORAGE_KEY);
         if (cached) {
           const parsed = JSON.parse(cached);
           if (
             Array.isArray(parsed) &&
             parsed.length > 0 &&
-            !parsed.some((v: any) => v.poster?.startsWith("data:image/webp") || v.poster?.includes("photo-1611591475806-039775089201") || v.id === "insta-1" || v.id === "insta-2")
+            !parsed.some((v: any) =>
+              String(v.id || "").startsWith("fth-panel-") ||
+              v.id === "insta-1" ||
+              v.id === "insta-2" ||
+              v.handle?.toLowerCase().includes("alnaya") ||
+              v.caption?.toLowerCase().includes("alnaya") ||
+              v.poster?.startsWith("data:image/webp") ||
+              v.poster?.includes("photo-1611591475806-039775089201")
+            )
           ) {
             return parsed;
           } else {
-            localStorage.removeItem("gleamnest_instagram_reels");
+            localStorage.removeItem(INSTA_STORAGE_KEY);
           }
         }
       } catch (e) {}
@@ -217,17 +237,22 @@ export function InstagramReelSection() {
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data.instagramVideos)) {
-          const cleanVideos = data.instagramVideos.map((v: any) => ({
-            ...v,
-            poster: (v.poster?.startsWith("data:image/webp")
-              ? "/uploads/images/charm-bangles-poster.jpg"
-              : v.poster?.includes("photo-1611591475806-039775089201")
-              ? "/images/gleamnest-brand-card.png"
-              : v.poster) || "/images/gleamnest-brand-card.png",
-          }));
+          const cleanVideos = data.instagramVideos
+            .filter((v: any) => !String(v.id || "").startsWith("fth-panel-") && v.id !== "insta-1" && v.id !== "insta-2")
+            .map((v: any) => ({
+              ...v,
+              handle: (v.handle && !v.handle.toLowerCase().includes("alnaya")) ? v.handle : "@gleamnest.in",
+              caption: (v.caption || "").replace(/alnaya\.in/gi, "gleamnest.in").replace(/alnaya/gi, "GleamNest"),
+              instagramLink: (v.instagramLink || "").replace(/alnaya\.in/gi, "gleamnest.in").replace(/alnaya/gi, "gleamnest.in") || "https://www.instagram.com/gleamnest.in?igsh=c3I4M2h1YmprdXI5",
+              poster: (v.poster?.startsWith("data:image/webp")
+                ? "/uploads/images/charm-bangles-poster.jpg"
+                : v.poster?.includes("photo-1611591475806-039775089201")
+                ? "/images/gleamnest-brand-card.png"
+                : v.poster) || "/images/gleamnest-brand-card.png",
+            }));
           setVideos(cleanVideos);
           try {
-            localStorage.setItem("gleamnest_instagram_reels", JSON.stringify(cleanVideos));
+            localStorage.setItem(INSTA_STORAGE_KEY, JSON.stringify(cleanVideos));
           } catch (e) {}
         }
       })
@@ -368,7 +393,7 @@ export function InstagramReelSection() {
                 </div>
                 <div className="min-w-0">
                   <h4 className="text-xs font-bold truncate max-w-[180px] sm:max-w-[220px]">{activeVideo.title}</h4>
-                  <p className="text-[10px] text-stone-400 truncate">{activeVideo.handle || "@gleamnest.in"}</p>
+                  <p className="text-[10px] text-stone-400 truncate">{activeVideo.handle && !activeVideo.handle.toLowerCase().includes("alnaya") ? activeVideo.handle : "@gleamnest.in"}</p>
                 </div>
               </div>
               <div className="flex items-center gap-2 shrink-0">
@@ -422,12 +447,12 @@ export function InstagramReelSection() {
             <div className="flex-shrink-0 p-3.5 sm:p-4 bg-stone-900 border-t border-stone-800 flex items-center justify-between gap-3 text-white">
               <div className="space-y-0.5 min-w-0 max-w-[65%]">
                 <p className="text-xs font-semibold truncate">{activeVideo.title}</p>
-                <p className="text-[11px] text-stone-400 line-clamp-1">{activeVideo.caption}</p>
+                <p className="text-[11px] text-stone-400 line-clamp-1">{activeVideo.caption?.replace(/alnaya\.in/gi, "gleamnest.in").replace(/alnaya/gi, "GleamNest")}</p>
               </div>
 
               {activeVideo.instagramLink && (
                 <a
-                  href={activeVideo.instagramLink}
+                  href={activeVideo.instagramLink?.replace(/alnaya\.in/gi, "gleamnest.in").replace(/alnaya/gi, "gleamnest.in") || "https://www.instagram.com/gleamnest.in?igsh=c3I4M2h1YmprdXI5"}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="px-3.5 py-1.5 rounded-full bg-[#E1306C] text-white text-xs font-semibold hover:bg-[#C1275B] transition-colors flex items-center gap-1.5 shrink-0 shadow-sm"

@@ -278,14 +278,19 @@ export default function AdminDashboardPage() {
           try { sessionStorage.setItem("gleamnest_admin_screenshots", JSON.stringify(cleanScreenshots)); } catch (e) {}
         }
         if (Array.isArray(data.instagramVideos)) {
-          const cleanInsta = data.instagramVideos.map((v: any) => ({
-            ...v,
-            poster: (v.poster?.startsWith("data:image/webp")
-              ? "/uploads/images/charm-bangles-poster.jpg"
-              : v.poster?.includes("photo-1611591475806-039775089201")
-              ? "/images/gleamnest-brand-card.png"
-              : v.poster) || "/images/gleamnest-brand-card.png",
-          }));
+          const cleanInsta = data.instagramVideos
+            .filter((v: any) => !String(v.id || "").startsWith("fth-panel-") && v.id !== "insta-1" && v.id !== "insta-2")
+            .map((v: any) => ({
+              ...v,
+              handle: (v.handle && !v.handle.toLowerCase().includes("alnaya")) ? v.handle : "@gleamnest.in",
+              caption: (v.caption || "").replace(/alnaya\.in/gi, "gleamnest.in").replace(/alnaya/gi, "GleamNest"),
+              instagramLink: (v.instagramLink || "").replace(/alnaya\.in/gi, "gleamnest.in").replace(/alnaya/gi, "gleamnest.in"),
+              poster: (v.poster?.startsWith("data:image/webp")
+                ? "/uploads/images/charm-bangles-poster.jpg"
+                : v.poster?.includes("photo-1611591475806-039775089201")
+                ? "/images/gleamnest-brand-card.png"
+                : v.poster) || "/images/gleamnest-brand-card.png",
+            }));
           setInstagramVideosList(cleanInsta);
           try { sessionStorage.setItem("gleamnest_admin_instavideos", JSON.stringify(cleanInsta)); } catch (e) {}
         }
@@ -2643,7 +2648,7 @@ export default function AdminDashboardPage() {
 
                           <div>
                             <p className="text-xs font-bold line-clamp-1 text-white">{video.title}</p>
-                            <p className="text-[10px] text-white/80">{video.handle || "@gleamnest.in"}</p>
+                            <p className="text-[10px] text-white/80">{video.handle && !video.handle.toLowerCase().includes("alnaya") ? video.handle : "@gleamnest.in"}</p>
                           </div>
                         </div>
                       </div>
@@ -2651,13 +2656,13 @@ export default function AdminDashboardPage() {
                       <div className="p-3 bg-card border-t border-border flex flex-col justify-between flex-1 gap-2">
                         {video.caption && (
                           <p className="text-[11px] text-muted-foreground line-clamp-2">
-                            {video.caption}
+                            {video.caption?.replace(/alnaya\.in/gi, "gleamnest.in").replace(/alnaya/gi, "GleamNest")}
                           </p>
                         )}
 
                         <div className="pt-2 border-t border-border/60 flex items-center justify-between">
                           <a
-                            href={video.instagramLink || video.videoUrl}
+                            href={(video.instagramLink || video.videoUrl)?.replace(/alnaya\.in/gi, "gleamnest.in").replace(/alnaya/gi, "gleamnest.in")}
                             target="_blank"
                             rel="noreferrer"
                             className="text-[11px] font-semibold text-primary hover:underline flex items-center gap-1"

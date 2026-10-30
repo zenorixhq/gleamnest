@@ -46,17 +46,41 @@ function sanitizeData(parsed: any) {
     return { ...item, imageUrl: img };
   });
 
-  // 2. Sanitize Video Reels posters:
+  // 2. Sanitize Video Reels:
   parsed.videoReels = parsed.videoReels.map((item: any) => {
     let poster = (item.poster || "").trim();
     if (poster.startsWith("data:image/webp") || poster.includes("photo-1611591475806-039775089201") || !poster) {
       wasDirty = true;
       poster = "/images/gleamnest-brand-card.png";
     }
-    return { ...item, poster };
+    let handle = (item.handle || "").trim();
+    if (!handle || handle.toLowerCase().includes("alnaya")) {
+      handle = "@gleamnest.in";
+      wasDirty = true;
+    }
+    let influencer = (item.influencer || "").trim();
+    if (influencer.toLowerCase().includes("alnaya")) {
+      influencer = "gleamnest";
+      wasDirty = true;
+    }
+    return { ...item, poster, handle, influencer };
   });
 
-  // 3. Sanitize Instagram Videos posters:
+  // 3. Sanitize Instagram Videos: Purge obsolete placeholder panels and enforce @gleamnest.in
+  const initialInstaCount = parsed.instagramVideos.length;
+  parsed.instagramVideos = parsed.instagramVideos.filter((item: any) => {
+    const id = String(item.id || "");
+    if (id.startsWith("fth-panel-") || id === "insta-1" || id === "insta-2") {
+      wasDirty = true;
+      return false;
+    }
+    return true;
+  });
+
+  if (parsed.instagramVideos.length !== initialInstaCount) {
+    wasDirty = true;
+  }
+
   parsed.instagramVideos = parsed.instagramVideos.map((item: any) => {
     let poster = (item.poster || "").trim();
     if (poster.startsWith("data:image/webp")) {
@@ -66,7 +90,26 @@ function sanitizeData(parsed: any) {
       wasDirty = true;
       poster = "/images/gleamnest-brand-card.png";
     }
-    return { ...item, poster };
+
+    let handle = (item.handle || "").trim();
+    if (!handle || handle.toLowerCase().includes("alnaya")) {
+      handle = "@gleamnest.in";
+      wasDirty = true;
+    }
+
+    let caption = item.caption || "";
+    if (caption.toLowerCase().includes("alnaya")) {
+      caption = caption.replace(/alnaya\.in/gi, "gleamnest.in").replace(/alnaya/gi, "GleamNest");
+      wasDirty = true;
+    }
+
+    let instagramLink = item.instagramLink || "";
+    if (instagramLink.toLowerCase().includes("alnaya")) {
+      instagramLink = instagramLink.replace(/alnaya\.in/gi, "gleamnest.in").replace(/alnaya/gi, "gleamnest.in");
+      wasDirty = true;
+    }
+
+    return { ...item, poster, handle, caption, instagramLink };
   });
 
   return { sanitized: parsed, wasDirty };

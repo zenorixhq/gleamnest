@@ -93,7 +93,7 @@ export const categories: Category[] = [
 
 export const products: Product[] = [
   {
-    "id": "alnaya-prod-000",
+    "id": "gleamnest-prod-000",
     "slug": "imperial-emerald-cuban-pendant",
     "title": "Imperial Emerald & Gold Cuban Pendant",
     "shortDescription": "Signature 18K gold Cuban link chain featuring an emerald-cut radiant green stone in a double micro-pavé halo.",

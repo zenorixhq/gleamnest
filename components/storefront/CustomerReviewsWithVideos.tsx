@@ -167,7 +167,7 @@ function AutoPlayingReelCard({
             {reel.title}
           </p>
           <p className="text-[10px] text-white/80 font-medium drop-shadow-sm">
-            {reel.handle}
+            {reel.handle && !reel.handle.toLowerCase().includes("alnaya") ? reel.handle : "@gleamnest.in"}
           </p>
           {reel.productTitle && (
             <span className="inline-block text-[9px] text-amber-300 font-semibold bg-white/10 px-1.5 py-0.5 rounded">
@@ -281,6 +281,8 @@ export function CustomerReviewsWithVideos() {
         if (Array.isArray(data.videoReels) && data.videoReels.length > 0) {
           const cleanReels = data.videoReels.map((r: any) => ({
             ...r,
+            handle: (r.handle && !r.handle.toLowerCase().includes("alnaya")) ? r.handle : "@gleamnest.in",
+            influencer: (r.influencer && !r.influencer.toLowerCase().includes("alnaya")) ? r.influencer : "gleamnest",
             poster: (r.poster?.startsWith("data:image/webp") || r.poster?.includes("photo-1611591475806-039775089201") || !r.poster)
               ? "/images/gleamnest-brand-card.png"
               : r.poster,
