@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { Product } from "@/types/store";
+import { products as fallbackProducts } from "@/data/mockData";
 
 const STORAGE_KEY = "gleamnest_catalog_live_v5";
 
@@ -31,7 +32,7 @@ function getInitialProducts(): { products: Product[]; hasLoaded: boolean } {
       // Ignore if storage error
     }
   }
-  return { products: [], hasLoaded: false };
+  return { products: fallbackProducts, hasLoaded: true };
 }
 
 function persistProducts(prods: Product[]) {
@@ -80,11 +81,19 @@ export const useProductStore = create<ProductStore>((set, get) => ({
         set({ products: data, hasLoaded: true, isLoading: false, error: null });
         persistProducts(data);
       } else {
-        set({ hasLoaded: true, isLoading: false });
+        if (get().products.length === 0) {
+          set({ products: fallbackProducts, hasLoaded: true, isLoading: false });
+        } else {
+          set({ hasLoaded: true, isLoading: false });
+        }
       }
     } catch (err: any) {
       console.error("fetchProducts error:", err);
-      set({ error: err.message, isLoading: false, hasLoaded: true });
+      if (get().products.length === 0) {
+        set({ products: fallbackProducts, hasLoaded: true, isLoading: false });
+      } else {
+        set({ error: err.message, isLoading: false, hasLoaded: true });
+      }
     }
   },
 

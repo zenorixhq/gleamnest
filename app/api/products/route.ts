@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { products as fallbackProducts } from "@/data/mockData";
 import {
   getCachedProducts,
   setCachedProducts,
@@ -68,7 +69,7 @@ export async function GET(req: Request) {
     });
 
     if (dbProducts.length === 0) {
-      return NextResponse.json([], { headers: CACHE_HEADERS });
+      return NextResponse.json(fallbackProducts, { headers: CACHE_HEADERS });
     }
 
     // Format DB products into application Product interface
@@ -77,7 +78,7 @@ export async function GET(req: Request) {
     return NextResponse.json(formatted, { headers: CACHE_HEADERS });
   } catch (err) {
     console.error("GET /api/products error:", err);
-    return NextResponse.json([], { headers: CACHE_HEADERS });
+    return NextResponse.json(fallbackProducts, { headers: CACHE_HEADERS });
   }
 }
 
