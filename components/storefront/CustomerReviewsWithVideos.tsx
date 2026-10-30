@@ -184,7 +184,15 @@ export function CustomerReviewsWithVideos() {
         const cached = sessionStorage.getItem("gleamnest_cached_reels");
         if (cached) {
           const parsed = JSON.parse(cached);
-          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            const hasCorrupt = parsed.some(
+              (v: any) =>
+                v.poster?.startsWith("data:image/webp") ||
+                v.poster?.includes("photo-1611591475806-039775089201")
+            );
+            if (!hasCorrupt) return parsed;
+            sessionStorage.removeItem("gleamnest_cached_reels");
+          }
         }
       } catch {}
     }
@@ -197,7 +205,15 @@ export function CustomerReviewsWithVideos() {
         const cached = sessionStorage.getItem("gleamnest_cached_screenshots");
         if (cached) {
           const parsed = JSON.parse(cached);
-          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            const hasCorrupt = parsed.some(
+              (s: any) =>
+                s.imageUrl?.startsWith("data:image/webp") ||
+                s.imageUrl?.includes("photo-1611591475806-039775089201")
+            );
+            if (!hasCorrupt) return parsed;
+            sessionStorage.removeItem("gleamnest_cached_screenshots");
+          }
         }
       } catch {}
     }
@@ -260,15 +276,30 @@ export function CustomerReviewsWithVideos() {
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data.videoReels) && data.videoReels.length > 0) {
-          setVideoReels(data.videoReels);
+          const cleanReels = data.videoReels.map((r: any) => ({
+            ...r,
+            poster: (r.poster?.startsWith("data:image/webp") || r.poster?.includes("photo-1611591475806-039775089201") || !r.poster)
+              ? "/images/gleamnest-brand-card.png"
+              : r.poster,
+          }));
+          setVideoReels(cleanReels);
           try {
-            sessionStorage.setItem("gleamnest_cached_reels", JSON.stringify(data.videoReels));
+            sessionStorage.setItem("gleamnest_cached_reels", JSON.stringify(cleanReels));
           } catch {}
         }
         if (Array.isArray(data.feedbackScreenshots) && data.feedbackScreenshots.length > 0) {
-          setFeedbackScreenshots(data.feedbackScreenshots);
+          const cleanScreenshots = data.feedbackScreenshots.map((s: any) => {
+            let img = (s.imageUrl || "").trim();
+            if (img.startsWith("data:image/webp") || img.includes("photo-1611591475806-039775089201") || !img) {
+              img = (s.customerName === "Sn" || s.piece === "Earing" || s.id === "fb-1793177769534")
+                ? "/uploads/screenshots/customer-review-whatsapp-1.jpg"
+                : "/images/gleamnest-brand-card.png";
+            }
+            return { ...s, imageUrl: img };
+          });
+          setFeedbackScreenshots(cleanScreenshots);
           try {
-            sessionStorage.setItem("gleamnest_cached_screenshots", JSON.stringify(data.feedbackScreenshots));
+            sessionStorage.setItem("gleamnest_cached_screenshots", JSON.stringify(cleanScreenshots));
           } catch {}
         }
         if (Array.isArray(data.reviews) && data.reviews.length > 0) {
@@ -524,13 +555,14 @@ export function CustomerReviewsWithVideos() {
                 <div
                   key={item.id}
                   onClick={() => setSelectedScreenshot(item)}
-                  className="group relative w-[calc(50%-6px)] sm:w-[calc(50%-8px)] min-w-[calc(50%-6px)] sm:min-w-[calc(50%-8px)] flex-shrink-0 snap-start aspect-[9/15] rounded-2xl sm:rounded-3xl overflow-hidden bg-stone-950 shadow-md hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 ease-out cursor-pointer border border-[#EADBBE]"
+                  className="group relative w-[calc(50%-6px)] sm:w-[calc(50%-8px)] min-w-[calc(50%-6px)] sm:min-w-[calc(50%-8px)] flex-shrink-0 snap-start aspect-[9/16] rounded-2xl sm:rounded-3xl overflow-hidden bg-stone-950 shadow-md hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 ease-out cursor-pointer border border-[#EADBBE] flex items-center justify-center"
                 >
-                  {/* Clean Screenshot Image - Pure screenshot matching user reference */}
+                  {/* Clean Screenshot Image - Preserves 100% uncropped chat text & details */}
                   <img
                     src={item.imageUrl}
-                    alt="Customer feedback screenshot"
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                    alt={item.customerName || "Customer feedback screenshot"}
+                    className="w-full h-full object-contain group-hover:scale-102 transition-transform duration-500 ease-out"
+                    loading="lazy"
                     onError={(e) => {
                       (e.target as HTMLImageElement).src = "/images/gleamnest-brand-card.png";
                     }}
@@ -748,11 +780,11 @@ export function CustomerReviewsWithVideos() {
             </div>
 
             {/* Enlarged Screenshot Image */}
-            <div className="p-2 sm:p-3 bg-stone-950 flex-1 min-h-0 flex items-center justify-center overflow-hidden max-h-[48vh] sm:max-h-[54vh]">
+            <div className="p-2 sm:p-3 bg-stone-950 flex-1 min-h-0 flex items-center justify-center overflow-hidden max-h-[62vh] sm:max-h-[70vh]">
               <img
                 src={selectedScreenshot.imageUrl}
                 alt="Customer feedback screenshot"
-                className="w-auto h-auto max-w-full max-h-[46vh] sm:max-h-[52vh] object-contain rounded-xl shadow-md"
+                className="w-auto h-auto max-w-full max-h-[60vh] sm:max-h-[68vh] object-contain rounded-xl shadow-md"
                 onError={(e) => {
                   (e.target as HTMLImageElement).src = "/images/gleamnest-brand-card.png";
                 }}

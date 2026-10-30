@@ -104,11 +104,15 @@ function AutoPlayingInstaCard({
       ) : (
         <img
           src={
-            vid.poster ||
-            "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&q=80&w=700"
+            vid.poster && !vid.poster.startsWith("data:image/webp")
+              ? vid.poster
+              : "/uploads/images/charm-bangles-poster.jpg"
           }
           alt={vid.title}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+          onError={(e) => {
+            (e.target as HTMLImageElement).src = "/images/gleamnest-brand-card.png";
+          }}
         />
       )}
 
@@ -165,7 +169,7 @@ export function InstagramReelSection() {
           if (
             Array.isArray(parsed) &&
             parsed.length > 0 &&
-            !parsed.some((v: any) => v.id === "insta-1" || v.id === "insta-2")
+            !parsed.some((v: any) => v.poster?.startsWith("data:image/webp") || v.poster?.includes("photo-1611591475806-039775089201") || v.id === "insta-1" || v.id === "insta-2")
           ) {
             return parsed;
           } else {
@@ -209,9 +213,17 @@ export function InstagramReelSection() {
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data.instagramVideos)) {
-          setVideos(data.instagramVideos);
+          const cleanVideos = data.instagramVideos.map((v: any) => ({
+            ...v,
+            poster: (v.poster?.startsWith("data:image/webp")
+              ? "/uploads/images/charm-bangles-poster.jpg"
+              : v.poster?.includes("photo-1611591475806-039775089201")
+              ? "/images/gleamnest-brand-card.png"
+              : v.poster) || "/images/gleamnest-brand-card.png",
+          }));
+          setVideos(cleanVideos);
           try {
-            localStorage.setItem("gleamnest_instagram_reels", JSON.stringify(data.instagramVideos));
+            localStorage.setItem("gleamnest_instagram_reels", JSON.stringify(cleanVideos));
           } catch (e) {}
         }
       })

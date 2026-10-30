@@ -118,7 +118,13 @@ export default function AdminDashboardPage() {
     if (typeof window !== "undefined") {
       try {
         const cached = sessionStorage.getItem("gleamnest_admin_videos");
-        if (cached) return JSON.parse(cached);
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed) && !parsed.some((v: any) => v.poster?.startsWith("data:image/webp") || v.poster?.includes("photo-1611591475806-039775089201"))) {
+            return parsed;
+          }
+          sessionStorage.removeItem("gleamnest_admin_videos");
+        }
       } catch (e) {}
     }
     return [];
@@ -127,7 +133,13 @@ export default function AdminDashboardPage() {
     if (typeof window !== "undefined") {
       try {
         const cached = sessionStorage.getItem("gleamnest_admin_screenshots");
-        if (cached) return JSON.parse(cached);
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed) && !parsed.some((s: any) => s.imageUrl?.startsWith("data:image/webp") || s.imageUrl?.includes("photo-1611591475806-039775089201"))) {
+            return parsed;
+          }
+          sessionStorage.removeItem("gleamnest_admin_screenshots");
+        }
       } catch (e) {}
     }
     return [];
@@ -136,7 +148,13 @@ export default function AdminDashboardPage() {
     if (typeof window !== "undefined") {
       try {
         const cached = sessionStorage.getItem("gleamnest_admin_instavideos");
-        if (cached) return JSON.parse(cached);
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed) && !parsed.some((v: any) => v.poster?.startsWith("data:image/webp") || v.poster?.includes("photo-1611591475806-039775089201"))) {
+            return parsed;
+          }
+          sessionStorage.removeItem("gleamnest_admin_instavideos");
+        }
       } catch (e) {}
     }
     return [];
@@ -237,16 +255,39 @@ export default function AdminDashboardPage() {
           try { sessionStorage.setItem("gleamnest_admin_reviews", JSON.stringify(data.reviews)); } catch (e) {}
         }
         if (Array.isArray(data.videoReels)) {
-          setVideosList(data.videoReels);
-          try { sessionStorage.setItem("gleamnest_admin_videos", JSON.stringify(data.videoReels)); } catch (e) {}
+          const cleanVideos = data.videoReels.map((v: any) => ({
+            ...v,
+            poster: (v.poster?.startsWith("data:image/webp") || v.poster?.includes("photo-1611591475806-039775089201") || !v.poster)
+              ? "/images/gleamnest-brand-card.png"
+              : v.poster,
+          }));
+          setVideosList(cleanVideos);
+          try { sessionStorage.setItem("gleamnest_admin_videos", JSON.stringify(cleanVideos)); } catch (e) {}
         }
         if (Array.isArray(data.feedbackScreenshots)) {
-          setFeedbackScreenshotsList(data.feedbackScreenshots);
-          try { sessionStorage.setItem("gleamnest_admin_screenshots", JSON.stringify(data.feedbackScreenshots)); } catch (e) {}
+          const cleanScreenshots = data.feedbackScreenshots.map((s: any) => {
+            let img = (s.imageUrl || "").trim();
+            if (img.startsWith("data:image/webp") || img.includes("photo-1611591475806-039775089201") || !img) {
+              img = (s.customerName === "Sn" || s.piece === "Earing" || s.id === "fb-1793177769534")
+                ? "/uploads/screenshots/customer-review-whatsapp-1.jpg"
+                : "/images/gleamnest-brand-card.png";
+            }
+            return { ...s, imageUrl: img };
+          });
+          setFeedbackScreenshotsList(cleanScreenshots);
+          try { sessionStorage.setItem("gleamnest_admin_screenshots", JSON.stringify(cleanScreenshots)); } catch (e) {}
         }
         if (Array.isArray(data.instagramVideos)) {
-          setInstagramVideosList(data.instagramVideos);
-          try { sessionStorage.setItem("gleamnest_admin_instavideos", JSON.stringify(data.instagramVideos)); } catch (e) {}
+          const cleanInsta = data.instagramVideos.map((v: any) => ({
+            ...v,
+            poster: (v.poster?.startsWith("data:image/webp")
+              ? "/uploads/images/charm-bangles-poster.jpg"
+              : v.poster?.includes("photo-1611591475806-039775089201")
+              ? "/images/gleamnest-brand-card.png"
+              : v.poster) || "/images/gleamnest-brand-card.png",
+          }));
+          setInstagramVideosList(cleanInsta);
+          try { sessionStorage.setItem("gleamnest_admin_instavideos", JSON.stringify(cleanInsta)); } catch (e) {}
         }
       })
       .catch((err) => console.error("Error fetching reviews:", err));
@@ -459,7 +500,6 @@ export default function AdminDashboardPage() {
       video.src = videoUrl;
       video.muted = true;
       video.playsInline = true;
-      video.crossOrigin = "anonymous";
       video.preload = "auto";
 
       const cleanup = () => {
@@ -495,10 +535,14 @@ export default function AdminDashboardPage() {
             }
           }
 
+          // Enforce strictly even dimensions to prevent YUV stride corruption
+          targetW = Math.max(2, Math.floor(targetW / 2) * 2);
+          targetH = Math.max(2, Math.floor(targetH / 2) * 2);
+
           const canvas = document.createElement("canvas");
           canvas.width = targetW;
           canvas.height = targetH;
-          const ctx = canvas.getContext("2d");
+          const ctx = canvas.getContext("2d", { colorSpace: "srgb" });
           if (!ctx) {
             clearTimeout(timeout);
             cleanup();
@@ -506,7 +550,10 @@ export default function AdminDashboardPage() {
             return;
           }
 
+          ctx.fillStyle = "#000000";
+          ctx.fillRect(0, 0, targetW, targetH);
           ctx.drawImage(video, 0, 0, targetW, targetH);
+
           canvas.toBlob(
             (blob) => {
               clearTimeout(timeout);
@@ -523,7 +570,7 @@ export default function AdminDashboardPage() {
               }
             },
             "image/jpeg",
-            0.82
+            0.90
           );
         } catch (e) {
           clearTimeout(timeout);
@@ -2470,11 +2517,14 @@ export default function AdminDashboardPage() {
                       key={item.id}
                       className="rounded-xl border border-border overflow-hidden bg-muted/20 flex flex-col justify-between group shadow-sm hover:shadow-md transition-all"
                     >
-                      <div className="relative aspect-[3/4] bg-stone-900 overflow-hidden">
+                      <div className="relative aspect-[9/16] bg-stone-950 overflow-hidden flex items-center justify-center">
                         <img
                           src={item.imageUrl}
                           alt={item.customerName || item.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          className="w-full h-full object-contain group-hover:scale-102 transition-transform duration-500"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = "/images/gleamnest-brand-card.png";
+                          }}
                         />
                         <div className="absolute top-2 right-2 flex items-center gap-1">
                           <span className="text-[10px] bg-black/70 backdrop-blur px-2 py-0.5 rounded-full font-semibold text-white">
@@ -2567,11 +2617,14 @@ export default function AdminDashboardPage() {
                       key={video.id}
                       className="rounded-xl border border-border overflow-hidden bg-muted/20 flex flex-col justify-between group shadow-sm hover:shadow-md transition-all"
                     >
-                      <div className="relative aspect-[9/14] bg-stone-900 overflow-hidden">
+                      <div className="relative aspect-[9/16] bg-stone-950 overflow-hidden">
                         <img
-                          src={video.poster || "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&q=80&w=700"}
+                          src={video.poster || "/images/gleamnest-brand-card.png"}
                           alt={video.title}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = "/images/gleamnest-brand-card.png";
+                          }}
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-black/30 flex flex-col justify-between p-3 text-white">
                           <div className="flex items-center justify-end">
@@ -2714,11 +2767,14 @@ export default function AdminDashboardPage() {
                     key={video.id}
                     className="rounded-xl border border-border overflow-hidden bg-muted/20 flex flex-col justify-between group shadow-sm"
                   >
-                    <div className="relative aspect-[9/14] bg-black overflow-hidden">
+                    <div className="relative aspect-[9/16] bg-stone-950 overflow-hidden">
                       <img
-                        src={video.poster}
+                        src={video.poster || "/images/gleamnest-brand-card.png"}
                         alt={video.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = "/images/gleamnest-brand-card.png";
+                        }}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30 flex flex-col justify-between p-3 text-white">
                         <div />
@@ -2984,11 +3040,11 @@ export default function AdminDashboardPage() {
                       className="group relative rounded-xl border border-border/80 bg-background overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col"
                     >
                       {/* Reel Video Preview Container */}
-                      <div className="relative aspect-[9/15] w-full overflow-hidden bg-stone-900">
+                      <div className="relative aspect-[9/16] w-full overflow-hidden bg-stone-950">
                         {isDirectVideo ? (
                           <video
                             src={video.videoUrl}
-                            poster={video.poster}
+                            poster={video.poster || "/images/gleamnest-brand-card.png"}
                             autoPlay
                             loop
                             muted
@@ -3000,10 +3056,13 @@ export default function AdminDashboardPage() {
                           <img
                             src={
                               video.poster ||
-                              "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&q=80&w=700"
+                              "/images/gleamnest-brand-card.png"
                             }
                             alt={video.title}
                             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = "/images/gleamnest-brand-card.png";
+                            }}
                           />
                         )}
 
@@ -3671,8 +3730,8 @@ export default function AdminDashboardPage() {
                 {/* Preview Thumbnail */}
                 {formState.imageUrl && (
                   <div className="flex items-center gap-3 pt-1">
-                    <div className="w-16 h-20 rounded-md overflow-hidden border border-border bg-card">
-                      <img src={formState.imageUrl} alt="Preview" className="w-full h-full object-cover" />
+                    <div className="w-20 h-24 rounded-lg overflow-hidden border border-border bg-stone-950 flex items-center justify-center">
+                      <img src={formState.imageUrl} alt="Preview" className="w-full h-full object-contain" />
                     </div>
                     <div className="text-xs space-y-1">
                       <p className="font-medium text-foreground">
@@ -3993,8 +4052,17 @@ export default function AdminDashboardPage() {
                 />
 
                 {videoForm.poster && (
-                  <div className="pt-1 flex items-center gap-2">
-                    <img src={videoForm.poster} alt="Poster preview" className="w-12 h-14 object-cover rounded border border-border" />
+                  <div className="pt-1 flex items-center gap-3">
+                    <div className="w-14 h-20 rounded-lg overflow-hidden border border-border bg-stone-950 flex items-center justify-center">
+                      <img
+                        src={videoForm.poster}
+                        alt="Poster preview"
+                        className="w-full h-full object-contain"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = "/images/gleamnest-brand-card.png";
+                        }}
+                      />
+                    </div>
                     <button
                       type="button"
                       onClick={() => setVideoForm({ ...videoForm, poster: "" })}
@@ -4179,8 +4247,8 @@ export default function AdminDashboardPage() {
                 {/* Preview Thumbnail */}
                 {screenshotForm.imageUrl && (
                   <div className="flex items-center gap-3 pt-2">
-                    <div className="w-16 h-20 rounded-md overflow-hidden border border-border bg-card">
-                      <img src={screenshotForm.imageUrl} alt="Preview" className="w-full h-full object-cover" />
+                    <div className="w-20 h-28 rounded-lg overflow-hidden border border-border bg-stone-950 flex items-center justify-center">
+                      <img src={screenshotForm.imageUrl} alt="Preview" className="w-full h-full object-contain" />
                     </div>
                     <div className="text-xs space-y-1">
                       <p className="font-medium text-emerald-600">Screenshot Ready ✓</p>
@@ -4426,8 +4494,17 @@ export default function AdminDashboardPage() {
                 />
 
                 {instaVideoForm.poster && (
-                  <div className="pt-1 flex items-center gap-2">
-                    <img src={instaVideoForm.poster} alt="Poster preview" className="w-12 h-14 object-cover rounded border border-border" />
+                  <div className="pt-1 flex items-center gap-3">
+                    <div className="w-14 h-20 rounded-lg overflow-hidden border border-border bg-stone-950 flex items-center justify-center">
+                      <img
+                        src={instaVideoForm.poster}
+                        alt="Poster preview"
+                        className="w-full h-full object-contain"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = "/images/gleamnest-brand-card.png";
+                        }}
+                      />
+                    </div>
                     <button
                       type="button"
                       onClick={() => setInstaVideoForm({ ...instaVideoForm, poster: "" })}

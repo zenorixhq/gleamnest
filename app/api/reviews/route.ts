@@ -24,12 +24,52 @@ function getInitialData() {
 }
 
 function sanitizeData(parsed: any) {
-  if (!parsed || typeof parsed !== "object") return getInitialData();
+  if (!parsed || typeof parsed !== "object") return { sanitized: getInitialData(), wasDirty: false };
   if (!Array.isArray(parsed.reviews)) parsed.reviews = [];
   if (!Array.isArray(parsed.videoReels)) parsed.videoReels = [];
   if (!Array.isArray(parsed.feedbackScreenshots)) parsed.feedbackScreenshots = [];
   if (!Array.isArray(parsed.instagramVideos)) parsed.instagramVideos = [];
-  return parsed;
+
+  let wasDirty = false;
+
+  // 1. Sanitize Screenshots: Eliminate any WebP canvas base64 or 404 Unsplash URLs
+  parsed.feedbackScreenshots = parsed.feedbackScreenshots.map((item: any) => {
+    let img = (item.imageUrl || "").trim();
+    if (img.startsWith("data:image/webp") || img.includes("photo-1611591475806-039775089201") || !img) {
+      wasDirty = true;
+      if (item.customerName === "Sn" || item.piece === "Earing" || item.id === "fb-1793177769534") {
+        img = "/uploads/screenshots/customer-review-whatsapp-1.jpg";
+      } else {
+        img = "/images/gleamnest-brand-card.png";
+      }
+    }
+    return { ...item, imageUrl: img };
+  });
+
+  // 2. Sanitize Video Reels posters:
+  parsed.videoReels = parsed.videoReels.map((item: any) => {
+    let poster = (item.poster || "").trim();
+    if (poster.startsWith("data:image/webp") || poster.includes("photo-1611591475806-039775089201") || !poster) {
+      wasDirty = true;
+      poster = "/images/gleamnest-brand-card.png";
+    }
+    return { ...item, poster };
+  });
+
+  // 3. Sanitize Instagram Videos posters:
+  parsed.instagramVideos = parsed.instagramVideos.map((item: any) => {
+    let poster = (item.poster || "").trim();
+    if (poster.startsWith("data:image/webp")) {
+      wasDirty = true;
+      poster = "/uploads/images/charm-bangles-poster.jpg";
+    } else if (poster.includes("photo-1611591475806-039775089201") || !poster) {
+      wasDirty = true;
+      poster = "/images/gleamnest-brand-card.png";
+    }
+    return { ...item, poster };
+  });
+
+  return { sanitized: parsed, wasDirty };
 }
 
 async function readData() {
@@ -37,7 +77,8 @@ async function readData() {
   try {
     if (fs.existsSync(dataFilePath)) {
       const content = fs.readFileSync(dataFilePath, "utf8");
-      fileData = sanitizeData(JSON.parse(content));
+      const { sanitized } = sanitizeData(JSON.parse(content));
+      fileData = sanitized;
     }
   } catch (e) {
     console.error("Error reading fallback clientReviews.json:", e);
@@ -50,9 +91,25 @@ async function readData() {
     });
     if (row?.value) {
       const parsed = JSON.parse(row.value);
-      const sanitized = sanitizeData(parsed);
-      if (!Array.isArray(sanitized.instagramVideos)) {
+      const { sanitized, wasDirty } = sanitizeData(parsed);
+      if (!Array.isArray(sanitized.instagramVideos) || sanitized.instagramVideos.length === 0) {
         sanitized.instagramVideos = fileData.instagramVideos || [];
+      }
+      if (!Array.isArray(sanitized.feedbackScreenshots) || sanitized.feedbackScreenshots.length === 0) {
+        sanitized.feedbackScreenshots = fileData.feedbackScreenshots || [];
+      }
+      // If corrupted webp base64 or broken URLs were found in database, permanently clean the DB row
+      if (wasDirty) {
+        try {
+          await prisma.siteContent.upsert({
+            where: { key: "client_reviews" },
+            update: { value: JSON.stringify(sanitized) },
+            create: { key: "client_reviews", value: JSON.stringify(sanitized) },
+          });
+          console.log("Auto-sanitized and updated client_reviews in database.");
+        } catch (dbErr) {
+          console.warn("Could not auto-save sanitized reviews to database:", dbErr);
+        }
       }
       return sanitized;
     }
@@ -203,7 +260,7 @@ export async function POST(req: Request) {
         influencer: body.influencer || "GleamNest Client",
         handle: body.handle || "@gleamnest.in",
         title: body.title || "Jewelry Styling Reel",
-        poster: body.poster || "https://images.unsplash.com/photo-1611591475806-039775089201?auto=format&fit=crop&q=80&w=700",
+        poster: body.poster || "/images/gleamnest-brand-card.png",
         videoUrl: videoUrl,
         views: body.views || "1.2K views",
         productTitle: body.productTitle || "GleamNest Jewelry",
