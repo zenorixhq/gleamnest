@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useCartStore } from "@/store/useCartStore";
 import { storeConfig } from "@/config/store.config";
@@ -30,11 +30,39 @@ export default function CartPage() {
     setMounted(true);
   }, []);
 
-  const subtotal = useCartStore((s) => s.getSubtotal)();
-  const discount = useCartStore((s) => s.getDiscountAmount)();
-  const shipping = useCartStore((s) => s.getShippingFee)();
-  const tax = useCartStore((s) => s.getTaxAmount)();
-  const total = useCartStore((s) => s.getTotal)();
+  // Instant memoized calculations directly from in-memory cart items
+  const { subtotal, discount, shipping, tax, total } = useMemo(() => {
+    const isQatar = selectedCurrency === "QAR";
+    let sub = 0;
+    for (let i = 0; i < items.length; i++) {
+      const it = items[i];
+      const price = isQatar
+        ? it.priceQatar !== undefined && it.priceQatar !== null
+          ? it.priceQatar
+          : Math.max(10, Math.round(it.price / 20))
+        : it.price;
+      sub += price * it.quantity;
+    }
+
+    let disc = 0;
+    if (appliedCoupon && sub > 0) {
+      disc =
+        appliedCoupon.discountType === "percentage"
+          ? (sub * appliedCoupon.amount) / 100
+          : Math.min(appliedCoupon.amount, sub);
+    }
+
+    let ship = 0;
+    if (sub > 0 && !isQatar && sub < storeConfig.commerce.freeShippingThreshold) {
+      ship = storeConfig.commerce.flatShippingFee;
+    }
+
+    const taxableAmount = Math.max(0, sub - disc);
+    const tx = taxableAmount * (storeConfig.commerce.taxRatePercent / 100);
+    const tot = Math.max(0, sub - disc + ship + tx);
+
+    return { subtotal: sub, discount: disc, shipping: ship, tax: tx, total: tot };
+  }, [items, appliedCoupon, selectedCurrency]);
 
   const isQatar = selectedCurrency === "QAR";
   const freeShippingThreshold = storeConfig.commerce.freeShippingThreshold;
@@ -43,8 +71,13 @@ export default function CartPage() {
 
   if (!mounted) {
     return (
-      <div className="max-w-4xl mx-auto px-4 py-24 text-center space-y-4">
-        <p className="text-xs text-muted-foreground animate-pulse">Loading your shopping bag...</p>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 space-y-8 animate-pulse">
+        <div className="h-8 w-48 bg-muted rounded-lg" />
+        <div className="h-12 w-full bg-muted/60 rounded-xl" />
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+          <div className="lg:col-span-8 h-72 bg-muted/40 rounded-2xl" />
+          <div className="lg:col-span-4 h-72 bg-muted/40 rounded-2xl" />
+        </div>
       </div>
     );
   }
@@ -131,7 +164,12 @@ export default function CartPage() {
                 <img
                   src={item.image}
                   alt={item.title}
+                  loading="eager"
+                  decoding="async"
                   className="w-full h-full object-contain rounded-lg max-w-full max-h-full"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = "/images/gleamnest-brand-card.png";
+                  }}
                 />
               </div>
 

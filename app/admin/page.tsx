@@ -347,19 +347,44 @@ export default function AdminDashboardPage() {
   const [isSavingItem, setIsSavingItem] = useState(false);
 
   // Media Optimization & Upload
-  const compressImageIfNeeded = async (file: File, maxDim = 1400, quality = 0.82): Promise<File> => {
+  // Retains 100% crystal-clear fidelity for screenshots and product photos.
+  // Avoids Chromium WebP canvas subsampling bugs (magenta/green striping) by preserving original files
+  // and using rock-solid high-quality JPEG (0.92) with even dimensions only when resizing giant camera files.
+  const compressImageIfNeeded = async (
+    file: File,
+    folder: "screenshots" | "videos" | "images" = "images",
+    maxDim = 1800,
+    quality = 0.92
+  ): Promise<File> => {
     if (!file.type.startsWith("image/")) return file;
     // Don't re-encode vector or animated images
     if (file.type === "image/svg+xml" || file.type === "image/gif") return file;
-    // Already lightweight and compact
-    if (file.size <= 100 * 1024) return file;
 
+    // For screenshots (WhatsApp / Instagram reviews / chats), PRESERVE ORIGINAL 100%
+    // Zero canvas re-encoding: eliminates all pixel distortion, text blurriness, and chroma banding!
+    if (folder === "screenshots") {
+      if (file.size <= 8 * 1024 * 1024) return file;
+    }
+
+    // For product photos & general images under 3MB, keep original file untouched to preserve diamond/gold luster and ICC color profiles
+    if (folder === "images" && file.size <= 3 * 1024 * 1024) {
+      return file;
+    }
+
+    // Only downscale massive camera photos (> 3MB) to high-definition web size
     return new Promise((resolve) => {
       const reader = new FileReader();
       reader.onload = (e) => {
         const img = new Image();
         img.onload = () => {
           let { width, height } = img;
+
+          // If dimensions are already within HD limits and file is reasonable, resolve original
+          if (width <= maxDim && height <= maxDim && file.size <= 4 * 1024 * 1024) {
+            resolve(file);
+            return;
+          }
+
           if (width > maxDim || height > maxDim) {
             if (width > height) {
               height = Math.round((height * maxDim) / width);
@@ -370,6 +395,10 @@ export default function AdminDashboardPage() {
             }
           }
 
+          // GUARANTEE EVEN DIMENSIONS: Prevents YUV 4:2:0 chroma stride misalignment in browser encoders
+          width = width - (width % 2);
+          height = height - (height % 2);
+
           const canvas = document.createElement("canvas");
           canvas.width = width;
           canvas.height = height;
@@ -379,12 +408,21 @@ export default function AdminDashboardPage() {
             return;
           }
 
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = "high";
+
+          // If converting from PNG with potential transparency to JPEG, fill white background
+          const isPng = file.type === "image/png";
+          if (!isPng) {
+            ctx.fillStyle = "#FFFFFF";
+            ctx.fillRect(0, 0, width, height);
+          }
+
           ctx.drawImage(img, 0, 0, width, height);
 
-          // WebP delivers 30-40% smaller file size with zero perceptible quality loss
-          const supportsWebp = canvas.toDataURL("image/webp").indexOf("data:image/webp") === 0;
-          const targetMime = supportsWebp ? "image/webp" : "image/jpeg";
-          const targetExt = supportsWebp ? ".webp" : ".jpg";
+          // We use standard image/jpeg or image/png, NEVER buggy canvas webp on browser client!
+          const targetMime = isPng ? "image/png" : "image/jpeg";
+          const targetExt = isPng ? ".png" : ".jpg";
 
           canvas.toBlob(
             (blob) => {
@@ -400,7 +438,7 @@ export default function AdminDashboardPage() {
               }
             },
             targetMime,
-            quality
+            isPng ? undefined : quality
           );
         };
         img.onerror = () => resolve(file);
@@ -737,13 +775,15 @@ export default function AdminDashboardPage() {
     try {
       let fileToUpload = file;
 
-      // 1. Convert images to low size immediately (crisp 1400px, 0.82 WebP/JPEG, ~80-160KB)
-      if (file.type.startsWith("image/") && file.size > 100 * 1024) {
+      // 1. Optimize huge camera images (> 3MB) while preserving crisp text on screenshots & fine jewelry photos
+      if (file.type.startsWith("image/") && file.size > 3 * 1024 * 1024) {
         const origSizeMB = (file.size / (1024 * 1024)).toFixed(1);
-        setUploadProgressText(`Optimizing image (${origSizeMB} MB ➔ converting to fast web format)...`);
-        fileToUpload = await compressImageIfNeeded(file);
+        setUploadProgressText(`Optimizing high-res image (${origSizeMB} MB ➔ preserving razor-sharp detail)...`);
+        fileToUpload = await compressImageIfNeeded(file, folder);
         const newSizeKB = Math.round(fileToUpload.size / 1024);
-        setUploadProgressText(`Image optimized to ${newSizeKB} KB! Uploading...`);
+        setUploadProgressText(`Image ready (${newSizeKB} KB)! Uploading...`);
+      } else if (file.type.startsWith("image/")) {
+        setUploadProgressText(`Uploading original high-quality image (${Math.round(file.size / 1024)} KB)...`);
       }
       // 2. Convert videos to low size immediately (720p 30fps ~1.4Mbps, ~1.5 - 3MB)
       else if ((file.type.startsWith("video/") || folder === "videos") && file.size > 2.5 * 1024 * 1024) {

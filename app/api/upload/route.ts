@@ -84,9 +84,9 @@ export async function POST(req: Request) {
     }
 
     // 3. Fallback for serverless (Vercel) when BLOB_READ_WRITE_TOKEN is not yet connected:
-    // Only allowed for small compressed images/thumbnails under 500KB. NEVER return base64 for videos!
-    if (safeFolder !== "videos" && buffer.length <= 500 * 1024) {
-      const mimeType = file.type || "image/jpeg";
+    // Allows crystal-clear screenshots and product images up to 2.5MB. NEVER return base64 for videos!
+    if (safeFolder !== "videos" && buffer.length <= 2.5 * 1024 * 1024) {
+      const mimeType = file.type || (originalName.endsWith(".png") ? "image/png" : "image/jpeg");
       const dataUrl = `data:${mimeType};base64,${buffer.toString("base64")}`;
 
       return NextResponse.json(

@@ -531,6 +531,9 @@ export function CustomerReviewsWithVideos() {
                     src={item.imageUrl}
                     alt="Customer feedback screenshot"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = "/images/gleamnest-brand-card.png";
+                    }}
                   />
 
                   {/* While hovering: Details Reveal smoothly */}
@@ -750,6 +753,9 @@ export function CustomerReviewsWithVideos() {
                 src={selectedScreenshot.imageUrl}
                 alt="Customer feedback screenshot"
                 className="w-auto h-auto max-w-full max-h-[46vh] sm:max-h-[52vh] object-contain rounded-xl shadow-md"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = "/images/gleamnest-brand-card.png";
+                }}
               />
             </div>
 

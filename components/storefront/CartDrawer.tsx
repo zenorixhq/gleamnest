@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { useCartStore } from "@/store/useCartStore";
 import { storeConfig } from "@/config/store.config";
@@ -28,17 +28,59 @@ export function CartDrawer() {
   const applyCoupon = useCartStore((s) => s.applyCoupon);
   const removeCoupon = useCartStore((s) => s.removeCoupon);
 
-  const subtotal = useCartStore((s) => s.getSubtotal)();
-  const discount = useCartStore((s) => s.getDiscountAmount)();
-  const shipping = useCartStore((s) => s.getShippingFee)();
-  const total = useCartStore((s) => s.getTotal)();
+  // Memoized, 0ms fast price calculations directly from in-memory cart state
+  const { subtotal, discount, shipping, total, itemCount } = useMemo(() => {
+    const isQatar = selectedCurrency === "QAR";
+    let sub = 0;
+    let count = 0;
+    for (let i = 0; i < items.length; i++) {
+      const it = items[i];
+      const price = isQatar
+        ? it.priceQatar !== undefined && it.priceQatar !== null
+          ? it.priceQatar
+          : Math.max(10, Math.round(it.price / 20))
+        : it.price;
+      sub += price * it.quantity;
+      count += it.quantity;
+    }
+
+    let disc = 0;
+    if (appliedCoupon && sub > 0) {
+      disc =
+        appliedCoupon.discountType === "percentage"
+          ? (sub * appliedCoupon.amount) / 100
+          : Math.min(appliedCoupon.amount, sub);
+    }
+
+    let ship = 0;
+    if (sub > 0 && !isQatar && sub < storeConfig.commerce.freeShippingThreshold) {
+      ship = storeConfig.commerce.flatShippingFee;
+    }
+
+    const tot = Math.max(0, sub - disc + ship);
+    return { subtotal: sub, discount: disc, shipping: ship, total: tot, itemCount: count };
+  }, [items, appliedCoupon, selectedCurrency]);
 
   const [couponCode, setCouponCode] = useState("");
   const [couponMsg, setCouponMsg] = useState<{ type: "success" | "error"; text: string } | null>(
     null
   );
 
-  if (!isCartOpen) return null;
+  // Instant body scroll lock & Escape key handling
+  useEffect(() => {
+    if (!isCartOpen) return;
+    const origOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeCart();
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => {
+      document.body.style.overflow = origOverflow;
+      window.removeEventListener("keydown", handleKey);
+    };
+  }, [isCartOpen, closeCart]);
 
   const isQatar = selectedCurrency === "QAR";
   const freeShippingThreshold = storeConfig.commerce.freeShippingThreshold;
@@ -58,22 +100,33 @@ export function CartDrawer() {
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden">
+    <div
+      className={`fixed inset-0 z-50 overflow-hidden transition-all duration-300 ease-out ${
+        isCartOpen ? "pointer-events-auto visible" : "pointer-events-none invisible"
+      }`}
+      aria-hidden={!isCartOpen}
+    >
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+        className={`fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300 ease-out ${
+          isCartOpen ? "opacity-100" : "opacity-0"
+        }`}
         onClick={closeCart}
       />
 
       <div className="fixed inset-y-0 right-0 max-w-full flex pl-0 sm:pl-10">
-        <div className="w-full sm:w-[420px] bg-card shadow-2xl flex flex-col border-l border-border animate-in slide-in-from-right duration-300">
+        <div
+          className={`w-full sm:w-[420px] bg-card shadow-2xl flex flex-col border-l border-border transform transition-transform duration-300 ease-out will-change-transform ${
+            isCartOpen ? "translate-x-0" : "translate-x-full"
+          }`}
+        >
           {/* Header */}
           <div className="px-4 sm:px-6 py-4 sm:py-5 border-b border-border flex items-center justify-between">
             <div className="flex items-center gap-2">
               <ShoppingBag className="w-5 h-5 text-primary" />
               <h2 className="text-base font-bold text-foreground">Shopping Bag</h2>
               <span className="text-xs font-semibold bg-muted px-2 py-0.5 rounded-full text-muted-foreground">
-                {items.reduce((sum, i) => sum + i.quantity, 0)} items
+                {itemCount} items
               </span>
             </div>
             <button
@@ -142,7 +195,12 @@ export function CartDrawer() {
                     <img
                       src={item.image}
                       alt={item.title}
+                      loading="eager"
+                      decoding="async"
                       className="w-full h-full object-contain rounded-lg max-w-full max-h-full"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = "/images/gleamnest-brand-card.png";
+                      }}
                     />
                   </div>
                   <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
