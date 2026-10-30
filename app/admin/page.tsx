@@ -2517,11 +2517,11 @@ export default function AdminDashboardPage() {
                       key={item.id}
                       className="rounded-xl border border-border overflow-hidden bg-muted/20 flex flex-col justify-between group shadow-sm hover:shadow-md transition-all"
                     >
-                      <div className="relative aspect-[9/16] bg-stone-950 overflow-hidden flex items-center justify-center">
+                      <div className="relative aspect-[3/4] bg-muted overflow-hidden">
                         <img
                           src={item.imageUrl}
                           alt={item.customerName || item.title}
-                          className="w-full h-full object-contain group-hover:scale-102 transition-transform duration-500"
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                           onError={(e) => {
                             (e.target as HTMLImageElement).src = "/images/gleamnest-brand-card.png";
                           }}
@@ -3743,8 +3743,8 @@ export default function AdminDashboardPage() {
                 {/* Preview Thumbnail */}
                 {formState.imageUrl && (
                   <div className="flex items-center gap-3 pt-1">
-                    <div className="w-20 h-24 rounded-lg overflow-hidden border border-border bg-stone-950 flex items-center justify-center">
-                      <img src={formState.imageUrl} alt="Preview" className="w-full h-full object-contain" />
+                    <div className="w-16 h-20 rounded-md overflow-hidden border border-border bg-card">
+                      <img src={formState.imageUrl} alt="Preview" className="w-full h-full object-cover" />
                     </div>
                     <div className="text-xs space-y-1">
                       <p className="font-medium text-foreground">
@@ -4260,8 +4260,8 @@ export default function AdminDashboardPage() {
                 {/* Preview Thumbnail */}
                 {screenshotForm.imageUrl && (
                   <div className="flex items-center gap-3 pt-2">
-                    <div className="w-20 h-28 rounded-lg overflow-hidden border border-border bg-stone-950 flex items-center justify-center">
-                      <img src={screenshotForm.imageUrl} alt="Preview" className="w-full h-full object-contain" />
+                    <div className="w-16 h-20 rounded-md overflow-hidden border border-border bg-card">
+                      <img src={screenshotForm.imageUrl} alt="Preview" className="w-full h-full object-cover" />
                     </div>
                     <div className="text-xs space-y-1">
                       <p className="font-medium text-emerald-600">Screenshot Ready ✓</p>

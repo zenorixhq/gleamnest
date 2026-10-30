@@ -114,7 +114,7 @@ function AutoPlayingReelCard({
   return (
     <div
       onClick={onClick}
-      className="group relative w-full aspect-[9/16] rounded-2xl sm:rounded-3xl overflow-hidden bg-stone-950 shadow-md cursor-pointer border border-[#EADBBE] hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 ease-out"
+      className="group relative w-full aspect-[9/15] max-h-[350px] rounded-xl sm:rounded-2xl overflow-hidden bg-stone-900 shadow-md cursor-pointer border border-[#EADBBE] hover:shadow-xl hover:-translate-y-1 transition-all duration-500 ease-out"
     >
       {/* Autoplaying live video element */}
       {isDirectVideo ? (
@@ -457,8 +457,8 @@ export function CustomerReviewsWithVideos() {
   }, []);
 
   return (
-    <section className="w-full bg-[#FAF7F2] py-10 sm:py-12 md:py-14 border-t border-[#EADBBE]/80 text-[#1C1917]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 sm:space-y-8">
+    <section className="w-full bg-[#FAF7F2] py-6 sm:py-8 md:py-10 border-t border-[#EADBBE]/80 text-[#1C1917]">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4 sm:space-y-6">
         {/* Header: The love we get */}
         <div className="text-center space-y-2">
           <span className="text-[10px] sm:text-xs uppercase tracking-[0.25em] text-[#8F7234] font-medium block">
@@ -558,13 +558,13 @@ export function CustomerReviewsWithVideos() {
                 <div
                   key={item.id}
                   onClick={() => setSelectedScreenshot(item)}
-                  className="group relative w-[calc(50%-6px)] sm:w-[calc(50%-8px)] min-w-[calc(50%-6px)] sm:min-w-[calc(50%-8px)] flex-shrink-0 snap-start aspect-[9/16] rounded-2xl sm:rounded-3xl overflow-hidden bg-stone-950 shadow-md hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 ease-out cursor-pointer border border-[#EADBBE] flex items-center justify-center"
+                  className="group relative w-[calc(50%-6px)] sm:w-[calc(50%-8px)] min-w-[calc(50%-6px)] sm:min-w-[calc(50%-8px)] flex-shrink-0 snap-start aspect-[9/15] max-h-[350px] rounded-xl sm:rounded-2xl overflow-hidden bg-stone-900 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-500 ease-out cursor-pointer border border-[#EADBBE]"
                 >
-                  {/* Clean Screenshot Image - Preserves 100% uncropped chat text & details */}
+                  {/* Customer Feedback Screenshot */}
                   <img
                     src={item.imageUrl}
                     alt={item.customerName || "Customer feedback screenshot"}
-                    className="w-full h-full object-contain group-hover:scale-102 transition-transform duration-500 ease-out"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                     loading="lazy"
                     onError={(e) => {
                       (e.target as HTMLImageElement).src = "/images/gleamnest-brand-card.png";
@@ -783,11 +783,11 @@ export function CustomerReviewsWithVideos() {
             </div>
 
             {/* Enlarged Screenshot Image */}
-            <div className="p-2 sm:p-3 bg-stone-950 flex-1 min-h-0 flex items-center justify-center overflow-hidden max-h-[62vh] sm:max-h-[70vh]">
+            <div className="p-2 sm:p-3 bg-stone-900 flex-1 min-h-0 flex items-center justify-center overflow-hidden max-h-[48vh] sm:max-h-[54vh]">
               <img
                 src={selectedScreenshot.imageUrl}
                 alt="Customer feedback screenshot"
-                className="w-auto h-auto max-w-full max-h-[60vh] sm:max-h-[68vh] object-contain rounded-xl shadow-md"
+                className="w-auto h-auto max-w-full max-h-[46vh] sm:max-h-[52vh] object-contain rounded-xl shadow-md"
                 onError={(e) => {
                   (e.target as HTMLImageElement).src = "/images/gleamnest-brand-card.png";
                 }}

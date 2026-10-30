@@ -1,8 +1,7 @@
 import { create } from "zustand";
 import { Product } from "@/types/store";
-import { products as fallbackProducts } from "@/data/mockData";
 
-const STORAGE_KEY = "gleamnest_catalog_live_v4";
+const STORAGE_KEY = "gleamnest_catalog_live_v5";
 
 // Auto-purge obsolete and legacy catalog cache keys from previous versions
 if (typeof window !== "undefined") {
@@ -10,9 +9,11 @@ if (typeof window !== "undefined") {
     localStorage.removeItem("gleamnest_products_catalog");
     localStorage.removeItem("gleamnest_products_catalog_v2");
     localStorage.removeItem("gleamnest_products_catalog_v3");
+    localStorage.removeItem("gleamnest_catalog_live_v4");
     sessionStorage.removeItem("gleamnest_products_catalog");
     sessionStorage.removeItem("gleamnest_products_catalog_v2");
     sessionStorage.removeItem("gleamnest_products_catalog_v3");
+    sessionStorage.removeItem("gleamnest_catalog_live_v4");
   } catch (e) {}
 }
 
@@ -30,8 +31,7 @@ function getInitialProducts(): { products: Product[]; hasLoaded: boolean } {
       // Ignore if storage error
     }
   }
-  // Initialize immediately with full jewelry catalog fallback for 0ms instantaneous render
-  return { products: fallbackProducts, hasLoaded: true };
+  return { products: [], hasLoaded: false };
 }
 
 function persistProducts(prods: Product[]) {
@@ -61,7 +61,7 @@ const initial = getInitialProducts();
 
 export const useProductStore = create<ProductStore>((set, get) => ({
   products: initial.products,
-  isLoading: false,
+  isLoading: !initial.hasLoaded,
   hasLoaded: initial.hasLoaded,
   error: null,
 
@@ -84,11 +84,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       }
     } catch (err: any) {
       console.error("fetchProducts error:", err);
-      if (get().products.length === 0) {
-        set({ products: fallbackProducts, hasLoaded: true, isLoading: false });
-      } else {
-        set({ error: err.message, isLoading: false, hasLoaded: true });
-      }
+      set({ error: err.message, isLoading: false, hasLoaded: true });
     }
   },
 
