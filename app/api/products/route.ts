@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { products as fallbackProducts } from "@/data/mockData";
+import {
+  getCachedProducts,
+  setCachedProducts,
+  invalidateProductsCache,
+} from "@/lib/productCache";
 
 export const dynamic = "force-dynamic";
 
@@ -42,11 +47,23 @@ function formatProduct(p: any) {
 }
 
 const CACHE_HEADERS = {
-  "Cache-Control": "public, s-maxage=30, stale-while-revalidate=120",
+  "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
 };
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
+    const { searchParams } = new URL(req.url);
+    const forceFresh = searchParams.get("fresh") === "true";
+
+    // 1. Fast path: Serve from server in-memory cache (< 1ms) if not requested fresh
+    if (!forceFresh) {
+      const memoryHit = getCachedProducts();
+      if (memoryHit && memoryHit.length > 0) {
+        return NextResponse.json(memoryHit, { headers: CACHE_HEADERS });
+      }
+    }
+
+    // 2. Query Neon PostgreSQL database
     const dbProducts = await prisma.product.findMany({
       orderBy: { createdAt: "desc" },
     });
@@ -57,6 +74,7 @@ export async function GET() {
 
     // Format DB products into application Product interface
     const formatted = dbProducts.map(formatProduct);
+    setCachedProducts(formatted);
     return NextResponse.json(formatted, { headers: CACHE_HEADERS });
   } catch (err) {
     console.error("GET /api/products error:", err);
@@ -111,6 +129,7 @@ export async function POST(req: Request) {
       },
     });
 
+    invalidateProductsCache();
     return NextResponse.json(formatProduct(newProduct), { status: 201 });
   } catch (err: any) {
     console.error("POST /api/products error:", err);

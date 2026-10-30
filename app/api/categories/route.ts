@@ -16,7 +16,14 @@ const CACHE_HEADERS = {
   "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
 };
 
-async function getStoredCategories(): Promise<Category[]> {
+let memoryCachedCategories: Category[] | null = null;
+let lastCategoriesCacheTime = 0;
+const CATEGORIES_CACHE_TTL = 60 * 1000;
+
+async function getStoredCategories(forceFresh = false): Promise<Category[]> {
+  if (!forceFresh && memoryCachedCategories && Date.now() - lastCategoriesCacheTime < CATEGORIES_CACHE_TTL) {
+    return memoryCachedCategories;
+  }
   try {
     const row = await prisma.siteContent.findUnique({
       where: { key: "site_categories" },
@@ -24,23 +31,31 @@ async function getStoredCategories(): Promise<Category[]> {
     if (row?.value) {
       const parsed = JSON.parse(row.value);
       if (Array.isArray(parsed) && parsed.length > 0) {
+        memoryCachedCategories = parsed;
+        lastCategoriesCacheTime = Date.now();
         return parsed;
       }
     }
   } catch (err) {
     console.warn("Error reading site_categories from DB:", err);
   }
+  memoryCachedCategories = defaultCategories;
+  lastCategoriesCacheTime = Date.now();
   return defaultCategories;
 }
 
 async function saveCategories(categoriesList: Category[]): Promise<boolean> {
   try {
+    memoryCachedCategories = null;
+    lastCategoriesCacheTime = 0;
     const jsonStr = JSON.stringify(categoriesList);
     await prisma.siteContent.upsert({
       where: { key: "site_categories" },
       update: { value: jsonStr },
       create: { key: "site_categories", value: jsonStr },
     });
+    memoryCachedCategories = categoriesList;
+    lastCategoriesCacheTime = Date.now();
     return true;
   } catch (err) {
     console.error("Error saving site_categories to DB:", err);
@@ -48,8 +63,10 @@ async function saveCategories(categoriesList: Category[]): Promise<boolean> {
   }
 }
 
-export async function GET() {
-  const categoriesList = await getStoredCategories();
+export async function GET(req: Request) {
+  const url = new URL(req.url);
+  const forceFresh = url.searchParams.get("fresh") === "true";
+  const categoriesList = await getStoredCategories(forceFresh);
   return NextResponse.json(categoriesList, { headers: CACHE_HEADERS });
 }
 

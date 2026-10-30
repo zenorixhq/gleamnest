@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { Product } from "@/types/store";
+import { products as fallbackProducts } from "@/data/mockData";
 
 const STORAGE_KEY = "gleamnest_catalog_live_v4";
 
@@ -29,7 +30,8 @@ function getInitialProducts(): { products: Product[]; hasLoaded: boolean } {
       // Ignore if storage error
     }
   }
-  return { products: [], hasLoaded: false };
+  // Initialize immediately with full jewelry catalog fallback for 0ms instantaneous render
+  return { products: fallbackProducts, hasLoaded: true };
 }
 
 function persistProducts(prods: Product[]) {
@@ -48,7 +50,7 @@ interface ProductStore {
   error: string | null;
 
   // Actions
-  fetchProducts: () => Promise<void>;
+  fetchProducts: (forceFresh?: boolean) => Promise<void>;
   addProduct: (productData: any) => Promise<Product | null>;
   updateProduct: (id: string, updateData: any) => Promise<Product | null>;
   deleteProduct: (id: string) => Promise<boolean>;
@@ -59,19 +61,22 @@ const initial = getInitialProducts();
 
 export const useProductStore = create<ProductStore>((set, get) => ({
   products: initial.products,
-  isLoading: !initial.hasLoaded,
+  isLoading: false,
   hasLoaded: initial.hasLoaded,
   error: null,
 
-  fetchProducts: async () => {
+  fetchProducts: async (forceFresh = false) => {
     try {
-      if (get().products.length === 0) {
+      const currentProducts = get().products;
+      if (!currentProducts || currentProducts.length === 0) {
         set({ isLoading: true });
       }
-      const res = await fetch(`/api/products?t=${Date.now()}`, { cache: "no-store" });
+
+      const url = forceFresh ? "/api/products?fresh=true" : "/api/products";
+      const res = await fetch(url);
       if (!res.ok) throw new Error("Failed to fetch products");
       const data = await res.json();
-      if (Array.isArray(data)) {
+      if (Array.isArray(data) && data.length > 0) {
         set({ products: data, hasLoaded: true, isLoading: false, error: null });
         persistProducts(data);
       } else {
@@ -79,7 +84,11 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       }
     } catch (err: any) {
       console.error("fetchProducts error:", err);
-      set({ error: err.message, isLoading: false, hasLoaded: true });
+      if (get().products.length === 0) {
+        set({ products: fallbackProducts, hasLoaded: true, isLoading: false });
+      } else {
+        set({ error: err.message, isLoading: false, hasLoaded: true });
+      }
     }
   },
 

@@ -43,9 +43,11 @@ export function Header() {
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
   const wishlistCount = wishlist.length;
 
-  // Track scroll position for sticky header styling
+  // Track scroll position for sticky header styling & warm up product catalog silently
   useEffect(() => {
     setMounted(true);
+    // Warm up product store in background without blocking
+    useProductStore.getState().fetchProducts();
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
     };

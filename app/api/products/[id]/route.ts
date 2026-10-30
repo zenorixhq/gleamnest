@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { invalidateProductsCache } from "@/lib/productCache";
 
 export const dynamic = "force-dynamic";
 
@@ -104,6 +105,7 @@ export async function PUT(
       },
     });
 
+    invalidateProductsCache();
     return NextResponse.json(formatProduct(updated));
   } catch (err: any) {
     console.error("PUT /api/products/[id] error:", err);
@@ -122,6 +124,7 @@ export async function DELETE(
     await prisma.product.delete({
       where: { id: params.id },
     });
+    invalidateProductsCache();
     return NextResponse.json({ success: true, message: "Product deleted" });
   } catch (err: any) {
     console.error("DELETE /api/products/[id] error:", err);
