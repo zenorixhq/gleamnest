@@ -121,7 +121,7 @@ function AutoPlayingReelCard({
         <video
           ref={videoRef}
           src={reel.videoUrl}
-          poster={reel.poster}
+          poster={reel.poster && !reel.poster.startsWith("data:image/webp") ? reel.poster : undefined}
           autoPlay
           loop
           muted={isMuted}
@@ -131,9 +131,12 @@ function AutoPlayingReelCard({
         />
       ) : (
         <img
-          src={reel.poster}
+          src={reel.poster && !reel.poster.startsWith("data:image/webp") ? reel.poster : "/images/gleamnest-brand-card.png"}
           alt={reel.title}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+          onError={(e) => {
+            (e.target as HTMLImageElement).src = "/images/gleamnest-brand-card.png";
+          }}
         />
       )}
 
@@ -853,7 +856,7 @@ export function CustomerReviewsWithVideos() {
             <div className="relative flex-1 min-h-0 max-h-[58vh] sm:max-h-[64vh] bg-black flex items-center justify-center overflow-hidden">
               <video
                 src={selectedVideo.videoUrl}
-                poster={selectedVideo.poster}
+                poster={selectedVideo.poster && !selectedVideo.poster.startsWith("data:image/webp") ? selectedVideo.poster : undefined}
                 autoPlay
                 controls
                 playsInline

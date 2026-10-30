@@ -2619,7 +2619,11 @@ export default function AdminDashboardPage() {
                     >
                       <div className="relative aspect-[9/16] bg-stone-950 overflow-hidden">
                         <img
-                          src={video.poster || "/images/gleamnest-brand-card.png"}
+                          src={
+                            video.poster && !video.poster.startsWith("data:image/webp")
+                              ? video.poster
+                              : "/images/gleamnest-brand-card.png"
+                          }
                           alt={video.title}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                           onError={(e) => {
@@ -2769,7 +2773,11 @@ export default function AdminDashboardPage() {
                   >
                     <div className="relative aspect-[9/16] bg-stone-950 overflow-hidden">
                       <img
-                        src={video.poster || "/images/gleamnest-brand-card.png"}
+                        src={
+                          video.poster && !video.poster.startsWith("data:image/webp")
+                            ? video.poster
+                            : "/images/gleamnest-brand-card.png"
+                        }
                         alt={video.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         onError={(e) => {
@@ -3044,7 +3052,11 @@ export default function AdminDashboardPage() {
                         {isDirectVideo ? (
                           <video
                             src={video.videoUrl}
-                            poster={video.poster || "/images/gleamnest-brand-card.png"}
+                            poster={
+                              video.poster && !video.poster.startsWith("data:image/webp")
+                                ? video.poster
+                                : "/images/gleamnest-brand-card.png"
+                            }
                             autoPlay
                             loop
                             muted
@@ -3055,8 +3067,9 @@ export default function AdminDashboardPage() {
                         ) : (
                           <img
                             src={
-                              video.poster ||
-                              "/images/gleamnest-brand-card.png"
+                              video.poster && !video.poster.startsWith("data:image/webp")
+                                ? video.poster
+                                : "/images/gleamnest-brand-card.png"
                             }
                             alt={video.title}
                             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"

@@ -93,7 +93,11 @@ function AutoPlayingInstaCard({
         <video
           ref={videoRef}
           src={vid.videoUrl}
-          poster={vid.poster}
+          poster={
+            vid.poster && !vid.poster.startsWith("data:image/webp")
+              ? vid.poster
+              : "/uploads/images/charm-bangles-poster.jpg"
+          }
           autoPlay
           loop
           muted={isMuted}
@@ -400,7 +404,11 @@ export function InstagramReelSection() {
                 <video
                   ref={videoPlayerRef}
                   src={activeVideo.videoUrl}
-                  poster={activeVideo.poster}
+                  poster={
+                    activeVideo.poster && !activeVideo.poster.startsWith("data:image/webp")
+                      ? activeVideo.poster
+                      : undefined
+                  }
                   autoPlay
                   loop
                   playsInline
