@@ -91,7 +91,10 @@ export default function AdminDashboardPage() {
         const cached = sessionStorage.getItem("gleamnest_categories");
         if (cached) {
           const parsed = JSON.parse(cached);
-          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          if (Array.isArray(parsed) && parsed.length > 0 && !parsed.some((c: any) => c.image?.includes("photo-1573408301185"))) {
+            return parsed;
+          }
+          sessionStorage.removeItem("gleamnest_categories");
         }
       } catch (e) {}
     }

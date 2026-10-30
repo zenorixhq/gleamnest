@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { Product } from "@/types/store";
 import { products as fallbackProducts } from "@/data/mockData";
 
-const STORAGE_KEY = "gleamnest_catalog_live_v5";
+const STORAGE_KEY = "gleamnest_catalog_live_v7";
 
 // Auto-purge obsolete and legacy catalog cache keys from previous versions
 if (typeof window !== "undefined") {
@@ -11,10 +11,14 @@ if (typeof window !== "undefined") {
     localStorage.removeItem("gleamnest_products_catalog_v2");
     localStorage.removeItem("gleamnest_products_catalog_v3");
     localStorage.removeItem("gleamnest_catalog_live_v4");
+    localStorage.removeItem("gleamnest_catalog_live_v5");
+    localStorage.removeItem("gleamnest_catalog_live_v6");
     sessionStorage.removeItem("gleamnest_products_catalog");
     sessionStorage.removeItem("gleamnest_products_catalog_v2");
     sessionStorage.removeItem("gleamnest_products_catalog_v3");
     sessionStorage.removeItem("gleamnest_catalog_live_v4");
+    sessionStorage.removeItem("gleamnest_catalog_live_v5");
+    sessionStorage.removeItem("gleamnest_catalog_live_v6");
   } catch (e) {}
 }
 
@@ -25,7 +29,19 @@ function getInitialProducts(): { products: Product[]; hasLoaded: boolean } {
       if (cached) {
         const parsed = JSON.parse(cached);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          return { products: parsed, hasLoaded: true };
+          // Verify cache does NOT contain stale template products
+          const isStale = parsed.some(
+            (p: any) =>
+              p.slug === "imperial-emerald-cuban-pendant" ||
+              p.title === "Statement Ring" ||
+              p.slug === "statement-ring" ||
+              p.title === "Imperial Emerald & Gold Cuban Pendant"
+          );
+          if (!isStale) {
+            return { products: parsed, hasLoaded: true };
+          }
+          localStorage.removeItem(STORAGE_KEY);
+          sessionStorage.removeItem(STORAGE_KEY);
         }
       }
     } catch (e) {
