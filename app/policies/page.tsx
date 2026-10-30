@@ -41,25 +41,11 @@ function PoliciesContent() {
     }
   }, [requestedTab]);
 
-  useEffect(() => {
-    if (zoomedImage) {
-      document.body.style.overflow = "hidden";
-      if ((window as any).__lenis) (window as any).__lenis.stop();
-    } else {
-      document.body.style.overflow = "";
-      if ((window as any).__lenis) (window as any).__lenis.start();
-    }
-    return () => {
-      document.body.style.overflow = "";
-      if ((window as any).__lenis) (window as any).__lenis.start();
-    };
-  }, [zoomedImage]);
-
   const tabs: { id: PolicyTab; label: string; icon: typeof Ruler; badge?: string }[] = [
     { id: "size-guide", label: "Size Guide", icon: Ruler, badge: "Bangles & Rings" },
     { id: "return-refund", label: "Return & Refund Policy", icon: RotateCcw, badge: "Important" },
     { id: "ordering-instructions", label: "Before Ordering", icon: AlertCircle, badge: "Must Read" },
-    { id: "care-guide", label: "Jewelry Care Guide", icon: Sparkles, badge: "Care & Standards" },
+    { id: "care-guide", label: "Jewelry Care Guide", icon: Sparkles, badge: "304 & 306 Steel" },
     { id: "shipping", label: "Shipping (DTDC & India Post)", icon: Truck, badge: "Pan-India" },
   ];
 
@@ -641,23 +627,23 @@ function PoliciesContent() {
               <div className="space-y-6 animate-in fade-in-50">
                 <div className="border-b border-border pb-4">
                   <h2 className="text-2xl font-bold text-foreground">
-                    Jewelry Care Guide
+                    Jewelry Care Guide (304 & 306 Grade Steel)
                   </h2>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Engineered in hallmark stainless steel with radiant 18K gold finish.
+                    Engineered in surgical-grade stainless steel with 18K real gold PVD coating.
                   </p>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div className="p-4 rounded-xl bg-background border border-border text-center space-y-1">
                     <span className="text-xs font-bold text-primary uppercase">Base Metal</span>
-                    <p className="text-sm font-black text-foreground">Premium Stainless Steel</p>
+                    <p className="text-sm font-black text-foreground">304 & 306 Stainless Steel</p>
                     <p className="text-[11px] text-muted-foreground">Surgical grade & non-corrosive</p>
                   </div>
 
                   <div className="p-4 rounded-xl bg-background border border-border text-center space-y-1">
                     <span className="text-xs font-bold text-primary uppercase">Gold Coating</span>
-                    <p className="text-sm font-black text-foreground">Radiant 18K Gold Finish</p>
+                    <p className="text-sm font-black text-foreground">Real 18K PVD Gold</p>
                     <p className="text-[11px] text-muted-foreground">Vacuum bonded for durability</p>
                   </div>
 
@@ -678,7 +664,7 @@ function PoliciesContent() {
                       <div>
                         <strong className="text-foreground">Waterproof & Shower Friendly:</strong>
                         <p className="text-muted-foreground mt-0.5 leading-relaxed">
-                          Feel free to wear your GleamNest jewelry in the shower, swimming pool, gym workouts, or during daily chores. Our fine jewelry pieces will not rust or discolor your skin.
+                          Feel free to wear your GleamNest jewelry in the shower, swimming pool, gym workouts, or during daily chores. Our 304 and 306 grade pieces will not rust or discolor your skin.
                         </p>
                       </div>
                     </div>
@@ -809,8 +795,7 @@ function PoliciesContent() {
       {/* Fullscreen Image Zoom Lightbox */}
       {zoomedImage && (
         <div
-          data-lenis-prevent
-          className="fixed inset-0 z-[9999] bg-black/90 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto animate-in fade-in-0 overscroll-contain"
+          className="fixed inset-0 z-[9999] bg-black/90 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto animate-in fade-in-0"
           onClick={() => setZoomedImage(null)}
         >
           <div className="relative max-w-4xl my-auto max-h-[90vh] overflow-hidden flex items-center justify-center">

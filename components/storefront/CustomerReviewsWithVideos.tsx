@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import {
   Play,
@@ -166,7 +167,7 @@ function AutoPlayingReelCard({
             {reel.handle}
           </p>
           {reel.productTitle && (
-            <span className="inline-block text-[9px] text-purple-300 font-semibold bg-white/10 px-1.5 py-0.5 rounded">
+            <span className="inline-block text-[9px] text-amber-300 font-semibold bg-white/10 px-1.5 py-0.5 rounded">
               {reel.productTitle}
             </span>
           )}
@@ -180,7 +181,7 @@ export function CustomerReviewsWithVideos() {
   const [videoReels, setVideoReels] = useState<VideoReel[]>(() => {
     if (typeof window !== "undefined") {
       try {
-        const cached = sessionStorage.getItem("alnaya_cached_reels");
+        const cached = sessionStorage.getItem("gleamnest_cached_reels");
         if (cached) {
           const parsed = JSON.parse(cached);
           if (Array.isArray(parsed) && parsed.length > 0) return parsed;
@@ -193,7 +194,7 @@ export function CustomerReviewsWithVideos() {
   const [feedbackScreenshots, setFeedbackScreenshots] = useState<FeedbackScreenshot[]>(() => {
     if (typeof window !== "undefined") {
       try {
-        const cached = sessionStorage.getItem("alnaya_cached_screenshots");
+        const cached = sessionStorage.getItem("gleamnest_cached_screenshots");
         if (cached) {
           const parsed = JSON.parse(cached);
           if (Array.isArray(parsed) && parsed.length > 0) return parsed;
@@ -206,7 +207,7 @@ export function CustomerReviewsWithVideos() {
   const [reviewQuotes, setReviewQuotes] = useState<ReviewQuote[]>(() => {
     if (typeof window !== "undefined") {
       try {
-        const cached = sessionStorage.getItem("alnaya_cached_quotes");
+        const cached = sessionStorage.getItem("gleamnest_cached_quotes");
         if (cached) {
           const parsed = JSON.parse(cached);
           if (Array.isArray(parsed) && parsed.length > 0) return parsed;
@@ -218,10 +219,36 @@ export function CustomerReviewsWithVideos() {
 
   const [selectedVideo, setSelectedVideo] = useState<VideoReel | null>(null);
   const [selectedScreenshot, setSelectedScreenshot] = useState<FeedbackScreenshot | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!selectedVideo && !selectedScreenshot) return;
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setSelectedVideo(null);
+        setSelectedScreenshot(null);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [selectedVideo, selectedScreenshot]);
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [isLeftDisabled, setIsLeftDisabled] = useState(true);
   const [isRightDisabled, setIsRightDisabled] = useState(false);
+
+  const reelsScrollRef = useRef<HTMLDivElement>(null);
+  const [isReelsLeftDisabled, setIsReelsLeftDisabled] = useState(true);
+  const [isReelsRightDisabled, setIsReelsRightDisabled] = useState(false);
 
   const quotesScrollRef = useRef<HTMLDivElement>(null);
   const [isQuotesLeftDisabled, setIsQuotesLeftDisabled] = useState(true);
@@ -235,19 +262,19 @@ export function CustomerReviewsWithVideos() {
         if (Array.isArray(data.videoReels) && data.videoReels.length > 0) {
           setVideoReels(data.videoReels);
           try {
-            sessionStorage.setItem("alnaya_cached_reels", JSON.stringify(data.videoReels));
+            sessionStorage.setItem("gleamnest_cached_reels", JSON.stringify(data.videoReels));
           } catch {}
         }
         if (Array.isArray(data.feedbackScreenshots) && data.feedbackScreenshots.length > 0) {
           setFeedbackScreenshots(data.feedbackScreenshots);
           try {
-            sessionStorage.setItem("alnaya_cached_screenshots", JSON.stringify(data.feedbackScreenshots));
+            sessionStorage.setItem("gleamnest_cached_screenshots", JSON.stringify(data.feedbackScreenshots));
           } catch {}
         }
         if (Array.isArray(data.reviews) && data.reviews.length > 0) {
           setReviewQuotes(data.reviews);
           try {
-            sessionStorage.setItem("alnaya_cached_quotes", JSON.stringify(data.reviews));
+            sessionStorage.setItem("gleamnest_cached_quotes", JSON.stringify(data.reviews));
           } catch {}
         }
       })
@@ -289,6 +316,45 @@ export function CustomerReviewsWithVideos() {
 
   const scrollNext = () => {
     const el = scrollContainerRef.current;
+    if (!el) return;
+    el.scrollBy({ left: el.clientWidth, behavior: "smooth" });
+  };
+
+  // Update Left / Right Arrow states based on scroll position for Client Reels
+  const updateReelsScrollButtons = () => {
+    const el = reelsScrollRef.current;
+    if (!el) return;
+    const { scrollLeft, scrollWidth, clientWidth } = el;
+    setIsReelsLeftDisabled(scrollLeft <= 6);
+    setIsReelsRightDisabled(scrollLeft + clientWidth >= scrollWidth - 6);
+  };
+
+  useEffect(() => {
+    updateReelsScrollButtons();
+    const el = reelsScrollRef.current;
+    if (!el) return;
+
+    el.addEventListener("scroll", updateReelsScrollButtons, { passive: true });
+    window.addEventListener("resize", updateReelsScrollButtons);
+
+    const timer = setTimeout(updateReelsScrollButtons, 100);
+
+    return () => {
+      el.removeEventListener("scroll", updateReelsScrollButtons);
+      window.removeEventListener("resize", updateReelsScrollButtons);
+      clearTimeout(timer);
+    };
+  }, [videoReels]);
+
+  // Scroll Client Reels 2 cards at a time (scrolls by container clientWidth)
+  const scrollReelsPrev = () => {
+    const el = reelsScrollRef.current;
+    if (!el) return;
+    el.scrollBy({ left: -el.clientWidth, behavior: "smooth" });
+  };
+
+  const scrollReelsNext = () => {
+    const el = reelsScrollRef.current;
     if (!el) return;
     el.scrollBy({ left: el.clientWidth, behavior: "smooth" });
   };
@@ -361,7 +427,7 @@ export function CustomerReviewsWithVideos() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 sm:space-y-8">
         {/* Header: The love we get */}
         <div className="text-center space-y-2">
-          <span className="text-[10px] sm:text-xs uppercase tracking-[0.25em] text-[#7E22CE] font-medium block">
+          <span className="text-[10px] sm:text-xs uppercase tracking-[0.25em] text-[#8F7234] font-medium block">
             IN THEIR WORDS
           </span>
           <h2 className="font-editorial text-3xl sm:text-5xl font-normal tracking-tight text-[#1C1917]">
@@ -371,24 +437,70 @@ export function CustomerReviewsWithVideos() {
 
         {/* Dual Showcase: Video Reels on Left + Verified Customer Feedback Screenshots on Right */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
-          {/* Left Side: Client Reels */}
-          <div className="lg:col-span-5 space-y-4">
+          {/* Left Side: Client Reels (Scrollable 2 cards at a time carousel) */}
+          <div className="lg:col-span-5 flex flex-col justify-between space-y-4 sm:space-y-6">
             <div className="flex items-center justify-between pb-2 border-b border-stone-300/60">
               <span className="text-xs uppercase tracking-widest font-semibold text-stone-700 flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-purple-600" />
+                <Sparkles className="w-3.5 h-3.5 text-amber-600" />
                 <span>Client Reels</span>
               </span>
               <span className="text-[11px] text-stone-500">Real wear tests</span>
             </div>
 
-            <div className="grid grid-cols-2 gap-3 sm:gap-4">
+            {/* Scrollable Container (Shows 2 reels at a time) */}
+            <div
+              ref={reelsScrollRef}
+              className="flex gap-3 sm:gap-4 overflow-x-auto pb-2 no-scrollbar scroll-smooth snap-x snap-mandatory"
+            >
               {videoReels.map((reel) => (
-                <AutoPlayingReelCard
+                <div
                   key={reel.id}
-                  reel={reel}
-                  onClick={() => setSelectedVideo(reel)}
-                />
+                  className="w-[calc(50%-6px)] sm:w-[calc(50%-8px)] min-w-[calc(50%-6px)] sm:min-w-[calc(50%-8px)] flex-shrink-0 snap-start"
+                >
+                  <AutoPlayingReelCard
+                    reel={reel}
+                    onClick={() => setSelectedVideo(reel)}
+                  />
+                </div>
               ))}
+            </div>
+
+            {/* Navigation Controls: Left and Right Arrows for Client Reels */}
+            <div className="flex items-center justify-between pt-1">
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={scrollReelsPrev}
+                  disabled={isReelsLeftDisabled}
+                  className={`w-9 h-9 rounded-full border flex items-center justify-center transition-all ${
+                    isReelsLeftDisabled
+                      ? "border-stone-200 text-stone-300 bg-stone-100 cursor-not-allowed opacity-35"
+                      : "border-stone-300 hover:border-stone-900 text-stone-700 hover:text-stone-900 bg-white hover:bg-stone-50 active:scale-95 shadow-sm cursor-pointer"
+                  }`}
+                  aria-label="Previous reels"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={scrollReelsNext}
+                  disabled={isReelsRightDisabled}
+                  className={`w-9 h-9 rounded-full border flex items-center justify-center transition-all ${
+                    isReelsRightDisabled
+                      ? "border-stone-200 text-stone-300 bg-stone-100 cursor-not-allowed opacity-35"
+                      : "border-stone-300 hover:border-stone-900 text-stone-700 hover:text-stone-900 bg-white hover:bg-stone-50 active:scale-95 shadow-sm cursor-pointer"
+                  }`}
+                  aria-label="Next reels"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+
+              <div className="flex items-center gap-1.5 text-xs text-stone-500">
+                <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+                <span className="hidden sm:inline">Tap to Play Reel</span>
+                <span className="sm:hidden">Tap to Play</span>
+              </div>
             </div>
           </div>
 
@@ -442,7 +554,7 @@ export function CustomerReviewsWithVideos() {
                     {/* Bottom: Piece & caption details revealed on hover */}
                     <div className="space-y-1">
                       {item.piece && (
-                        <span className="inline-block text-[9px] sm:text-[10px] text-purple-300 font-semibold bg-white/10 backdrop-blur-sm px-2 py-0.5 rounded">
+                        <span className="inline-block text-[9px] sm:text-[10px] text-amber-300 font-semibold bg-white/10 backdrop-blur-sm px-2 py-0.5 rounded">
                           Piece: {item.piece}
                         </span>
                       )}
@@ -506,7 +618,7 @@ export function CustomerReviewsWithVideos() {
             <div className="flex items-center justify-between pb-2 border-b border-stone-300/60">
               <div>
                 <span className="text-xs uppercase tracking-widest font-semibold text-stone-700 flex items-center gap-1.5">
-                  <Quote className="w-3.5 h-3.5 text-[#7E22CE]" />
+                  <Quote className="w-3.5 h-3.5 text-[#8F7234]" />
                   <span>Customer Review Quotes</span>
                 </span>
                 <p className="text-[11px] text-stone-500">Verified client testimonials & reviews</p>
@@ -551,7 +663,7 @@ export function CustomerReviewsWithVideos() {
               {reviewQuotes.map((item, idx) => (
                 <div
                   key={item.id || idx}
-                  className="w-[280px] xs:w-[320px] sm:w-[380px] min-w-[280px] xs:min-w-[320px] sm:min-w-[380px] flex-shrink-0 snap-start bg-[#FFFDF9] border border-[#EADBBE] rounded-2xl p-5 sm:p-6 flex flex-col justify-between space-y-4 shadow-sm hover:shadow-md hover:border-purple-400/50 transition-all"
+                  className="w-[280px] xs:w-[320px] sm:w-[380px] min-w-[280px] xs:min-w-[320px] sm:min-w-[380px] flex-shrink-0 snap-start bg-[#FFFDF9] border border-[#EADBBE] rounded-2xl p-5 sm:p-6 flex flex-col justify-between space-y-4 shadow-sm hover:shadow-md hover:border-[#8F7234]/50 transition-all"
                 >
                   <div className="space-y-3">
                     {/* Rating Stars & Quote Glyph */}
@@ -577,7 +689,7 @@ export function CustomerReviewsWithVideos() {
                       <p className="text-xs font-bold text-stone-900">{item.author}</p>
                       <p className="text-[11px] text-stone-500 font-light">{item.location}</p>
                       {item.piece && (
-                        <p className="text-[10px] text-purple-700 font-medium pt-0.5 truncate max-w-[200px]">
+                        <p className="text-[10px] text-[#8F7234] font-medium pt-0.5 truncate max-w-[200px]">
                           Piece: {item.piece}
                         </p>
                       )}
@@ -595,28 +707,29 @@ export function CustomerReviewsWithVideos() {
       </div>
 
       {/* Screenshot Lightbox Modal (Clickable with Full Details revealed on click, Anonymous) */}
-      {selectedScreenshot && (
+      {mounted && selectedScreenshot && createPortal(
         <div
-          data-lenis-prevent
-          className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200 overscroll-contain"
+          className="fixed inset-0 z-[9999] bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 overflow-y-auto animate-in fade-in duration-200"
           onClick={() => setSelectedScreenshot(null)}
+          role="dialog"
+          aria-modal="true"
         >
           <div
-            className="relative max-w-lg w-full bg-[#FFFDF9] rounded-2xl overflow-hidden shadow-2xl border border-[#EADBBE] animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]"
+            className="relative max-w-md sm:max-w-lg w-full bg-[#FFFDF9] rounded-2xl overflow-hidden shadow-2xl border border-[#EADBBE] animate-in zoom-in-95 duration-200 flex flex-col my-auto max-h-[92vh] sm:max-h-[88vh]"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header: Anonymous Verified Feedback */}
-            <div className="px-4 sm:px-5 py-3.5 bg-[#FAF5EB] border-b border-[#EADBBE] flex items-center justify-between flex-shrink-0">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-full bg-[#25D366]/20 text-[#25D366] flex items-center justify-center">
+            <div className="px-4 sm:px-5 py-3 bg-[#FAF5EB] border-b border-[#EADBBE] flex items-center justify-between flex-shrink-0">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="w-8 h-8 rounded-full bg-[#25D366]/20 text-[#25D366] flex items-center justify-center shrink-0">
                   <MessageCircle className="w-4 h-4 fill-current" />
                 </div>
-                <div>
-                  <h4 className="text-sm font-bold text-[#1C1917] flex items-center gap-1.5">
+                <div className="min-w-0">
+                  <h4 className="text-sm font-bold text-[#1C1917] flex items-center gap-1.5 truncate">
                     <span>Verified Customer Review</span>
-                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                   </h4>
-                  <p className="text-[11px] text-stone-500">
+                  <p className="text-[11px] text-stone-500 truncate">
                     {selectedScreenshot.location || "Real Customer Conversation"}
                   </p>
                 </div>
@@ -624,7 +737,7 @@ export function CustomerReviewsWithVideos() {
               <button
                 type="button"
                 onClick={() => setSelectedScreenshot(null)}
-                className="p-1.5 rounded-full hover:bg-stone-200 text-stone-600 hover:text-stone-900 transition-colors cursor-pointer"
+                className="p-1.5 rounded-full hover:bg-stone-200 text-stone-600 hover:text-stone-900 transition-colors cursor-pointer shrink-0"
                 aria-label="Close preview"
               >
                 <X className="w-5 h-5" />
@@ -632,24 +745,24 @@ export function CustomerReviewsWithVideos() {
             </div>
 
             {/* Enlarged Screenshot Image */}
-            <div className="p-3 bg-stone-950 overflow-y-auto flex items-center justify-center max-h-[55vh]">
+            <div className="p-2 sm:p-3 bg-stone-950 flex-1 min-h-0 flex items-center justify-center overflow-hidden max-h-[48vh] sm:max-h-[54vh]">
               <img
                 src={selectedScreenshot.imageUrl}
                 alt="Customer feedback screenshot"
-                className="w-auto h-auto max-w-full max-h-[50vh] object-contain rounded-xl shadow-md"
+                className="w-auto h-auto max-w-full max-h-[46vh] sm:max-h-[52vh] object-contain rounded-xl shadow-md"
               />
             </div>
 
             {/* Modal Footer with Full Details Revealed on Click */}
-            <div className="p-4 sm:p-5 bg-white border-t border-[#EADBBE] space-y-2.5 flex-shrink-0 overflow-y-auto max-h-[30vh]">
+            <div className="p-4 sm:p-5 bg-white border-t border-[#EADBBE] space-y-2.5 flex-shrink-0 overflow-y-auto max-h-[26vh]">
               {selectedScreenshot.piece && (
-                <span className="inline-block px-2.5 py-0.5 rounded-full bg-purple-50 text-purple-700 text-xs font-semibold">
+                <span className="inline-block px-2.5 py-0.5 rounded-full bg-[#FAF5EB] text-[#8F7234] text-xs font-semibold">
                   Verified Piece: {selectedScreenshot.piece}
                 </span>
               )}
               {selectedScreenshot.caption && (
                 <div className="space-y-1">
-                  <p className="text-[11px] font-bold uppercase tracking-wider text-purple-700">
+                  <p className="text-[11px] font-bold uppercase tracking-wider text-[#8F7234]">
                     Customer Review:
                   </p>
                   <p className="text-xs sm:text-sm text-stone-800 leading-relaxed font-light italic bg-[#FAF7F2] p-3 rounded-xl border border-[#EADBBE]/70">
@@ -666,60 +779,70 @@ export function CustomerReviewsWithVideos() {
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Video Modal Player (Plays with sound when clicked) */}
-      {selectedVideo && (
+      {mounted && selectedVideo && createPortal(
         <div
-          data-lenis-prevent
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200 overscroll-contain"
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-4 md:p-6 bg-black/85 backdrop-blur-md overflow-y-auto animate-in fade-in duration-200"
           onClick={() => setSelectedVideo(null)}
+          role="dialog"
+          aria-modal="true"
         >
           <div
-            className="relative w-full max-w-sm sm:max-w-md bg-stone-900 rounded-2xl overflow-hidden shadow-2xl border border-stone-700 animate-in zoom-in-95 duration-200"
+            className="relative w-full max-w-[360px] sm:max-w-[400px] bg-stone-900 rounded-2xl overflow-hidden shadow-2xl border border-stone-700 animate-in zoom-in-95 duration-200 flex flex-col my-auto max-h-[92vh] sm:max-h-[88vh]"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Close Button */}
-            <button
-              type="button"
-              onClick={() => setSelectedVideo(null)}
-              className="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-black/90 transition-colors"
-              aria-label="Close video player"
-            >
-              <X className="w-5 h-5" />
-            </button>
+            {/* Header with Title and Close Button */}
+            <div className="flex-shrink-0 px-4 py-3 bg-stone-950/95 border-b border-stone-800 flex items-center justify-between text-white">
+              <div className="min-w-0 pr-2">
+                <h4 className="text-xs font-bold truncate">{selectedVideo.productTitle || "Client Reel"}</h4>
+                <p className="text-[10px] text-stone-400 truncate">{selectedVideo.influencer || "Verified Client Video"}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelectedVideo(null)}
+                className="p-1.5 rounded-full hover:bg-stone-800 text-stone-300 transition-colors cursor-pointer shrink-0"
+                aria-label="Close video player"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
 
             {/* Video Player */}
-            <div className="relative aspect-[9/16] bg-black flex items-center justify-center">
+            <div className="relative flex-1 min-h-0 max-h-[58vh] sm:max-h-[64vh] bg-black flex items-center justify-center overflow-hidden">
               <video
                 src={selectedVideo.videoUrl}
                 poster={selectedVideo.poster}
                 autoPlay
                 controls
                 playsInline
-                className="w-full h-full object-cover"
+                className="w-full h-full max-h-[58vh] sm:max-h-[64vh] object-contain"
               />
             </div>
 
             {/* Product Tag Bar */}
-            <div className="p-4 bg-stone-950 flex items-center justify-between text-white border-t border-stone-800">
-              <div>
-                <p className="text-xs font-semibold">{selectedVideo.productTitle}</p>
-                <p className="text-[11px] text-purple-300 font-mono">₹{selectedVideo.productPrice}</p>
+            <div className="flex-shrink-0 p-3.5 sm:p-4 bg-stone-950 flex items-center justify-between text-white border-t border-stone-800">
+              <div className="min-w-0 pr-2">
+                <p className="text-xs font-semibold truncate">{selectedVideo.productTitle}</p>
+                <p className="text-[11px] text-amber-400 font-mono">₹{selectedVideo.productPrice}</p>
               </div>
 
               {selectedVideo.productSlug && selectedVideo.productSlug !== "all" && (
                 <Link
                   href={`/products/${selectedVideo.productSlug}`}
-                  className="px-4 py-1.5 rounded-full bg-white text-stone-900 text-xs font-semibold hover:bg-stone-200 transition-colors"
+                  className="px-4 py-1.5 rounded-full bg-white text-stone-900 text-xs font-semibold hover:bg-stone-200 transition-colors shrink-0 shadow-sm"
+                  onClick={() => setSelectedVideo(null)}
                 >
                   Shop Piece
                 </Link>
               )}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </section>
   );

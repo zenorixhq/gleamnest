@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import {
   MessageCircle,
   Sparkles,
@@ -35,7 +36,12 @@ export function ClientFeedbackScreenshots({ className = "" }: ClientFeedbackScre
     () => (initialReviewData.feedbackScreenshots || []) as FeedbackScreenshot[]
   );
   const [zoomedScreenshot, setZoomedScreenshot] = useState<FeedbackScreenshot | null>(null);
+  const [mounted, setMounted] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const fetchScreenshots = () => {
     fetch(`/api/reviews?t=${Date.now()}`, { cache: "no-store" })
@@ -97,7 +103,7 @@ export function ClientFeedbackScreenshots({ className = "" }: ClientFeedbackScre
         {/* Section Header */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div className="space-y-1.5">
-            <div className="flex items-center gap-2 text-xs font-bold text-[#7E22CE] uppercase tracking-widest">
+            <div className="flex items-center gap-2 text-xs font-bold text-[#8F7234] uppercase tracking-widest">
               <MessageCircle className="w-4 h-4 text-[#25D366]" />
               <span>Real Customer Conversations</span>
             </div>
@@ -105,7 +111,7 @@ export function ClientFeedbackScreenshots({ className = "" }: ClientFeedbackScre
               Client Feedback
             </h2>
             <p className="text-xs sm:text-sm text-stone-600 max-w-xl font-light">
-              Real WhatsApp chats, direct messages, and unboxing reviews sent by our verified jewelry collectors across India.
+              Real WhatsApp chats, direct messages, and unboxing reviews sent by our verified jewelry collectors across India & Qatar.
             </p>
           </div>
 
@@ -176,7 +182,7 @@ export function ClientFeedbackScreenshots({ className = "" }: ClientFeedbackScre
               {/* Bottom Caption / Quote */}
               <div className="p-4 bg-[#FFFDF9] space-y-2 border-t border-[#EADBBE]/50">
                 {item.piece && (
-                  <div className="inline-block px-2 py-0.5 rounded-md bg-purple-50 text-purple-700 text-[10px] font-semibold">
+                  <div className="inline-block px-2 py-0.5 rounded-md bg-[#FAF5EB] text-[#8F7234] text-[10px] font-semibold">
                     Piece: {item.piece}
                   </div>
                 )}
@@ -187,7 +193,7 @@ export function ClientFeedbackScreenshots({ className = "" }: ClientFeedbackScre
                 )}
                 <div className="flex items-center justify-between pt-1 text-[10px] text-stone-500">
                   <span>{item.date || "Verified WhatsApp Order"}</span>
-                  <span className="text-purple-700 font-medium flex items-center gap-0.5">
+                  <span className="text-[#C5A059] font-medium flex items-center gap-0.5">
                     <Heart className="w-3 h-3 fill-current text-rose-500" />
                     <span>Loved</span>
                   </span>
@@ -199,33 +205,35 @@ export function ClientFeedbackScreenshots({ className = "" }: ClientFeedbackScre
       </div>
 
       {/* Lightbox Modal for Fullscreen Screenshot Preview */}
-      {zoomedScreenshot && (
+      {mounted && zoomedScreenshot && createPortal(
         <div
-          data-lenis-prevent
-          className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in-0 duration-200 overscroll-contain"
+          className="fixed inset-0 z-[9999] bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 overflow-y-auto animate-in fade-in-0 duration-200"
           onClick={() => setZoomedScreenshot(null)}
+          role="dialog"
+          aria-modal="true"
         >
           <div
-            className="relative max-w-lg w-full bg-[#FFFDF9] rounded-2xl overflow-hidden shadow-2xl border border-[#EADBBE] animate-in zoom-in-95 duration-200"
+            className="relative max-w-md sm:max-w-lg w-full bg-[#FFFDF9] rounded-2xl overflow-hidden shadow-2xl border border-[#EADBBE] animate-in zoom-in-95 duration-200 flex flex-col my-auto max-h-[92vh] sm:max-h-[88vh]"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
-            <div className="px-5 py-4 bg-[#FAF5EB] border-b border-[#EADBBE] flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-full bg-[#25D366]/20 text-[#25D366] flex items-center justify-center">
+            <div className="px-4 sm:px-5 py-3 bg-[#FAF5EB] border-b border-[#EADBBE] flex items-center justify-between flex-shrink-0">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="w-8 h-8 rounded-full bg-[#25D366]/20 text-[#25D366] flex items-center justify-center shrink-0">
                   <MessageCircle className="w-4 h-4 fill-current" />
                 </div>
-                <div>
-                  <h4 className="text-sm font-bold text-[#1C1917] flex items-center gap-1.5">
-                    <span>{zoomedScreenshot.customerName}</span>
-                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                <div className="min-w-0">
+                  <h4 className="text-sm font-bold text-[#1C1917] flex items-center gap-1.5 truncate">
+                    <span>{zoomedScreenshot.customerName || "Verified Customer Review"}</span>
+                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                   </h4>
-                  <p className="text-[11px] text-stone-500">{zoomedScreenshot.location}</p>
+                  <p className="text-[11px] text-stone-500 truncate">{zoomedScreenshot.location || "Real Customer Conversation"}</p>
                 </div>
               </div>
               <button
+                type="button"
                 onClick={() => setZoomedScreenshot(null)}
-                className="p-1.5 rounded-full hover:bg-stone-200 text-stone-600 hover:text-stone-900 transition-colors"
+                className="p-1.5 rounded-full hover:bg-stone-200 text-stone-600 hover:text-stone-900 transition-colors cursor-pointer shrink-0"
                 aria-label="Close preview"
               >
                 <X className="w-5 h-5" />
@@ -233,24 +241,24 @@ export function ClientFeedbackScreenshots({ className = "" }: ClientFeedbackScre
             </div>
 
             {/* Enlarged Screenshot Image */}
-            <div className="p-3 bg-stone-950/5 max-h-[65vh] overflow-y-auto flex items-center justify-center">
+            <div className="p-2 sm:p-3 bg-stone-950 flex-1 min-h-0 flex items-center justify-center overflow-hidden max-h-[48vh] sm:max-h-[54vh]">
               <img
                 src={zoomedScreenshot.imageUrl}
-                alt={zoomedScreenshot.title}
-                className="w-auto h-auto max-w-full max-h-[60vh] object-contain rounded-xl shadow-md"
+                alt={zoomedScreenshot.title || "Feedback screenshot"}
+                className="w-auto h-auto max-w-full max-h-[46vh] sm:max-h-[52vh] object-contain rounded-xl shadow-md"
               />
             </div>
 
             {/* Modal Footer Caption */}
-            <div className="p-5 bg-white border-t border-[#EADBBE] space-y-2">
+            <div className="p-4 sm:p-5 bg-white border-t border-[#EADBBE] space-y-2 flex-shrink-0 overflow-y-auto max-h-[26vh]">
               {zoomedScreenshot.piece && (
-                <span className="inline-block px-2.5 py-0.5 rounded-full bg-purple-50 text-purple-700 text-xs font-semibold">
+                <span className="inline-block px-2.5 py-0.5 rounded-full bg-[#FAF5EB] text-[#8F7234] text-xs font-semibold">
                   Verified Piece: {zoomedScreenshot.piece}
                 </span>
               )}
               {zoomedScreenshot.caption && (
-                <p className="text-xs sm:text-sm text-stone-800 leading-relaxed font-light italic">
-                  {zoomedScreenshot.caption}
+                <p className="text-xs sm:text-sm text-stone-800 leading-relaxed font-light italic bg-[#FAF7F2] p-3 rounded-xl border border-[#EADBBE]/70">
+                  &ldquo;{zoomedScreenshot.caption}&rdquo;
                 </p>
               )}
               <div className="pt-2 flex items-center justify-between text-xs text-stone-500 border-t border-stone-100">
@@ -262,7 +270,8 @@ export function ClientFeedbackScreenshots({ className = "" }: ClientFeedbackScre
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </section>
   );

@@ -23,86 +23,13 @@ function getInitialData() {
   };
 }
 
-const DEFAULT_FOLLOW_HOUSE_PANELS = [
-  "/images/follow-house/panel-1.jpg",
-  "/images/follow-house/panel-2.jpg",
-  "/images/follow-house/panel-3.jpg",
-  "/images/follow-house/panel-4.jpg",
-  "/images/follow-house/panel-5.jpg",
-];
-
-function cleanTextValue(val: any): any {
-  if (typeof val !== "string") return val;
-  // If it's a base64 data URL or blob, NEVER run text replacements on it!
-  if (val.startsWith("data:") || val.startsWith("blob:")) return val;
-
-  // If it's a URL or image path, only replace gleamnest in domain/handle if needed
-  if (val.startsWith("http://") || val.startsWith("https://") || val.startsWith("/")) {
-    return val
-      .replace(/@?gleamnest\.in/gi, "@alnaya.in")
-      .replace(/gleamnest/gi, "alnaya");
-  }
-
-  // Text content cleaning
-  return val
-    .replace(/@?gleamnest\.in/gi, "@alnaya.in")
-    .replace(/gleamnest/gi, "alnaya")
-    .replace(/304\s*(&|and)\s*306(\s*grade)?\s*steel/gi, "radiant finish")
-    .replace(/304\s*steel/gi, "hallmark stainless")
-    .replace(/304\s*(&|and)\s*306/gi, "hallmark")
-    .replace(/anti-?tarnish/gi, "waterproof")
-    .replace(/pvd\s*coating/gi, "radiant finish")
-    .replace(/\bpvd\b/gi, "radiant finish");
-}
-
-function sanitizeObject(obj: any): any {
-  if (!obj || typeof obj !== "object") return obj;
-  if (Array.isArray(obj)) {
-    return obj.map(sanitizeObject);
-  }
-  const result: any = {};
-  for (const [key, value] of Object.entries(obj)) {
-    if (key === "poster" || key === "imageUrl" || key === "image") {
-      if (typeof value === "string") {
-        if (value.includes("radiant finish")) {
-          result[key] = "/images/follow-house/panel-1.jpg";
-        } else if (!value.startsWith("data:") && value.includes("gleamnest")) {
-          result[key] = value.replace(/gleamnest/gi, "alnaya");
-        } else {
-          result[key] = value;
-        }
-      } else {
-        result[key] = value;
-      }
-    } else if (typeof value === "string") {
-      result[key] = cleanTextValue(value);
-    } else if (typeof value === "object" && value !== null) {
-      result[key] = sanitizeObject(value);
-    } else {
-      result[key] = value;
-    }
-  }
-  return result;
-}
-
 function sanitizeData(parsed: any) {
   if (!parsed || typeof parsed !== "object") return getInitialData();
-  const cleaned = sanitizeObject(parsed);
-  if (!Array.isArray(cleaned.reviews)) cleaned.reviews = [];
-  if (!Array.isArray(cleaned.videoReels)) cleaned.videoReels = [];
-  if (!Array.isArray(cleaned.feedbackScreenshots)) cleaned.feedbackScreenshots = [];
-  if (!Array.isArray(cleaned.instagramVideos)) cleaned.instagramVideos = [];
-
-  // Auto-heal any corrupted or oversized posters in instagramVideos
-  cleaned.instagramVideos = cleaned.instagramVideos.map((item: any, idx: number) => {
-    let poster = item.poster;
-    if (!poster || typeof poster !== "string" || poster.includes("radiant finish") || (poster.startsWith("data:") && poster.length > 50000)) {
-      poster = DEFAULT_FOLLOW_HOUSE_PANELS[idx % DEFAULT_FOLLOW_HOUSE_PANELS.length];
-    }
-    return { ...item, poster };
-  });
-
-  return cleaned;
+  if (!Array.isArray(parsed.reviews)) parsed.reviews = [];
+  if (!Array.isArray(parsed.videoReels)) parsed.videoReels = [];
+  if (!Array.isArray(parsed.feedbackScreenshots)) parsed.feedbackScreenshots = [];
+  if (!Array.isArray(parsed.instagramVideos)) parsed.instagramVideos = [];
+  return parsed;
 }
 
 async function readData() {
@@ -166,9 +93,13 @@ async function writeData(data: any) {
   }
 }
 
+const CACHE_HEADERS = {
+  "Cache-Control": "public, s-maxage=30, stale-while-revalidate=120",
+};
+
 export async function GET() {
   const data = await readData();
-  return NextResponse.json(data, { headers: NO_CACHE_HEADERS });
+  return NextResponse.json(data, { headers: CACHE_HEADERS });
 }
 
 export async function POST(req: Request) {
@@ -187,7 +118,7 @@ export async function POST(req: Request) {
         title: body.title || "WhatsApp / DM Customer Review",
         customerName: body.customerName || "Verified Buyer",
         location: body.location || "Kerala, India",
-        piece: body.piece || "Everyday Fine Jewelry",
+        piece: body.piece || "Anti-Tarnish Fine Jewelry",
         imageUrl: imageUrl,
         caption: body.caption || "",
         date: body.date || "Verified Recent Buyer",
@@ -238,13 +169,13 @@ export async function POST(req: Request) {
       const newInstaVideo = {
         id: `insta-${Date.now()}`,
         title: body.title || "Jewelry Styling Reel",
-        handle: body.handle || "@alnaya.in",
-        caption: body.caption || "Everyday luxury waterproof jewelry in radiant finish",
+        handle: body.handle || "@gleamnest.in",
+        caption: body.caption || "Everyday luxury waterproof jewelry in 304 & 306 steel",
         videoUrl: videoUrl,
         embedUrl: embedUrl,
         poster: body.poster || "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&q=80&w=700",
         views: body.views || "15.2K",
-        instagramLink: instagramLink || "https://www.instagram.com/alnaya.in?psln=cDNzY3liNjltb203",
+        instagramLink: instagramLink || "https://www.instagram.com/gleamnest.in?igsh=c3I4M2h1YmprdXI5",
       };
 
       if (!data.instagramVideos) data.instagramVideos = [];
@@ -269,13 +200,13 @@ export async function POST(req: Request) {
 
       const newVideo = {
         id: `vid-${Date.now()}`,
-        influencer: body.influencer || "Alnaya Client",
-        handle: body.handle || "@alnaya.in",
+        influencer: body.influencer || "GleamNest Client",
+        handle: body.handle || "@gleamnest.in",
         title: body.title || "Jewelry Styling Reel",
         poster: body.poster || "https://images.unsplash.com/photo-1611591475806-039775089201?auto=format&fit=crop&q=80&w=700",
         videoUrl: videoUrl,
         views: body.views || "1.2K views",
-        productTitle: body.productTitle || "Alnaya Jewelry",
+        productTitle: body.productTitle || "GleamNest Jewelry",
         productSlug: body.productSlug || "all",
         productPrice: Number(body.productPrice) || 150,
       };
@@ -290,7 +221,7 @@ export async function POST(req: Request) {
         id: `rev-${Date.now()}`,
         author: body.author || "Verified Customer",
         location: body.location || "Kerala, India",
-        piece: body.piece || "Everyday Fine Jewelry",
+        piece: body.piece || "Anti-Tarnish Fine Jewelry",
         rating: Number(body.rating) || 5,
         quote: body.quote || "",
       };
@@ -345,7 +276,7 @@ export async function PUT(req: Request) {
         data.instagramVideos.push({
           id: targetId,
           title: body.title || "Jewelry Styling Reel",
-          handle: body.handle || "@alnaya.in",
+          handle: body.handle || "@gleamnest.in",
           caption: body.caption || "",
           videoUrl: body.videoUrl,
           poster: body.poster || "",
@@ -398,37 +329,20 @@ export async function DELETE(req: Request) {
     }
 
     const data = await readData();
-    const targetId = decodeURIComponent(String(id)).trim().toLowerCase();
+    const targetId = String(id).trim();
 
     if (type === "screenshot") {
-      data.feedbackScreenshots = (data.feedbackScreenshots || []).filter(
-        (s: any) => decodeURIComponent(String(s.id)).trim().toLowerCase() !== targetId
-      );
-    } else if (type === "instagramVideo" || type === "reel" || type === "followHouse") {
-      data.instagramVideos = (data.instagramVideos || []).filter(
-        (v: any) => decodeURIComponent(String(v.id)).trim().toLowerCase() !== targetId
-      );
+      data.feedbackScreenshots = (data.feedbackScreenshots || []).filter((s: any) => String(s.id).trim() !== targetId);
+    } else if (type === "instagramVideo") {
+      data.instagramVideos = (data.instagramVideos || []).filter((v: any) => String(v.id).trim() !== targetId);
     } else if (type === "video") {
-      data.videoReels = (data.videoReels || []).filter(
-        (v: any) => decodeURIComponent(String(v.id)).trim().toLowerCase() !== targetId
-      );
+      data.videoReels = (data.videoReels || []).filter((v: any) => String(v.id).trim() !== targetId);
     } else {
-      data.reviews = (data.reviews || []).filter(
-        (r: any) => decodeURIComponent(String(r.id)).trim().toLowerCase() !== targetId
-      );
+      data.reviews = (data.reviews || []).filter((r: any) => String(r.id).trim() !== targetId);
     }
 
     await writeData(data);
-    return NextResponse.json(
-      {
-        success: true,
-        instagramVideos: data.instagramVideos,
-        videoReels: data.videoReels,
-        reviews: data.reviews,
-        feedbackScreenshots: data.feedbackScreenshots,
-      },
-      { headers: NO_CACHE_HEADERS }
-    );
+    return NextResponse.json({ success: true }, { headers: NO_CACHE_HEADERS });
   } catch (err: any) {
     console.error("Error in DELETE /api/reviews:", err);
     return NextResponse.json(

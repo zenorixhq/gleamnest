@@ -25,18 +25,6 @@ export function SmoothScrollProvider({ children }: { children: React.ReactNode }
       touchMultiplier: 1.0,
       syncTouch: false, // Keep native 120Hz capacitive touch on mobile/tablets with zero lag
       autoRaf: false,
-      allowNestedScroll: true,
-      prevent: (node: HTMLElement) => {
-        if (!node) return false;
-        // Never hijack or smooth scroll inside any modal, dialog, fixed overlay, drawer, or prevent container
-        return (
-          node.hasAttribute?.("data-lenis-prevent") ||
-          Boolean(node.closest?.("[data-lenis-prevent]")) ||
-          Boolean(node.closest?.(".fixed")) ||
-          Boolean(node.closest?.("[role='dialog']")) ||
-          Boolean(node.closest?.("[aria-modal='true']"))
-        );
-      },
     });
 
     lenisRef.current = lenis;
@@ -66,26 +54,16 @@ export function SmoothScrollProvider({ children }: { children: React.ReactNode }
     document.addEventListener("click", handleAnchorClick, { passive: false });
 
     // Watch for modal scroll locks (document.body.style.overflow = "hidden")
-    const checkScrollLock = () => {
-      const isLocked =
-        document.body.style.overflow === "hidden" ||
-        document.documentElement.style.overflow === "hidden" ||
-        document.body.classList.contains("overflow-hidden") ||
-        document.body.classList.contains("modal-open");
+    const observer = new MutationObserver(() => {
+      const isLocked = document.body.style.overflow === "hidden";
       if (isLocked) {
         lenis.stop();
       } else {
         lenis.start();
       }
-    };
-
-    const observer = new MutationObserver(checkScrollLock);
+    });
 
     observer.observe(document.body, {
-      attributes: true,
-      attributeFilter: ["style", "class"],
-    });
-    observer.observe(document.documentElement, {
       attributes: true,
       attributeFilter: ["style", "class"],
     });

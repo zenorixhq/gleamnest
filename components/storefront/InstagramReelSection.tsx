@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import {
   Instagram,
   Play,
@@ -115,7 +116,6 @@ function AutoPlayingInstaCard({
       <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/15 to-black/35 flex flex-col justify-between p-3.5 sm:p-4 text-white pointer-events-none">
         {/* Top Badges (View count removed) */}
         <div className="flex items-center justify-end text-xs pointer-events-auto">
-
           <div className="flex items-center gap-1.5">
             {isDirectVideo && (
               <button
@@ -147,7 +147,7 @@ function AutoPlayingInstaCard({
             {vid.caption}
           </p>
           <span className="inline-block text-[10px] text-[#F3DFB0] font-mono tracking-wider">
-            {vid.handle || "@alnaya.in"}
+            {vid.handle || "@gleamnest.in"}
           </span>
         </div>
       </div>
@@ -159,7 +159,7 @@ export function InstagramReelSection() {
   const [videos, setVideos] = useState<InstagramVideoItem[]>(() => {
     if (typeof window !== "undefined") {
       try {
-        const cached = localStorage.getItem("alnaya_instagram_reels");
+        const cached = localStorage.getItem("gleamnest_instagram_reels");
         if (cached) {
           const parsed = JSON.parse(cached);
           if (
@@ -169,7 +169,7 @@ export function InstagramReelSection() {
           ) {
             return parsed;
           } else {
-            localStorage.removeItem("alnaya_instagram_reels");
+            localStorage.removeItem("gleamnest_instagram_reels");
           }
         }
       } catch (e) {}
@@ -182,18 +182,25 @@ export function InstagramReelSection() {
   const carouselRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    if (activeVideo) {
-      document.body.style.overflow = "hidden";
-      if ((window as any).__lenis) (window as any).__lenis.stop();
-    } else {
-      document.body.style.overflow = "";
-      if ((window as any).__lenis) (window as any).__lenis.start();
-    }
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!activeVideo) return;
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setActiveVideo(null);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
     return () => {
-      document.body.style.overflow = "";
-      if ((window as any).__lenis) (window as any).__lenis.start();
+      document.body.style.overflow = originalOverflow;
+      window.removeEventListener("keydown", handleKeyDown);
     };
   }, [activeVideo]);
 
@@ -204,7 +211,7 @@ export function InstagramReelSection() {
         if (Array.isArray(data.instagramVideos)) {
           setVideos(data.instagramVideos);
           try {
-            localStorage.setItem("alnaya_instagram_reels", JSON.stringify(data.instagramVideos));
+            localStorage.setItem("gleamnest_instagram_reels", JSON.stringify(data.instagramVideos));
           } catch (e) {}
         }
       })
@@ -248,20 +255,20 @@ export function InstagramReelSection() {
         {/* Section Header */}
         <div className="text-center space-y-2">
           <div className="flex items-center justify-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-[#7E22CE] animate-pulse" />
-            <span className="text-[10px] sm:text-xs uppercase tracking-[0.25em] text-[#7E22CE] font-medium block">
+            <span className="w-2 h-2 rounded-full bg-[#C5A059] animate-pulse" />
+            <span className="text-[10px] sm:text-xs uppercase tracking-[0.25em] text-[#8F7234] font-medium block">
               FOLLOW THE HOUSE
             </span>
           </div>
 
           <a
-            href="https://www.instagram.com/alnaya.in?psln=cDNzY3liNjltb203"
+            href="https://www.instagram.com/gleamnest.in?igsh=c3I4M2h1YmprdXI5"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 font-editorial text-3xl sm:text-5xl md:text-6xl font-normal tracking-tight text-[#1C1917] hover:text-[#7E22CE] transition-colors"
+            className="inline-flex items-center gap-2 font-editorial text-3xl sm:text-5xl md:text-6xl font-normal tracking-tight text-[#1C1917] hover:text-[#C5A059] transition-colors"
           >
-            <span>@alnaya.in</span>
-            <Instagram className="w-6 h-6 sm:w-8 sm:h-8 text-[#7E22CE]" />
+            <span>@gleamnest.in</span>
+            <Instagram className="w-6 h-6 sm:w-8 sm:h-8 text-[#C5A059]" />
           </a>
           <p className="text-xs sm:text-sm text-stone-600 font-light max-w-md mx-auto">
             Swipe through our latest styling reels, water tests, and styling inspiration.
@@ -313,51 +320,54 @@ export function InstagramReelSection() {
         {/* Bottom CTA to Instagram Profile */}
         <div className="text-center pt-2">
           <a
-            href="https://www.instagram.com/alnaya.in?psln=cDNzY3liNjltb203"
+            href="https://www.instagram.com/gleamnest.in?igsh=c3I4M2h1YmprdXI5"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full border border-[#1C1917] text-[#1C1917] hover:bg-[#1C1917] hover:text-white font-semibold text-xs tracking-wider uppercase transition-all shadow-sm"
           >
             <Instagram className="w-4 h-4" />
-            <span>Follow @alnaya.in on Instagram</span>
+            <span>Follow @gleamnest.in on Instagram</span>
             <ExternalLink className="w-3.5 h-3.5" />
           </a>
         </div>
       </div>
 
       {/* Video Modal Player (Expanded View with Audio) */}
-      {activeVideo && (
+      {mounted && activeVideo && createPortal(
         <div
-          data-lenis-prevent
-          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200 overscroll-contain"
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-4 md:p-6 bg-black/85 backdrop-blur-md overflow-y-auto animate-in fade-in duration-200"
           onClick={() => setActiveVideo(null)}
+          role="dialog"
+          aria-modal="true"
         >
           <div
-            className="relative w-full max-w-sm sm:max-w-md bg-stone-950 rounded-2xl overflow-hidden shadow-2xl border border-stone-800 animate-in zoom-in-95 duration-200 flex flex-col"
+            className="relative w-full max-w-[360px] sm:max-w-[400px] bg-stone-950 rounded-2xl overflow-hidden shadow-2xl border border-stone-800 animate-in zoom-in-95 duration-200 flex flex-col my-auto max-h-[92vh] sm:max-h-[88vh]"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="px-4 py-3 bg-stone-900 border-b border-stone-800 flex items-center justify-between text-white">
-              <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-amber-500 to-rose-500 flex items-center justify-center">
+            <div className="flex-shrink-0 px-4 py-3 bg-stone-900 border-b border-stone-800 flex items-center justify-between text-white">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-amber-500 to-rose-500 flex items-center justify-center shrink-0">
                   <Instagram className="w-4 h-4 text-white" />
                 </div>
-                <div>
-                  <h4 className="text-xs font-bold truncate max-w-[200px]">{activeVideo.title}</h4>
-                  <p className="text-[10px] text-stone-400">{activeVideo.handle || "@alnaya.in"}</p>
+                <div className="min-w-0">
+                  <h4 className="text-xs font-bold truncate max-w-[180px] sm:max-w-[220px]">{activeVideo.title}</h4>
+                  <p className="text-[10px] text-stone-400 truncate">{activeVideo.handle || "@gleamnest.in"}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 shrink-0">
                 <button
+                  type="button"
                   onClick={() => setIsMuted(!isMuted)}
-                  className="p-1.5 rounded-full hover:bg-stone-800 text-stone-300"
+                  className="p-1.5 rounded-full hover:bg-stone-800 text-stone-300 transition-colors cursor-pointer"
                   title={isMuted ? "Unmute" : "Mute"}
                 >
                   {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
                 </button>
                 <button
+                  type="button"
                   onClick={() => setActiveVideo(null)}
-                  className="p-1.5 rounded-full hover:bg-stone-800 text-stone-300"
+                  className="p-1.5 rounded-full hover:bg-stone-800 text-stone-300 transition-colors cursor-pointer"
                   aria-label="Close video player"
                 >
                   <X className="w-5 h-5" />
@@ -366,7 +376,7 @@ export function InstagramReelSection() {
             </div>
 
             {/* Video Player Display */}
-            <div className="relative aspect-[9/15] max-h-[68vh] bg-black flex items-center justify-center overflow-hidden">
+            <div className="relative flex-1 min-h-0 max-h-[58vh] sm:max-h-[64vh] bg-black flex items-center justify-center overflow-hidden">
               {activeVideo.embedUrl ? (
                 <iframe
                   src={activeVideo.embedUrl}
@@ -383,14 +393,14 @@ export function InstagramReelSection() {
                   loop
                   playsInline
                   muted={isMuted}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full max-h-[58vh] sm:max-h-[64vh] object-contain"
                 />
               )}
             </div>
 
             {/* Caption & Instagram CTA Bar */}
-            <div className="p-4 bg-stone-900 border-t border-stone-800 flex items-center justify-between gap-3 text-white">
-              <div className="space-y-0.5 max-w-[65%]">
+            <div className="flex-shrink-0 p-3.5 sm:p-4 bg-stone-900 border-t border-stone-800 flex items-center justify-between gap-3 text-white">
+              <div className="space-y-0.5 min-w-0 max-w-[65%]">
                 <p className="text-xs font-semibold truncate">{activeVideo.title}</p>
                 <p className="text-[11px] text-stone-400 line-clamp-1">{activeVideo.caption}</p>
               </div>
@@ -400,7 +410,7 @@ export function InstagramReelSection() {
                   href={activeVideo.instagramLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-3.5 py-1.5 rounded-full bg-[#E1306C] text-white text-xs font-semibold hover:bg-[#C1275B] transition-colors flex items-center gap-1.5 shrink-0"
+                  className="px-3.5 py-1.5 rounded-full bg-[#E1306C] text-white text-xs font-semibold hover:bg-[#C1275B] transition-colors flex items-center gap-1.5 shrink-0 shadow-sm"
                 >
                   <Instagram className="w-3.5 h-3.5" />
                   <span>View Post</span>
@@ -408,7 +418,8 @@ export function InstagramReelSection() {
               )}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </section>
   );
