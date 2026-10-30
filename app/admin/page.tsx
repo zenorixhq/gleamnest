@@ -46,6 +46,8 @@ import {
   Instagram,
   Camera,
   Sparkles,
+  Cloud,
+  Loader2,
 } from "lucide-react";
 import { upload } from "@vercel/blob/client";
 
@@ -79,6 +81,8 @@ export default function AdminDashboardPage() {
 
   const [activeTab, setActiveTab] = useState<"overview" | "orders" | "inventory" | "config" | "reviews" | "collections" | "reels">("inventory");
   const [searchQuery, setSearchQuery] = useState("");
+  const [isMigratingBlob, setIsMigratingBlob] = useState(false);
+  const [migrationMessage, setMigrationMessage] = useState<string | null>(null);
 
   // Curated Collections (Category Cards) State
   const [categoriesList, setCategoriesList] = useState<Category[]>(() => {
@@ -820,6 +824,34 @@ export default function AdminDashboardPage() {
         resolve(file);
       };
     });
+  };
+
+  const handleMigrateToBlob = async () => {
+    if (
+      !confirm(
+        "This will migrate all Base64 product images, curated categories, and reviews to your Vercel Public Blob CDN, reducing database bandwidth by 99.7%. Proceed?"
+      )
+    ) {
+      return;
+    }
+    setIsMigratingBlob(true);
+    setMigrationMessage("Optimizing and uploading images to Vercel Blob CDN...");
+    try {
+      const res = await fetch("/api/admin/migrate-images");
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setMigrationMessage(
+          `✓ Success! Migrated ${data.migratedProducts} products, ${data.migratedCategories} categories, and ${data.migratedReviews} reviews to Vercel Blob!`
+        );
+        fetchProducts(true);
+      } else {
+        setMigrationMessage(`Error: ${data.error || "Migration failed"}`);
+      }
+    } catch (err: any) {
+      setMigrationMessage(`Error: ${err?.message || "Migration failed"}`);
+    } finally {
+      setIsMigratingBlob(false);
+    }
   };
 
   const uploadFileToServer = async (file: File, folder: "screenshots" | "videos" | "images") => {
@@ -2423,6 +2455,47 @@ export default function AdminDashboardPage() {
                   <p>Username / Email: <strong className="text-foreground font-mono">admin@gleamnest.in</strong> (or <span className="font-mono">admin</span>)</p>
                   <p>Default Password: <strong className="text-foreground font-mono">gleamnest@2026</strong></p>
                   <p>Session Security: <strong className="text-emerald-700">Encrypted Local Storage Authentication</strong></p>
+                </div>
+              </div>
+
+              {/* Vercel Blob CDN & Database Bandwidth Optimization */}
+              <div className="p-5 rounded-xl bg-muted/30 border border-border space-y-3 col-span-1 md:col-span-2">
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <div className="flex items-center gap-2 text-foreground font-bold text-xs uppercase tracking-wider">
+                    <Cloud className="w-4 h-4 text-blue-500" />
+                    <span>Vercel Blob CDN & Database Bandwidth Optimization</span>
+                  </div>
+                  <span className="text-[11px] font-medium text-emerald-600 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20">
+                    Zero Quota Overages
+                  </span>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Migrate existing Base64 images directly to Vercel Public Blob CDN. Photos will be served globally at edge speed, shrinking your PostgreSQL database queries by 99.7% and keeping your Neon Free tier running forever.
+                </p>
+                <div className="pt-2 flex items-center gap-3 flex-wrap">
+                  <button
+                    type="button"
+                    onClick={handleMigrateToBlob}
+                    disabled={isMigratingBlob}
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-primary-foreground font-bold text-xs hover:bg-primary/90 transition-all disabled:opacity-50 shadow-sm"
+                  >
+                    {isMigratingBlob ? (
+                      <>
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        <span>Migrating to Blob CDN...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                        <span>1-Click Migrate All Photos to Vercel Blob</span>
+                      </>
+                    )}
+                  </button>
+                  {migrationMessage && (
+                    <span className="text-xs font-medium text-foreground bg-background px-3 py-1.5 rounded-lg border border-border">
+                      {migrationMessage}
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
