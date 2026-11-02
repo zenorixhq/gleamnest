@@ -523,7 +523,7 @@ ${greetingMessage}
                     <span>
                       {sizeInfo.type === "ring"
                         ? "GleamNest cm sizing (5cm = Size 5, 6cm = Size 7). Need help? Open our interactive Size Guide."
-                        : "Standard Indian Bangle sizing (2-2 to 2-10). Check inner diameter in Size Guide."}
+                        : "Standard Indian Bangle sizing (2.2, 2.6, 2.8). Check inner diameter in Size Guide."}
                     </span>
                   </p>
                 </div>

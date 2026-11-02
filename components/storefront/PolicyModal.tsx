@@ -359,14 +359,14 @@ export function PolicyModal({
                         </thead>
                         <tbody className="divide-y divide-border">
                           <tr className="hover:bg-muted/20">
-                            <td className="p-3 font-bold text-primary">Size 2-2</td>
+                            <td className="p-3 font-bold text-primary">Size 2.2</td>
                             <td className="p-3">2.125 in (2 1/8&quot;)</td>
                             <td className="p-3 font-mono">5.40 cm</td>
                             <td className="p-3 text-muted-foreground">Petite / Small wrist fit</td>
                           </tr>
                           <tr className="bg-primary/5 hover:bg-primary/10">
                             <td className="p-3 font-bold text-primary flex items-center gap-1.5">
-                              <span>Size 2-6</span>
+                              <span>Size 2.6</span>
                               <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-primary text-primary-foreground">
                                 Most Popular
                               </span>
@@ -376,7 +376,7 @@ export function PolicyModal({
                             <td className="p-3 font-semibold text-foreground">Standard Medium wrist fit</td>
                           </tr>
                           <tr className="hover:bg-muted/20">
-                            <td className="p-3 font-bold text-primary">Size 2-8</td>
+                            <td className="p-3 font-bold text-primary">Size 2.8</td>
                             <td className="p-3">2.500 in (2 1/2&quot;)</td>
                             <td className="p-3 font-mono">6.35 cm</td>
                             <td className="p-3 text-muted-foreground">Large wrist fit</td>
@@ -433,7 +433,7 @@ export function PolicyModal({
                       <div className="p-3.5 rounded-xl bg-card border border-border/80 space-y-1">
                         <span className="font-bold text-primary">Step 4: Compare with Chart</span>
                         <p className="text-muted-foreground">
-                          Match your measurement to our official Bangle Size Chart above to identify your size (2-2 to 2-10).
+                          Match your measurement to our official Bangle Size Chart above to identify your size (2.2 to 2.8).
                         </p>
                       </div>
                     </div>

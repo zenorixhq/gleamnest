@@ -294,14 +294,14 @@ export const products: Product[] = [
       {
         "name": "Bangle Size",
         "options": [
-          "Size 2-2 (2.125\" - Small)",
-          "Size 2-6 (2.375\" - Standard)",
-          "Size 2-8 (2.50\" - Large)"
+          "Size 2.2 (2.125\" - Small)",
+          "Size 2.6 (2.375\" - Standard)",
+          "Size 2.8 (2.50\" - Large)"
         ],
         "sizeStock": {
-          "Size 2-2 (2.125\" - Small)": 0,
-          "Size 2-6 (2.375\" - Standard)": 0,
-          "Size 2-8 (2.50\" - Large)": 0
+          "Size 2.2 (2.125\" - Small)": 0,
+          "Size 2.6 (2.375\" - Standard)": 0,
+          "Size 2.8 (2.50\" - Large)": 0
         }
       }
     ]
@@ -358,14 +358,14 @@ export const products: Product[] = [
       {
         "name": "Bangle Size",
         "options": [
-          "Size 2-2 (2.125\" - Small)",
-          "Size 2-6 (2.375\" - Standard)",
-          "Size 2-8 (2.50\" - Large)"
+          "Size 2.2 (2.125\" - Small)",
+          "Size 2.6 (2.375\" - Standard)",
+          "Size 2.8 (2.50\" - Large)"
         ],
         "sizeStock": {
-          "Size 2-2 (2.125\" - Small)": 1,
-          "Size 2-6 (2.375\" - Standard)": 1,
-          "Size 2-8 (2.50\" - Large)": 1
+          "Size 2.2 (2.125\" - Small)": 1,
+          "Size 2.6 (2.375\" - Standard)": 1,
+          "Size 2.8 (2.50\" - Large)": 1
         }
       }
     ]

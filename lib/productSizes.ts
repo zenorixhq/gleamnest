@@ -39,15 +39,15 @@ export const RING_ADJUSTABLE_OPTION = "Adjustable / Free Size";
 export const RING_SIZES = RING_SPECIFIC_SIZES;
 
 export const BANGLE_SPECIFIC_SIZES = [
-  "Size 2-2 (2.125\" - Small)",
-  "Size 2-6 (2.375\" - Standard)",
-  "Size 2-8 (2.50\" - Large)",
+  "Size 2.2 (2.125\" - Small)",
+  "Size 2.6 (2.375\" - Standard)",
+  "Size 2.8 (2.50\" - Large)",
 ];
 
 export const BANGLE_SIZE_GUIDE_DATA = [
-  { size: "Size 2-2", inches: "2.125 in (2 1/8\")", cm: "5.40 cm", fit: "Petite / Small wrist fit" },
-  { size: "Size 2-6", inches: "2.375 in (2 3/8\")", cm: "6.03 cm", fit: "Standard Medium wrist fit (Most Popular)", popular: true },
-  { size: "Size 2-8", inches: "2.500 in (2 1/2\")", cm: "6.35 cm", fit: "Large wrist fit" },
+  { size: "Size 2.2", inches: "2.125 in (2 1/8\")", cm: "5.40 cm", fit: "Petite / Small wrist fit" },
+  { size: "Size 2.6", inches: "2.375 in (2 3/8\")", cm: "6.03 cm", fit: "Standard Medium wrist fit (Most Popular)", popular: true },
+  { size: "Size 2.8", inches: "2.500 in (2 1/2\")", cm: "6.35 cm", fit: "Large wrist fit" },
 ];
 
 export const BANGLE_ADJUSTABLE_OPTION = "Adjustable / Openable Cuff";
@@ -180,20 +180,39 @@ export function getProductSizeInfo(product?: {
           isAdjustableOnly: true,
         };
       } else {
-        // Admin chose Specific Sizes -> Omit any adjustable option
-        const cleanedSizes = explicitSizeAttr.options.filter(
-          (o) => !/adjustable|openable|cuff|free size/i.test(o)
-        );
+        // Admin chose Specific Sizes -> Omit any adjustable option and normalize 2-2/2-6/2-8 to 2.2/2.6/2.8
+        const cleanedSizes = explicitSizeAttr.options
+          .filter((o) => !/adjustable|openable|cuff|free size/i.test(o))
+          .map((o) =>
+            o
+              .replace(/\b2-2\b/g, "2.2")
+              .replace(/\b2-6\b/g, "2.6")
+              .replace(/\b2-8\b/g, "2.8")
+          );
         const sizesToUse = cleanedSizes.length > 0 ? cleanedSizes : BANGLE_SPECIFIC_SIZES;
-        const sizeStock = explicitSizeAttr.sizeStock;
+        
+        let sizeStock = explicitSizeAttr.sizeStock;
+        if (sizeStock) {
+          const mappedStock: Record<string, number> = {};
+          for (const [key, val] of Object.entries(sizeStock)) {
+            const normalizedKey = key
+              .replace(/\b2-2\b/g, "2.2")
+              .replace(/\b2-6\b/g, "2.6")
+              .replace(/\b2-8\b/g, "2.8");
+            mappedStock[normalizedKey] = val;
+          }
+          sizeStock = mappedStock;
+        }
 
         // Choose first in-stock size as default, or standard size
-        let defaultSize = sizesToUse.includes("Size 2-6 (2.375\" - Standard)")
-          ? "Size 2-6 (2.375\" - Standard)"
+        let defaultSize = sizesToUse.includes("Size 2.6 (2.375\" - Standard)")
+          ? "Size 2.6 (2.375\" - Standard)"
+          : sizesToUse.includes("Size 2-6 (2.375\" - Standard)")
+          ? "Size 2.6 (2.375\" - Standard)"
           : sizesToUse[0];
 
         if (sizeStock) {
-          const firstInStock = sizesToUse.find((s) => (sizeStock[s] ?? 0) > 0);
+          const firstInStock = sizesToUse.find((s) => (sizeStock![s] ?? 0) > 0);
           if (firstInStock) {
             defaultSize = firstInStock;
           }
@@ -229,7 +248,7 @@ export function getProductSizeInfo(product?: {
     return {
       type: "bangle",
       label: "Bangle Size",
-      defaultSize: "Size 2-6 (2.375\" - Standard)",
+      defaultSize: "Size 2.6 (2.375\" - Standard)",
       options: BANGLE_SPECIFIC_SIZES,
       isAdjustableOnly: false,
     };

@@ -3479,7 +3479,7 @@ export default function AdminDashboardPage() {
                       <p className="text-[11px] text-muted-foreground mt-1 leading-snug">
                         {isRingCategory(formState.category)
                           ? "Manage inventory per ring size (Sizes 5–14 based on finger circumference in cm). Set 0 for out of stock sizes."
-                          : "Manage inventory per bangle size (Sizes 2-2, 2-6, 2-8). Set 0 for out of stock sizes."}
+                          : "Manage inventory per bangle size (Sizes 2.2, 2.6, 2.8). Set 0 for out of stock sizes."}
                       </p>
                     </button>
                   </div>
@@ -4387,7 +4387,7 @@ export default function AdminDashboardPage() {
                   <label className="text-xs font-semibold text-foreground">Jewelry Piece Purchased</label>
                   <input
                     type="text"
-                    placeholder="e.g. Clover Bangle (Size 2-6)"
+                    placeholder="e.g. Clover Bangle (Size 2.6)"
                     value={screenshotForm.piece}
                     onChange={(e) => setScreenshotForm({ ...screenshotForm, piece: e.target.value })}
                     className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border focus:ring-1 focus:ring-primary outline-none"

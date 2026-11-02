@@ -342,14 +342,14 @@ function PoliciesContent() {
                           </thead>
                           <tbody className="divide-y divide-border">
                             <tr className="hover:bg-muted/20">
-                              <td className="p-3 sm:p-4 font-bold text-primary">Size 2-2</td>
+                              <td className="p-3 sm:p-4 font-bold text-primary">Size 2.2</td>
                               <td className="p-3 sm:p-4">2.125 in (2 1/8&quot;)</td>
                               <td className="p-3 sm:p-4 font-mono">5.40 cm</td>
                               <td className="p-3 sm:p-4 text-muted-foreground">Petite / Small wrist fit</td>
                             </tr>
                             <tr className="bg-primary/5 hover:bg-primary/10">
                               <td className="p-3 sm:p-4 font-bold text-primary flex items-center gap-2">
-                                <span>Size 2-6</span>
+                                <span>Size 2.6</span>
                                 <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-primary text-primary-foreground">
                                   Most Popular
                                 </span>
@@ -359,7 +359,7 @@ function PoliciesContent() {
                               <td className="p-3 sm:p-4 font-semibold text-foreground">Standard Medium wrist fit</td>
                             </tr>
                             <tr className="hover:bg-muted/20">
-                              <td className="p-3 sm:p-4 font-bold text-primary">Size 2-8</td>
+                              <td className="p-3 sm:p-4 font-bold text-primary">Size 2.8</td>
                               <td className="p-3 sm:p-4">2.500 in (2 1/2&quot;)</td>
                               <td className="p-3 sm:p-4 font-mono">6.35 cm</td>
                               <td className="p-3 sm:p-4 text-muted-foreground">Large wrist fit</td>
@@ -416,7 +416,7 @@ function PoliciesContent() {
                         <div className="p-4 rounded-xl bg-background border border-border space-y-1">
                           <span className="font-bold text-primary">Step 4: Check the Chart</span>
                           <p className="text-muted-foreground leading-relaxed">
-                            Compare your measurement with our official size table above to select your accurate size (2-2 to 2-10).
+                            Compare your measurement with our official size table above to select your accurate size (2.2 to 2.8).
                           </p>
                         </div>
                       </div>

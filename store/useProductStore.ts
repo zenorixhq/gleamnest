@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { Product } from "@/types/store";
 import { products as fallbackProducts } from "@/data/mockData";
 
-const STORAGE_KEY = "gleamnest_catalog_live_v7";
+const STORAGE_KEY = "gleamnest_catalog_live_v8";
 
 // Auto-purge obsolete and legacy catalog cache keys from previous versions
 if (typeof window !== "undefined") {
@@ -13,12 +13,14 @@ if (typeof window !== "undefined") {
     localStorage.removeItem("gleamnest_catalog_live_v4");
     localStorage.removeItem("gleamnest_catalog_live_v5");
     localStorage.removeItem("gleamnest_catalog_live_v6");
+    localStorage.removeItem("gleamnest_catalog_live_v7");
     sessionStorage.removeItem("gleamnest_products_catalog");
     sessionStorage.removeItem("gleamnest_products_catalog_v2");
     sessionStorage.removeItem("gleamnest_products_catalog_v3");
     sessionStorage.removeItem("gleamnest_catalog_live_v4");
     sessionStorage.removeItem("gleamnest_catalog_live_v5");
     sessionStorage.removeItem("gleamnest_catalog_live_v6");
+    sessionStorage.removeItem("gleamnest_catalog_live_v7");
   } catch (e) {}
 }
 
