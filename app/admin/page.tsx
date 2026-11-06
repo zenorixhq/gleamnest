@@ -406,21 +406,20 @@ export default function AdminDashboardPage() {
   const compressImageIfNeeded = async (
     file: File,
     folder: "screenshots" | "videos" | "images" = "images",
-    maxDim = 1800,
-    quality = 0.92
+    maxDim = 1200,
+    quality = 0.88
   ): Promise<File> => {
     if (!file.type.startsWith("image/")) return file;
     // Don't re-encode vector or animated images
     if (file.type === "image/svg+xml" || file.type === "image/gif") return file;
 
-    // For screenshots (WhatsApp / Instagram reviews / chats), PRESERVE ORIGINAL 100%
-    // Zero canvas re-encoding: eliminates all pixel distortion, text blurriness, and chroma banding!
+    // For screenshots (WhatsApp / Instagram reviews / chats), preserve up to 2MB untouched
     if (folder === "screenshots") {
-      if (file.size <= 8 * 1024 * 1024) return file;
+      if (file.size <= 2 * 1024 * 1024) return file;
     }
 
-    // For product photos & general images under 3MB, keep original file untouched to preserve diamond/gold luster and ICC color profiles
-    if (folder === "images" && file.size <= 3 * 1024 * 1024) {
+    // For product photos & general images under 150KB, keep original file untouched
+    if (folder === "images" && file.size <= 150 * 1024) {
       return file;
     }
 
@@ -473,9 +472,9 @@ export default function AdminDashboardPage() {
 
           ctx.drawImage(img, 0, 0, width, height);
 
-          // We use standard image/jpeg or image/png, NEVER buggy canvas webp on browser client!
-          const targetMime = isPng ? "image/png" : "image/jpeg";
-          const targetExt = isPng ? ".png" : ".jpg";
+          // Always convert heavy photos & PNGs to high-quality JPEG (0.88) to shrink 2.5MB files down to 60-90KB
+          const targetMime = "image/jpeg";
+          const targetExt = ".jpg";
 
           canvas.toBlob(
             (blob) => {
@@ -491,7 +490,7 @@ export default function AdminDashboardPage() {
               }
             },
             targetMime,
-            isPng ? undefined : quality
+            0.88
           );
         };
         img.onerror = () => resolve(file);
@@ -862,15 +861,15 @@ export default function AdminDashboardPage() {
     try {
       let fileToUpload = file;
 
-      // 1. Optimize huge camera images (> 3MB) while preserving crisp text on screenshots & fine jewelry photos
-      if (file.type.startsWith("image/") && file.size > 3 * 1024 * 1024) {
-        const origSizeMB = (file.size / (1024 * 1024)).toFixed(1);
-        setUploadProgressText(`Optimizing high-res image (${origSizeMB} MB ➔ preserving razor-sharp detail)...`);
+      // 1. Optimize images (> 150KB) to ensure lightning-fast loading and ultra-low bandwidth
+      if (file.type.startsWith("image/") && file.size > 150 * 1024) {
+        const origSizeKB = Math.round(file.size / 1024);
+        setUploadProgressText(`Optimizing image (${origSizeKB} KB ➔ fast web size)...`);
         fileToUpload = await compressImageIfNeeded(file, folder);
         const newSizeKB = Math.round(fileToUpload.size / 1024);
         setUploadProgressText(`Image ready (${newSizeKB} KB)! Uploading...`);
       } else if (file.type.startsWith("image/")) {
-        setUploadProgressText(`Uploading original high-quality image (${Math.round(file.size / 1024)} KB)...`);
+        setUploadProgressText(`Uploading lightweight image (${Math.round(file.size / 1024)} KB)...`);
       }
       // 2. Convert videos to low size immediately (720p 30fps ~1.4Mbps, ~1.5 - 3MB)
       else if ((file.type.startsWith("video/") || folder === "videos") && file.size > 2.5 * 1024 * 1024) {
@@ -2103,9 +2102,13 @@ export default function AdminDashboardPage() {
                       <td className="py-3">
                         <div className="flex items-center gap-3">
                           <img
-                            src={product.images[0]}
+                            src={product.images[0] || "/images/gleamnest-brand-card.png"}
                             alt=""
-                            className="w-10 h-12 object-cover rounded-md border border-border"
+                            loading="lazy"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = "/images/gleamnest-brand-card.png";
+                            }}
+                            className="w-10 h-12 object-cover rounded-md border border-border bg-stone-100"
                           />
                           <div>
                             <span className="font-bold text-foreground block">{product.title}</span>
