@@ -27,6 +27,9 @@ interface CartStore {
   setCurrency: (code: string) => void;
   applyCoupon: (code: string) => { success: boolean; message: string };
   removeCoupon: () => void;
+  isFirstPurchaseCustomer: (phone?: string) => boolean;
+  autoCheckAndApplyFirstPurchaseDiscount: (phone?: string) => void;
+  markCustomerAsPurchased: (phone?: string) => void;
 
   // Quick View
   openQuickView: (product: Product) => void;
@@ -99,6 +102,10 @@ export const useCartStore = create<CartStore>()(
           };
           set({ items: [...currentItems, newItem], isCartOpen: true });
         }
+        // Auto-check and apply 5% discount for 1st purchase customers
+        setTimeout(() => {
+          get().autoCheckAndApplyFirstPurchaseDiscount();
+        }, 0);
       },
 
       removeItem: (itemId) => {
@@ -147,6 +154,74 @@ export const useCartStore = create<CartStore>()(
         set({ selectedCurrency: code });
       },
 
+      isFirstPurchaseCustomer: (phone?: string) => {
+        if (typeof window === "undefined") return true;
+        try {
+          if (localStorage.getItem("gleamnest_has_purchased") === "true") {
+            return false;
+          }
+          const placedOrdersStr = localStorage.getItem("gleamnest_placed_orders");
+          if (placedOrdersStr) {
+            const placed = JSON.parse(placedOrdersStr);
+            if (Array.isArray(placed) && placed.length > 0) {
+              return false;
+            }
+          }
+          const savedPhone = localStorage.getItem("gleamnest_customer_phone");
+          if (savedPhone) {
+            return false;
+          }
+          if (phone) {
+            const clean = phone.replace(/[^0-9]/g, "");
+            if (clean.length >= 7 && placedOrdersStr) {
+              const placed = JSON.parse(placedOrdersStr || "[]");
+              if (placed.some((o: any) => (o.phone || "").replace(/[^0-9]/g, "").includes(clean.slice(-8)))) {
+                return false;
+              }
+            }
+          }
+          return true;
+        } catch {
+          return true;
+        }
+      },
+
+      autoCheckAndApplyFirstPurchaseDiscount: (phone?: string) => {
+        const isFirst = get().isFirstPurchaseCustomer(phone);
+        const currentCoupon = get().appliedCoupon;
+        if (!isFirst) {
+          // Returning customer -> enforce normal rates
+          if (currentCoupon) {
+            set({ appliedCoupon: null });
+          }
+        } else {
+          // First purchase customer -> automatically apply the 5% first purchase discount!
+          if (!currentCoupon && get().items.length > 0) {
+            const defaultCoupon = storeConfig.commerce.activeCoupons.find((c) => c.code === "GLEAM5") || {
+              code: "GLEAM5",
+              discountType: "percentage" as const,
+              amount: 5,
+              firstPurchaseOnly: true,
+              description: "5% off your 1st purchase (new customer special)",
+            };
+            set({ appliedCoupon: defaultCoupon });
+          }
+        }
+      },
+
+      markCustomerAsPurchased: (phone?: string) => {
+        if (typeof window === "undefined") return;
+        try {
+          localStorage.setItem("gleamnest_has_purchased", "true");
+          if (phone) {
+            localStorage.setItem("gleamnest_customer_phone", phone);
+          }
+          set({ appliedCoupon: null });
+        } catch (e) {
+          console.error("Failed to mark customer as purchased:", e);
+        }
+      },
+
       applyCoupon: (code) => {
         const cleanCode = code.trim().toUpperCase();
         const found = storeConfig.commerce.activeCoupons.find(
@@ -154,7 +229,19 @@ export const useCartStore = create<CartStore>()(
         );
 
         if (!found) {
-          return { success: false, message: "Invalid or expired promotional code." };
+          return {
+            success: false,
+            message: "Invalid promo code. Only the 5% 1st purchase discount (GLEAM5) is active.",
+          };
+        }
+
+        // Strict verification: only 1st purchase per customer
+        if (!get().isFirstPurchaseCustomer()) {
+          set({ appliedCoupon: null });
+          return {
+            success: false,
+            message: "The 5% discount is valid only on your 1st purchase. Normal rate applies for repeat orders.",
+          };
         }
 
         const subtotal = get().getSubtotal();
@@ -165,24 +252,10 @@ export const useCartStore = create<CartStore>()(
           };
         }
 
-        // Check if coupon is strictly restricted to first purchase
-        if (found.firstPurchaseOnly && typeof window !== "undefined") {
-          const hasPurchased = localStorage.getItem("gleamnest_has_purchased") === "true";
-          const placedOrders = localStorage.getItem("gleamnest_placed_orders");
-          if (hasPurchased || (placedOrders && JSON.parse(placedOrders || "[]").length > 0)) {
-            return {
-              success: false,
-              message: `Promo code ${found.code} is valid only on your first purchase.`,
-            };
-          }
-        }
-
         set({ appliedCoupon: found });
         return {
           success: true,
-          message: found.firstPurchaseOnly
-            ? `Promo code ${found.code} applied (5% first purchase discount)!`
-            : `Promo code ${found.code} applied successfully!`,
+          message: "5% 1st purchase discount applied successfully!",
         };
       },
 
@@ -208,10 +281,17 @@ export const useCartStore = create<CartStore>()(
         const subtotal = get().getSubtotal();
         if (!coupon || subtotal === 0) return 0;
 
-        if (coupon.discountType === "percentage") {
-          return (subtotal * coupon.amount) / 100;
+        // Strict rule: Only 1st purchase per customer receives 5% discount
+        if (coupon.firstPurchaseOnly && !get().isFirstPurchaseCustomer()) {
+          return 0;
         }
-        return Math.min(coupon.amount, subtotal);
+
+        if (coupon.discountType === "percentage") {
+          // Exactly 5% discount only
+          const safePercent = Math.min(coupon.amount, 5);
+          return (subtotal * safePercent) / 100;
+        }
+        return 0;
       },
 
       getShippingFee: () => {

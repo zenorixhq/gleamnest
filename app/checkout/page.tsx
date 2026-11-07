@@ -34,6 +34,9 @@ export default function CheckoutPage() {
   const appliedCoupon = useCartStore((s) => s.appliedCoupon);
   const applyCoupon = useCartStore((s) => s.applyCoupon);
   const removeCoupon = useCartStore((s) => s.removeCoupon);
+  const autoCheckAndApplyFirstPurchaseDiscount = useCartStore((s) => s.autoCheckAndApplyFirstPurchaseDiscount);
+  const isFirstPurchaseCustomer = useCartStore((s) => s.isFirstPurchaseCustomer);
+  const markCustomerAsPurchased = useCartStore((s) => s.markCustomerAsPurchased);
 
   useEffect(() => {
     setMounted(true);
@@ -47,6 +50,8 @@ export default function CheckoutPage() {
   const [couponCode, setCouponCode] = useState("");
   const [couponMsg, setCouponMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isCustomerReturning, setIsCustomerReturning] = useState(false);
+  const [isVerifyingPhone, setIsVerifyingPhone] = useState(false);
 
   const [formData, setFormData] = useState({
     country: selectedCurrency === "QAR" ? "Qatar" : "India",
@@ -69,7 +74,61 @@ export default function CheckoutPage() {
     setCurrency(country === "Qatar" ? "QAR" : "INR");
   };
 
-  const grandTotal = Math.max(0, subtotal - discount + shipping);
+  useEffect(() => {
+    autoCheckAndApplyFirstPurchaseDiscount();
+    const isReturning = !isFirstPurchaseCustomer();
+    if (isReturning) {
+      setIsCustomerReturning(true);
+      removeCoupon();
+    }
+  }, [autoCheckAndApplyFirstPurchaseDiscount, isFirstPurchaseCustomer, removeCoupon]);
+
+  useEffect(() => {
+    const clean = formData.phone.replace(/[^0-9]/g, "");
+    if (clean.length < 8) {
+      const localReturning = !isFirstPurchaseCustomer();
+      setIsCustomerReturning(localReturning);
+      if (localReturning) removeCoupon();
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      setIsVerifyingPhone(true);
+      try {
+        const localReturning = !isFirstPurchaseCustomer(clean);
+        if (localReturning) {
+          setIsCustomerReturning(true);
+          removeCoupon();
+          setIsVerifyingPhone(false);
+          return;
+        }
+
+        const res = await fetch(`/api/orders?phone=${clean}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.isFirstPurchase === false) {
+            setIsCustomerReturning(true);
+            removeCoupon();
+            if (typeof window !== "undefined") {
+              localStorage.setItem("gleamnest_has_purchased", "true");
+            }
+          } else {
+            setIsCustomerReturning(false);
+            autoCheckAndApplyFirstPurchaseDiscount(clean);
+          }
+        }
+      } catch (e) {
+        console.error("Phone verification error:", e);
+      } finally {
+        setIsVerifyingPhone(false);
+      }
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [formData.phone, isFirstPurchaseCustomer, autoCheckAndApplyFirstPurchaseDiscount, removeCoupon]);
+
+  const effectiveDiscount = isCustomerReturning ? 0 : discount;
+  const grandTotal = Math.max(0, subtotal - effectiveDiscount + shipping);
 
   if (!mounted) {
     return (
@@ -99,6 +158,15 @@ export default function CheckoutPage() {
   const handleApplyCoupon = (e: React.FormEvent) => {
     e.preventDefault();
     if (!couponCode.trim()) return;
+
+    if (isCustomerReturning || !isFirstPurchaseCustomer(formData.phone)) {
+      setCouponMsg({
+        type: "error",
+        text: "The 5% discount is valid on your 1st purchase only. Normal rate applies for repeat orders.",
+      });
+      return;
+    }
+
     const res = applyCoupon(couponCode);
     if (res.success) {
       setCouponMsg({ type: "success", text: res.message });
@@ -182,7 +250,7 @@ ${itemsText}
 💳 *PAYMENT SUMMARY*
 ━━━━━━━━━━━━━━━━━━━━━
 • Subtotal: ${formatPrice(subtotal, selectedCurrency)}
-${discount > 0 ? `• Discount (${appliedCoupon?.code}${appliedCoupon?.firstPurchaseOnly ? " - 5% First Purchase" : ""}): -${formatPrice(discount, selectedCurrency)}\n` : ""}• Shipping: ${shippingText}
+${effectiveDiscount > 0 ? `• 1st Purchase Special (5% OFF): -${formatPrice(effectiveDiscount, selectedCurrency)}\n` : `• Client Pricing: Standard Rate (Repeat Order)\n`}• Shipping: ${shippingText}
 ─────────────────────
 ✨ *TOTAL AMOUNT PAYABLE:* *${formatPrice(grandTotal, selectedCurrency)}*
 ─────────────────────
@@ -240,7 +308,7 @@ ${greetingMessage}
           selectedVariant: i.selectedVariant,
         })),
         subtotal,
-        discountTotal: discount,
+        discountTotal: effectiveDiscount,
         shippingFee: shipping,
         grandTotal,
         paymentMethod: isQatar ? "WhatsApp Direct (Qatar)" : "WhatsApp Direct UPI",
@@ -249,9 +317,9 @@ ${greetingMessage}
       }),
     }).catch((err) => console.error("Failed to save order to DB:", err));
 
-    // Record completed purchase to enforce first purchase rule
+    // Record completed purchase to strictly enforce 1st purchase only rule
+    markCustomerAsPurchased(formData.phone);
     if (typeof window !== "undefined") {
-      localStorage.setItem("gleamnest_has_purchased", "true");
       try {
         const prev = JSON.parse(localStorage.getItem("gleamnest_placed_orders") || "[]");
         prev.push({ orderNumber, phone: formData.phone, date: new Date().toISOString() });
@@ -400,6 +468,23 @@ ${greetingMessage}
                 <p className="text-[11px] text-muted-foreground">
                   Primary number for instant order confirmation & tracking updates.
                 </p>
+                {formData.phone.replace(/[^0-9]/g, "").length >= 7 && (
+                  <div className="pt-1">
+                    {isVerifyingPhone ? (
+                      <span className="text-[10px] text-muted-foreground animate-pulse">Verifying customer status...</span>
+                    ) : isCustomerReturning ? (
+                      <div className="flex items-center gap-1.5 p-2 rounded-xl bg-amber-500/10 border border-amber-500/25 text-xs text-amber-900 dark:text-amber-200">
+                        <User className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                        <span><strong>Welcome back!</strong> As a returning customer, normal rates apply to this order.</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-1.5 p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/25 text-xs text-emerald-900 dark:text-emerald-200">
+                        <Sparkles className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                        <span><strong>1st Purchase Special:</strong> 5% discount is applied to your order!</span>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Secondary / Alternate Contact Number (Image 3 Requirement) */}
@@ -579,7 +664,7 @@ ${greetingMessage}
                   <div className="flex items-center justify-between bg-primary/10 border border-primary/20 px-3 py-2 rounded-lg text-xs">
                     <div className="flex items-center gap-2 text-primary font-semibold">
                       <Tag className="w-3.5 h-3.5" />
-                      <span>{appliedCoupon.code} applied ({appliedCoupon.firstPurchaseOnly ? "5% First Purchase" : formatPrice(discount, selectedCurrency)} -{formatPrice(discount, selectedCurrency)})</span>
+                      <span>{appliedCoupon.code} applied (5% 1st Purchase Special -{formatPrice(effectiveDiscount, selectedCurrency)})</span>
                     </div>
                     <button
                       type="button"
@@ -627,12 +712,17 @@ ${greetingMessage}
                   <span>Subtotal</span>
                   <span>{formatPrice(subtotal, selectedCurrency)}</span>
                 </div>
-                {discount > 0 && (
+                {effectiveDiscount > 0 ? (
                   <div className="flex justify-between text-emerald-600 font-medium">
-                    <span>Coupon Discount</span>
-                    <span>-{formatPrice(discount, selectedCurrency)}</span>
+                    <span>1st Purchase Discount (5% OFF)</span>
+                    <span>-{formatPrice(effectiveDiscount, selectedCurrency)}</span>
                   </div>
-                )}
+                ) : isCustomerReturning ? (
+                  <div className="flex justify-between text-muted-foreground text-[11px] bg-muted/40 p-2 rounded-lg">
+                    <span>Client Status:</span>
+                    <span className="font-semibold text-foreground">Repeat Client (Normal Rate)</span>
+                  </div>
+                ) : null}
                 <div className="flex justify-between text-muted-foreground">
                   <span>{isQatar ? "Qatar Delivery (Within 14 Days)" : "Pan-India Delivery"}</span>
                   <span>{shipping === 0 ? (isQatar ? "FREE (Within 14 Days)" : "FREE") : formatPrice(shipping, selectedCurrency)}</span>

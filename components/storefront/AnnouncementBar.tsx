@@ -20,6 +20,7 @@ export function AnnouncementBar() {
   const tickerItems = isQatar
     ? [
         "100% Anti-Tarnish & Waterproof",
+        "5% OFF on Your 1st Purchase",
         "Premium 304 & 306 Grade Stainless Steel",
         "Free Delivery Across Qatar (Within 14 Days)",
         "Hypoallergenic & Shower Safe",
@@ -27,6 +28,7 @@ export function AnnouncementBar() {
       ]
     : [
         "100% Anti-Tarnish & Waterproof",
+        "5% OFF on Your 1st Purchase",
         "Premium 304 & 306 Grade Stainless Steel",
         `Free Pan-India Delivery Above ₹${storeConfig.commerce.freeShippingThreshold}`,
         `Express Shipping Only ₹${storeConfig.commerce.flatShippingFee}`,

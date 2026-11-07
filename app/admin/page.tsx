@@ -2323,11 +2323,20 @@ export default function AdminDashboardPage() {
                       </div>
 
                       <div className="flex flex-col sm:flex-row sm:items-center gap-4 shrink-0">
-                        <div className="text-right sm:text-right">
-                          <span className="text-[10px] uppercase font-bold text-muted-foreground">Total</span>
+                        <div className="text-right sm:text-right space-y-0.5">
+                          <span className="text-[10px] uppercase font-bold text-muted-foreground block">Total</span>
                           <p className="text-sm font-black text-foreground">
                             {formatPrice(order.grandTotal || 0)}
                           </p>
+                          {order.discountTotal && order.discountTotal > 0 ? (
+                            <span className="inline-block text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200/60">
+                              1st Order (5% OFF)
+                            </span>
+                          ) : (
+                            <span className="inline-block text-[10px] font-medium px-1.5 py-0.5 rounded bg-muted text-muted-foreground border border-border/50">
+                              Repeat Order (Normal Rate)
+                            </span>
+                          )}
                         </div>
 
                         <select

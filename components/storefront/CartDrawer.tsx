@@ -27,6 +27,15 @@ export function CartDrawer() {
   const appliedCoupon = useCartStore((s) => s.appliedCoupon);
   const applyCoupon = useCartStore((s) => s.applyCoupon);
   const removeCoupon = useCartStore((s) => s.removeCoupon);
+  const autoCheckAndApplyFirstPurchaseDiscount = useCartStore((s) => s.autoCheckAndApplyFirstPurchaseDiscount);
+  const isFirstPurchaseCustomer = useCartStore((s) => s.isFirstPurchaseCustomer);
+  const isFirstCustomer = isFirstPurchaseCustomer();
+
+  useEffect(() => {
+    if (isCartOpen) {
+      autoCheckAndApplyFirstPurchaseDiscount();
+    }
+  }, [isCartOpen, autoCheckAndApplyFirstPurchaseDiscount]);
 
   // Memoized, 0ms fast price calculations directly from in-memory cart state
   const { subtotal, discount, shipping, total, itemCount } = useMemo(() => {
@@ -90,6 +99,15 @@ export function CartDrawer() {
   const handleApplyCoupon = (e: React.FormEvent) => {
     e.preventDefault();
     if (!couponCode.trim()) return;
+
+    if (!isFirstPurchaseCustomer()) {
+      setCouponMsg({
+        type: "error",
+        text: "The 5% discount is valid on your 1st purchase only. Normal rate applies for repeat orders.",
+      });
+      return;
+    }
+
     const res = applyCoupon(couponCode);
     if (res.success) {
       setCouponMsg({ type: "success", text: res.message });
@@ -280,7 +298,7 @@ export function CartDrawer() {
                   <div className="flex items-center justify-between bg-primary/10 border border-primary/20 px-3 py-2 rounded-lg text-xs">
                     <div className="flex items-center gap-2 text-primary font-semibold">
                       <Tag className="w-3.5 h-3.5" />
-                      <span>{appliedCoupon.code} ({appliedCoupon.amount}{appliedCoupon.discountType === "percentage" ? "% OFF" : " OFF"}{appliedCoupon.firstPurchaseOnly ? " - First Order" : ""})</span>
+                      <span>{appliedCoupon.code} (5% 1st Purchase Special -{formatPrice(discount, selectedCurrency)})</span>
                     </div>
                     <button
                       onClick={removeCoupon}
@@ -326,12 +344,17 @@ export function CartDrawer() {
                   <span>Subtotal</span>
                   <span>{formatPrice(subtotal, selectedCurrency)}</span>
                 </div>
-                {discount > 0 && (
+                {discount > 0 ? (
                   <div className="flex justify-between text-emerald-600 font-medium">
-                    <span>Coupon Discount</span>
+                    <span>1st Purchase Discount (5% OFF)</span>
                     <span>-{formatPrice(discount, selectedCurrency)}</span>
                   </div>
-                )}
+                ) : !isFirstCustomer ? (
+                  <div className="flex justify-between text-muted-foreground text-[11px] bg-muted/40 p-2 rounded-lg">
+                    <span>Client Status:</span>
+                    <span className="font-semibold text-foreground">Repeat Client (Normal Rate)</span>
+                  </div>
+                ) : null}
                 <div className="flex justify-between text-muted-foreground">
                   <span>Estimated Shipping</span>
                   <span>{shipping === 0 ? (isQatar ? "FREE (Within 14 Days)" : "FREE") : formatPrice(shipping, selectedCurrency)}</span>

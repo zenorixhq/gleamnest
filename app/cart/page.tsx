@@ -25,10 +25,14 @@ export default function CartPage() {
   const clearCart = useCartStore((s) => s.clearCart);
   const selectedCurrency = useCartStore((s) => s.selectedCurrency);
   const appliedCoupon = useCartStore((s) => s.appliedCoupon);
+  const autoCheckAndApplyFirstPurchaseDiscount = useCartStore((s) => s.autoCheckAndApplyFirstPurchaseDiscount);
+  const isFirstPurchaseCustomer = useCartStore((s) => s.isFirstPurchaseCustomer);
+  const isFirstCustomer = isFirstPurchaseCustomer();
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+    autoCheckAndApplyFirstPurchaseDiscount();
+  }, [autoCheckAndApplyFirstPurchaseDiscount]);
 
   // Instant memoized calculations directly from in-memory cart items
   const { subtotal, discount, shipping, tax, total } = useMemo(() => {
@@ -245,12 +249,17 @@ export default function CartPage() {
               <span>Subtotal</span>
               <span>{formatPrice(subtotal, selectedCurrency)}</span>
             </div>
-            {discount > 0 && (
+            {discount > 0 ? (
               <div className="flex justify-between text-emerald-600 font-medium">
-                <span>Discount ({appliedCoupon?.code})</span>
+                <span>1st Purchase Discount (5% OFF)</span>
                 <span>-{formatPrice(discount, selectedCurrency)}</span>
               </div>
-            )}
+            ) : !isFirstCustomer ? (
+              <div className="flex justify-between text-muted-foreground text-[11px] bg-muted/40 p-2 rounded-lg">
+                <span>Client Status:</span>
+                <span className="font-semibold text-foreground">Repeat Client (Normal Rate)</span>
+              </div>
+            ) : null}
             <div className="flex justify-between text-muted-foreground">
               <span>Shipping</span>
               <span>{shipping === 0 ? (isQatar ? "FREE (Qatar Express)" : "FREE") : formatPrice(shipping, selectedCurrency)}</span>
