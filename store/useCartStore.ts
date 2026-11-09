@@ -35,7 +35,7 @@ interface CartStore {
   openQuickView: (product: Product) => void;
   closeQuickView: () => void;
 
-  // Computed helpers (India INR)
+  // Computed helpers
   getSubtotal: () => number;
   getDiscountAmount: () => number;
   getShippingFee: () => number;
@@ -49,13 +49,14 @@ export const useCartStore = create<CartStore>()(
     (set, get) => ({
       items: [],
       wishlist: [],
-      selectedCurrency: "INR",
+      selectedCurrency: storeConfig.commerce.defaultCurrency,
       appliedCoupon: null,
       isCartOpen: false,
       quickViewProduct: null,
 
       addItem: (product, quantity = 1, selectedVariant) => {
         const currentItems = get().items;
+        // Normalize variant: if variant has empty options or default key, keep it standard
         const hasOptions =
           selectedVariant &&
           selectedVariant.options &&
@@ -69,10 +70,16 @@ export const useCartStore = create<CartStore>()(
         );
 
         const indiaPrice = product.salePrice || product.price;
-        const availableStock =
-          product.inStock !== false ? (product.stockCount !== undefined ? product.stockCount : 10) : 0;
+        const qatarPrice =
+          product.salePriceQatar !== undefined && product.salePriceQatar !== null
+            ? product.salePriceQatar
+            : product.priceQatar !== undefined && product.priceQatar !== null
+            ? product.priceQatar
+            : Math.max(10, Math.round(indiaPrice / 20));
+
+        const availableStock = product.inStock !== false ? (product.stockCount !== undefined ? product.stockCount : 10) : 0;
         if (availableStock <= 0) {
-          return;
+          return; // Cannot add out of stock product
         }
 
         if (existingIndex > -1) {
@@ -87,6 +94,7 @@ export const useCartStore = create<CartStore>()(
             title: product.title,
             slug: product.slug,
             price: indiaPrice,
+            priceQatar: qatarPrice,
             image: product.images[0],
             quantity: Math.min(availableStock, quantity),
             stockCount: availableStock,
@@ -94,8 +102,7 @@ export const useCartStore = create<CartStore>()(
           };
           set({ items: [...currentItems, newItem], isCartOpen: true });
         }
-
-        // Auto-check 1st purchase 5% discount
+        // Auto-check and apply 5% discount for 1st purchase customers
         setTimeout(() => {
           get().autoCheckAndApplyFirstPurchaseDiscount();
         }, 0);
@@ -144,24 +151,23 @@ export const useCartStore = create<CartStore>()(
       },
 
       setCurrency: (code) => {
-        set({ selectedCurrency: "INR" });
+        set({ selectedCurrency: code });
       },
 
-      // Check whether customer is a first-time buyer
       isFirstPurchaseCustomer: (phone?: string) => {
         if (typeof window === "undefined") return true;
         try {
-          if (localStorage.getItem("noomis_has_purchased") === "true") {
+          if (localStorage.getItem("gleamnest_has_purchased") === "true") {
             return false;
           }
-          const placedOrdersStr = localStorage.getItem("noomis_placed_orders");
+          const placedOrdersStr = localStorage.getItem("gleamnest_placed_orders");
           if (placedOrdersStr) {
             const placed = JSON.parse(placedOrdersStr);
             if (Array.isArray(placed) && placed.length > 0) {
               return false;
             }
           }
-          const savedPhone = localStorage.getItem("noomis_customer_phone");
+          const savedPhone = localStorage.getItem("gleamnest_customer_phone");
           if (savedPhone) {
             return false;
           }
@@ -180,20 +186,19 @@ export const useCartStore = create<CartStore>()(
         }
       },
 
-      // Automatically apply 5% discount for 1st purchase; enforce normal rates on repeat orders
       autoCheckAndApplyFirstPurchaseDiscount: (phone?: string) => {
         const isFirst = get().isFirstPurchaseCustomer(phone);
         const currentCoupon = get().appliedCoupon;
         if (!isFirst) {
           // Returning customer -> enforce normal rates
-          if (currentCoupon?.firstPurchaseOnly) {
+          if (currentCoupon) {
             set({ appliedCoupon: null });
           }
         } else {
-          // First purchase customer -> automatically apply the 5% first purchase discount
+          // First purchase customer -> automatically apply the 5% first purchase discount!
           if (!currentCoupon && get().items.length > 0) {
-            const defaultCoupon = storeConfig.commerce.activeCoupons.find((c) => c.code === "NOOMI5") || {
-              code: "NOOMI5",
+            const defaultCoupon = storeConfig.commerce.activeCoupons.find((c) => c.code === "GLEAM5") || {
+              code: "GLEAM5",
               discountType: "percentage" as const,
               amount: 5,
               firstPurchaseOnly: true,
@@ -207,9 +212,9 @@ export const useCartStore = create<CartStore>()(
       markCustomerAsPurchased: (phone?: string) => {
         if (typeof window === "undefined") return;
         try {
-          localStorage.setItem("noomis_has_purchased", "true");
+          localStorage.setItem("gleamnest_has_purchased", "true");
           if (phone) {
-            localStorage.setItem("noomis_customer_phone", phone);
+            localStorage.setItem("gleamnest_customer_phone", phone);
           }
           set({ appliedCoupon: null });
         } catch (e) {
@@ -226,16 +231,16 @@ export const useCartStore = create<CartStore>()(
         if (!found) {
           return {
             success: false,
-            message: "Invalid promo code. Use NOOMI5 for 5% off your 1st purchase.",
+            message: "Invalid promo code. Only the 5% 1st purchase discount (GLEAM5) is active.",
           };
         }
 
         // Strict verification: only 1st purchase per customer
-        if (found.firstPurchaseOnly && !get().isFirstPurchaseCustomer()) {
+        if (!get().isFirstPurchaseCustomer()) {
           set({ appliedCoupon: null });
           return {
             success: false,
-            message: "The 5% first-purchase offer was already redeemed on an earlier order. Standard normal rates apply.",
+            message: "The 5% discount is valid only on your 1st purchase. Normal rate applies for repeat orders.",
           };
         }
 
@@ -250,7 +255,7 @@ export const useCartStore = create<CartStore>()(
         set({ appliedCoupon: found });
         return {
           success: true,
-          message: `${found.amount}% discount applied successfully!`,
+          message: "5% 1st purchase discount applied successfully!",
         };
       },
 
@@ -259,9 +264,16 @@ export const useCartStore = create<CartStore>()(
       openQuickView: (product) => set({ quickViewProduct: product }),
       closeQuickView: () => set({ quickViewProduct: null }),
 
-      // All amounts in INR (₹)
       getSubtotal: () => {
-        return get().items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+        const isQatar = get().selectedCurrency === "QAR";
+        return get().items.reduce((sum, item) => {
+          const itemPrice = isQatar
+            ? item.priceQatar !== undefined && item.priceQatar !== null
+              ? item.priceQatar
+              : Math.max(10, Math.round(item.price / 20))
+            : item.price;
+          return sum + itemPrice * item.quantity;
+        }, 0);
       },
 
       getDiscountAmount: () => {
@@ -275,8 +287,9 @@ export const useCartStore = create<CartStore>()(
         }
 
         if (coupon.discountType === "percentage") {
-          const safePercent = Math.min(coupon.amount, 10);
-          return Math.round((subtotal * safePercent) / 100);
+          // Exactly 5% discount only
+          const safePercent = Math.min(coupon.amount, 5);
+          return (subtotal * safePercent) / 100;
         }
         return 0;
       },
@@ -284,20 +297,27 @@ export const useCartStore = create<CartStore>()(
       getShippingFee: () => {
         const subtotal = get().getSubtotal();
         if (subtotal === 0) return 0;
-        const threshold = storeConfig.commerce.freeShippingThreshold || 799;
+        // FREE Delivery anywhere in Qatar on all orders!
+        if (get().selectedCurrency === "QAR") return 0;
+        const threshold = storeConfig.commerce.freeShippingThreshold;
         if (subtotal >= threshold) return 0;
-        return storeConfig.commerce.flatShippingFee || 40;
+        return storeConfig.commerce.flatShippingFee;
       },
 
       getTaxAmount: () => {
-        return 0; // Tax inclusive pricing
+        const subtotal = get().getSubtotal();
+        const discount = get().getDiscountAmount();
+        const taxableAmount = Math.max(0, subtotal - discount);
+        const rate = storeConfig.commerce.taxRatePercent / 100;
+        return taxableAmount * rate;
       },
 
       getTotal: () => {
         const subtotal = get().getSubtotal();
         const discount = get().getDiscountAmount();
         const shipping = get().getShippingFee();
-        return Math.max(0, subtotal - discount + shipping);
+        const tax = get().getTaxAmount();
+        return Math.max(0, subtotal - discount + shipping + tax);
       },
 
       getItemCount: () => {
@@ -305,7 +325,7 @@ export const useCartStore = create<CartStore>()(
       },
     }),
     {
-      name: "noomis-cart-storage",
+      name: "lumina-cart-storage",
       partialize: (state) => ({
         items: state.items,
         wishlist: state.wishlist,

@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: "/",
       disallow: ["/admin", "/api/"],
     },
-    sitemap: "https://noomiscouture.com/sitemap.xml",
+    sitemap: "https://gleamnest.in/sitemap.xml",
   };
 }

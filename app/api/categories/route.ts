@@ -67,7 +67,7 @@ export async function GET(req: Request) {
   const url = new URL(req.url);
   const forceFresh = url.searchParams.get("fresh") === "true";
   const categoriesList = await getStoredCategories(forceFresh);
-  return NextResponse.json(categoriesList, { headers: NO_CACHE_HEADERS });
+  return NextResponse.json(categoriesList, { headers: CACHE_HEADERS });
 }
 
 export async function POST(req: Request) {
@@ -84,7 +84,7 @@ export async function POST(req: Request) {
     }
 
     // Adding a single new category
-    const currentList = await getStoredCategories(true);
+    const currentList = await getStoredCategories();
     const slug =
       body.slug ||
       body.name
@@ -101,15 +101,7 @@ export async function POST(req: Request) {
       productCount: typeof body.productCount === "number" ? body.productCount : 0,
     };
 
-    const existingIdx = currentList.findIndex((c) => c.slug === slug || (body.id && c.id === body.id));
-    let updated: Category[];
-    if (existingIdx >= 0) {
-      updated = [...currentList];
-      updated[existingIdx] = { ...updated[existingIdx], ...newCategory };
-    } else {
-      updated = [...currentList, newCategory];
-    }
-
+    const updated = [...currentList, newCategory];
     await saveCategories(updated);
     return NextResponse.json({ success: true, item: newCategory, categories: updated }, { headers: NO_CACHE_HEADERS });
   } catch (err: any) {
@@ -127,7 +119,7 @@ export async function PUT(req: Request) {
       return NextResponse.json({ error: "Category ID is required" }, { status: 400 });
     }
 
-    const currentList = await getStoredCategories(true);
+    const currentList = await getStoredCategories();
     let found = false;
 
     const updated = currentList.map((cat) => {
@@ -177,7 +169,7 @@ export async function DELETE(req: Request) {
       return NextResponse.json({ error: "Category ID is required" }, { status: 400 });
     }
 
-    const currentList = await getStoredCategories(true);
+    const currentList = await getStoredCategories();
     const updated = currentList.filter((cat) => cat.id !== id && cat.slug !== id);
 
     await saveCategories(updated);

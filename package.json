@@ -1,13 +1,13 @@
 {
-  "name": "noomis-couture",
+  "name": "gleamnest-store",
   "version": "1.0.0",
   "private": true,
-  "description": "Noomi's Couture - Wear Your Confidence Luxury Jewelry Store",
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
