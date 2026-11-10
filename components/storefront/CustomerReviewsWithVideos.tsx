@@ -167,7 +167,7 @@ function AutoPlayingReelCard({
             {reel.title}
           </p>
           <p className="text-[10px] text-white/80 font-medium drop-shadow-sm">
-            {reel.handle && !reel.handle.toLowerCase().includes("alnaya") ? reel.handle : "@gleamnest.in"}
+            {reel.handle && !reel.handle.toLowerCase().includes("alnaya") && !reel.handle.toLowerCase().includes("noomi") ? reel.handle : "@gleamnest.in"}
           </p>
           {reel.productTitle && (
             <span className="inline-block text-[9px] text-amber-300 font-semibold bg-white/10 px-1.5 py-0.5 rounded">
@@ -191,7 +191,10 @@ export function CustomerReviewsWithVideos() {
             const hasCorrupt = parsed.some(
               (v: any) =>
                 v.poster?.startsWith("data:image/webp") ||
-                v.poster?.includes("photo-1611591475806-039775089201")
+                v.poster?.includes("photo-1611591475806-039775089201") ||
+                v.poster?.includes("noomi") ||
+                v.handle?.toLowerCase().includes("noomi") ||
+                v.influencer?.toLowerCase().includes("noomi")
             );
             if (!hasCorrupt) return parsed;
             sessionStorage.removeItem("gleamnest_cached_reels");
@@ -281,9 +284,9 @@ export function CustomerReviewsWithVideos() {
         if (Array.isArray(data.videoReels) && data.videoReels.length > 0) {
           const cleanReels = data.videoReels.map((r: any) => ({
             ...r,
-            handle: (r.handle && !r.handle.toLowerCase().includes("alnaya")) ? r.handle : "@gleamnest.in",
-            influencer: (r.influencer && !r.influencer.toLowerCase().includes("alnaya")) ? r.influencer : "gleamnest",
-            poster: (r.poster?.startsWith("data:image/webp") || r.poster?.includes("photo-1611591475806-039775089201") || !r.poster)
+            handle: (r.handle && !r.handle.toLowerCase().includes("alnaya") && !r.handle.toLowerCase().includes("noomi")) ? r.handle : "@gleamnest.in",
+            influencer: (r.influencer && !r.influencer.toLowerCase().includes("alnaya") && !r.influencer.toLowerCase().includes("noomi")) ? r.influencer : "gleamnest",
+            poster: (r.poster?.startsWith("data:image/webp") || r.poster?.includes("photo-1611591475806-039775089201") || r.poster?.includes("noomi") || !r.poster)
               ? "/images/gleamnest-brand-card.png"
               : r.poster,
           }));
@@ -842,7 +845,11 @@ export function CustomerReviewsWithVideos() {
             <div className="flex-shrink-0 px-4 py-3 bg-stone-950/95 border-b border-stone-800 flex items-center justify-between text-white">
               <div className="min-w-0 pr-2">
                 <h4 className="text-xs font-bold truncate">{selectedVideo.productTitle || "Client Reel"}</h4>
-                <p className="text-[10px] text-stone-400 truncate">{selectedVideo.influencer || "Verified Client Video"}</p>
+                <p className="text-[10px] text-stone-400 truncate">
+                  {selectedVideo.influencer && !selectedVideo.influencer.toLowerCase().includes("noomi") && !selectedVideo.influencer.toLowerCase().includes("alnaya")
+                    ? selectedVideo.influencer
+                    : "Verified Client Video"}
+                </p>
               </div>
               <button
                 type="button"

@@ -146,16 +146,43 @@ function AutoPlayingInstaCard({
           <Maximize2 className="w-4 h-4 text-[#1C1917]" />
         </div>
 
+function cleanCaptionText(text?: string): string {
+  if (!text) return "";
+  return text
+    .replace(/@noomi_s_couture\.in/gi, "@gleamnest.in")
+    .replace(/@noomi_s_couture/gi, "@gleamnest.in")
+    .replace(/#noomi_s_couturein/gi, "#GleamNestin")
+    .replace(/noomi_s_couture/gi, "gleamnest.in")
+    .replace(/noomiscouture/gi, "gleamnest.in")
+    .replace(/noomis/gi, "gleamnest")
+    .replace(/alnaya\.in/gi, "gleamnest.in")
+    .replace(/alnaya/gi, "GleamNest");
+}
+
+function cleanHandleText(handle?: string): string {
+  if (!handle || handle.toLowerCase().includes("alnaya") || handle.toLowerCase().includes("noomi")) {
+    return "@gleamnest.in";
+  }
+  return handle;
+}
+
+function cleanInstagramLink(link?: string): string {
+  if (!link || link.toLowerCase().includes("alnaya") || link.toLowerCase().includes("noomi")) {
+    return "https://www.instagram.com/gleamnest.in?igsh=c3I4M2h1YmprdXI5";
+  }
+  return link;
+}
+
         {/* Bottom Details */}
         <div className="space-y-1">
           <p className="text-xs sm:text-sm font-semibold text-white line-clamp-1 leading-snug drop-shadow-sm">
             {vid.title}
           </p>
           <p className="text-[11px] text-white/85 line-clamp-1 font-light drop-shadow-sm">
-            {vid.caption?.replace(/alnaya\.in/gi, "gleamnest.in").replace(/alnaya/gi, "GleamNest")}
+            {cleanCaptionText(vid.caption)}
           </p>
           <span className="inline-block text-[10px] text-[#F3DFB0] font-mono tracking-wider">
-            {vid.handle && !vid.handle.toLowerCase().includes("alnaya") ? vid.handle : "@gleamnest.in"}
+            {cleanHandleText(vid.handle)}
           </span>
         </div>
       </div>
@@ -168,12 +195,14 @@ if (typeof window !== "undefined") {
   try {
     localStorage.removeItem("gleamnest_instagram_reels");
     localStorage.removeItem("gleamnest_instagram_reels_v2");
+    localStorage.removeItem("gleamnest_instagram_reels_v3");
     sessionStorage.removeItem("gleamnest_instagram_reels");
     sessionStorage.removeItem("gleamnest_instagram_reels_v2");
+    sessionStorage.removeItem("gleamnest_instagram_reels_v3");
   } catch (e) {}
 }
 
-const INSTA_STORAGE_KEY = "gleamnest_instagram_reels_v3";
+const INSTA_STORAGE_KEY = "gleamnest_instagram_reels_v4";
 
 export function InstagramReelSection() {
   const [videos, setVideos] = useState<InstagramVideoItem[]>(() => {
@@ -190,9 +219,14 @@ export function InstagramReelSection() {
               v.id === "insta-1" ||
               v.id === "insta-2" ||
               v.handle?.toLowerCase().includes("alnaya") ||
+              v.handle?.toLowerCase().includes("noomi") ||
               v.caption?.toLowerCase().includes("alnaya") ||
+              v.caption?.toLowerCase().includes("noomi") ||
+              v.instagramLink?.toLowerCase().includes("alnaya") ||
+              v.instagramLink?.toLowerCase().includes("noomi") ||
               v.poster?.startsWith("data:image/webp") ||
-              v.poster?.includes("photo-1611591475806-039775089201")
+              v.poster?.includes("photo-1611591475806-039775089201") ||
+              v.poster?.includes("noomi")
             )
           ) {
             return parsed;
@@ -241,12 +275,12 @@ export function InstagramReelSection() {
             .filter((v: any) => !String(v.id || "").startsWith("fth-panel-") && v.id !== "insta-1" && v.id !== "insta-2")
             .map((v: any) => ({
               ...v,
-              handle: (v.handle && !v.handle.toLowerCase().includes("alnaya")) ? v.handle : "@gleamnest.in",
-              caption: (v.caption || "").replace(/alnaya\.in/gi, "gleamnest.in").replace(/alnaya/gi, "GleamNest"),
-              instagramLink: (v.instagramLink || "").replace(/alnaya\.in/gi, "gleamnest.in").replace(/alnaya/gi, "gleamnest.in") || "https://www.instagram.com/gleamnest.in?igsh=c3I4M2h1YmprdXI5",
+              handle: cleanHandleText(v.handle),
+              caption: cleanCaptionText(v.caption),
+              instagramLink: cleanInstagramLink(v.instagramLink),
               poster: (v.poster?.startsWith("data:image/webp")
                 ? "/uploads/images/charm-bangles-poster.jpg"
-                : v.poster?.includes("photo-1611591475806-039775089201")
+                : v.poster?.includes("photo-1611591475806-039775089201") || v.poster?.includes("noomi")
                 ? "/images/gleamnest-brand-card.png"
                 : v.poster) || "/images/gleamnest-brand-card.png",
             }));
@@ -393,7 +427,7 @@ export function InstagramReelSection() {
                 </div>
                 <div className="min-w-0">
                   <h4 className="text-xs font-bold truncate max-w-[180px] sm:max-w-[220px]">{activeVideo.title}</h4>
-                  <p className="text-[10px] text-stone-400 truncate">{activeVideo.handle && !activeVideo.handle.toLowerCase().includes("alnaya") ? activeVideo.handle : "@gleamnest.in"}</p>
+                  <p className="text-[10px] text-stone-400 truncate">{cleanHandleText(activeVideo.handle)}</p>
                 </div>
               </div>
               <div className="flex items-center gap-2 shrink-0">
@@ -447,12 +481,12 @@ export function InstagramReelSection() {
             <div className="flex-shrink-0 p-3.5 sm:p-4 bg-stone-900 border-t border-stone-800 flex items-center justify-between gap-3 text-white">
               <div className="space-y-0.5 min-w-0 max-w-[65%]">
                 <p className="text-xs font-semibold truncate">{activeVideo.title}</p>
-                <p className="text-[11px] text-stone-400 line-clamp-1">{activeVideo.caption?.replace(/alnaya\.in/gi, "gleamnest.in").replace(/alnaya/gi, "GleamNest")}</p>
+                <p className="text-[11px] text-stone-400 line-clamp-1">{cleanCaptionText(activeVideo.caption)}</p>
               </div>
 
               {activeVideo.instagramLink && (
                 <a
-                  href={activeVideo.instagramLink?.replace(/alnaya\.in/gi, "gleamnest.in").replace(/alnaya/gi, "gleamnest.in") || "https://www.instagram.com/gleamnest.in?igsh=c3I4M2h1YmprdXI5"}
+                  href={cleanInstagramLink(activeVideo.instagramLink)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="px-3.5 py-1.5 rounded-full bg-[#E1306C] text-white text-xs font-semibold hover:bg-[#C1275B] transition-colors flex items-center gap-1.5 shrink-0 shadow-sm"

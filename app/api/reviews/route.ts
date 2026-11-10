@@ -32,10 +32,10 @@ function sanitizeData(parsed: any) {
 
   let wasDirty = false;
 
-  // 1. Sanitize Screenshots: Eliminate any WebP canvas base64 or 404 Unsplash URLs
+  // 1. Sanitize Screenshots: Eliminate any WebP canvas base64, 404 Unsplash URLs, or old brand assets
   parsed.feedbackScreenshots = parsed.feedbackScreenshots.map((item: any) => {
     let img = (item.imageUrl || "").trim();
-    if (img.startsWith("data:image/webp") || img.includes("photo-1611591475806-039775089201") || !img) {
+    if (img.startsWith("data:image/webp") || img.includes("photo-1611591475806-039775089201") || img.includes("noomi") || !img) {
       wasDirty = true;
       if (item.customerName === "Sn" || item.piece === "Earing" || item.id === "fb-1793177769534") {
         img = "/uploads/screenshots/customer-review-whatsapp-1.jpg";
@@ -49,21 +49,26 @@ function sanitizeData(parsed: any) {
   // 2. Sanitize Video Reels:
   parsed.videoReels = parsed.videoReels.map((item: any) => {
     let poster = (item.poster || "").trim();
-    if (poster.startsWith("data:image/webp") || poster.includes("photo-1611591475806-039775089201") || !poster) {
+    if (poster.startsWith("data:image/webp") || poster.includes("photo-1611591475806-039775089201") || poster.includes("noomi") || !poster) {
       wasDirty = true;
       poster = "/images/gleamnest-brand-card.png";
     }
     let handle = (item.handle || "").trim();
-    if (!handle || handle.toLowerCase().includes("alnaya")) {
+    if (!handle || handle.toLowerCase().includes("alnaya") || handle.toLowerCase().includes("noomi")) {
       handle = "@gleamnest.in";
       wasDirty = true;
     }
     let influencer = (item.influencer || "").trim();
-    if (influencer.toLowerCase().includes("alnaya")) {
+    if (influencer.toLowerCase().includes("alnaya") || influencer.toLowerCase().includes("noomi")) {
       influencer = "gleamnest";
       wasDirty = true;
     }
-    return { ...item, poster, handle, influencer };
+    let productTitle = (item.productTitle || "").trim();
+    if (productTitle.toLowerCase().includes("noomi") || productTitle.toLowerCase().includes("alnaya")) {
+      productTitle = "GleamNest Jewelry";
+      wasDirty = true;
+    }
+    return { ...item, poster, handle, influencer, productTitle };
   });
 
   // 3. Sanitize Instagram Videos: Purge obsolete placeholder panels and enforce @gleamnest.in
@@ -86,26 +91,34 @@ function sanitizeData(parsed: any) {
     if (poster.startsWith("data:image/webp")) {
       wasDirty = true;
       poster = "/uploads/images/charm-bangles-poster.jpg";
-    } else if (poster.includes("photo-1611591475806-039775089201") || !poster) {
+    } else if (poster.includes("photo-1611591475806-039775089201") || poster.includes("noomi") || !poster) {
       wasDirty = true;
       poster = "/images/gleamnest-brand-card.png";
     }
 
     let handle = (item.handle || "").trim();
-    if (!handle || handle.toLowerCase().includes("alnaya")) {
+    if (!handle || handle.toLowerCase().includes("alnaya") || handle.toLowerCase().includes("noomi")) {
       handle = "@gleamnest.in";
       wasDirty = true;
     }
 
     let caption = item.caption || "";
-    if (caption.toLowerCase().includes("alnaya")) {
-      caption = caption.replace(/alnaya\.in/gi, "gleamnest.in").replace(/alnaya/gi, "GleamNest");
+    if (caption.toLowerCase().includes("alnaya") || caption.toLowerCase().includes("noomi")) {
+      caption = caption
+        .replace(/@noomi_s_couture\.in/gi, "@gleamnest.in")
+        .replace(/@noomi_s_couture/gi, "@gleamnest.in")
+        .replace(/#noomi_s_couturein/gi, "#GleamNestin")
+        .replace(/noomi_s_couture/gi, "gleamnest.in")
+        .replace(/noomiscouture/gi, "gleamnest.in")
+        .replace(/noomis/gi, "gleamnest")
+        .replace(/alnaya\.in/gi, "gleamnest.in")
+        .replace(/alnaya/gi, "GleamNest");
       wasDirty = true;
     }
 
     let instagramLink = item.instagramLink || "";
-    if (instagramLink.toLowerCase().includes("alnaya")) {
-      instagramLink = instagramLink.replace(/alnaya\.in/gi, "gleamnest.in").replace(/alnaya/gi, "gleamnest.in");
+    if (instagramLink.toLowerCase().includes("alnaya") || instagramLink.toLowerCase().includes("noomi") || !instagramLink) {
+      instagramLink = "https://www.instagram.com/gleamnest.in?igsh=c3I4M2h1YmprdXI5";
       wasDirty = true;
     }
 
@@ -194,7 +207,7 @@ async function writeData(data: any) {
 }
 
 const CACHE_HEADERS = {
-  "Cache-Control": "public, s-maxage=300, stale-while-revalidate=86400",
+  "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
 };
 
 export async function GET() {
