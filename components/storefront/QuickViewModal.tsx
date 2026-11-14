@@ -336,6 +336,7 @@ export function QuickViewModal() {
 
               <Link
                 href={`/products/${product.slug}`}
+                prefetch={true}
                 onClick={closeQuickView}
                 className="w-full py-2.5 px-4 rounded-xl border border-border text-foreground hover:bg-muted font-medium text-xs flex items-center justify-center gap-1.5 transition-colors"
               >

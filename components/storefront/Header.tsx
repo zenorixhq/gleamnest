@@ -512,6 +512,7 @@ export function Header() {
                       <Link
                         key={product.id}
                         href={`/products/${product.slug}`}
+                        prefetch={true}
                         onClick={() => {
                           setSearchOpen(false);
                           setSearchQuery("");

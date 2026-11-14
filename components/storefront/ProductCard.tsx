@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Product } from "@/types/store";
 import { useCartStore } from "@/store/useCartStore";
 import { formatPrice, getProductPrices } from "@/lib/utils";
@@ -12,6 +13,7 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
+  const router = useRouter();
   const [isAdded, setIsAdded] = useState(false);
   const selectedCurrency = useCartStore((s) => s.selectedCurrency);
   const addItem = useCartStore((s) => s.addItem);
@@ -60,6 +62,13 @@ export function ProductCard({ product }: ProductCardProps) {
     toggleWishlist(product.id);
   };
 
+  const handleCardClick = (e: React.MouseEvent) => {
+    if ((e.target as HTMLElement).closest("button")) {
+      return;
+    }
+    router.push(`/products/${product.slug}`);
+  };
+
   const displayImage =
     Array.isArray(product.images) && product.images.length > 0 && product.images[0]
       ? product.images[0]
@@ -68,10 +77,21 @@ export function ProductCard({ product }: ProductCardProps) {
       : "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&q=80&w=800";
 
   return (
-    <div className="group relative flex flex-col bg-transparent">
+    <div
+      onClick={handleCardClick}
+      className="group relative flex flex-col bg-transparent cursor-pointer touch-manipulation select-none"
+    >
       {/* Product Image Container with Top-Right Floating Wishlist Icon */}
       <div className="relative aspect-square w-full rounded-2xl overflow-hidden bg-[#FAF8F5] border border-stone-200/50 shadow-2xs group-hover:shadow-md transition-shadow duration-300">
-        <Link href={`/products/${product.slug}`} className="block w-full h-full relative">
+        <Link
+          href={`/products/${product.slug}`}
+          prefetch={true}
+          className="block w-full h-full relative"
+          onClick={(e) => {
+            // Let the link navigate normally
+            e.stopPropagation();
+          }}
+        >
           <img
             src={displayImage}
             alt={product.title}
@@ -82,8 +102,9 @@ export function ProductCard({ product }: ProductCardProps) {
           />
         </Link>
 
-        {/* Floating Wishlist Heart Button in Top-Right Corner (Exact Reference Style) */}
+        {/* Floating Wishlist Heart Button in Top-Right Corner */}
         <button
+          type="button"
           onClick={handleWishlistToggle}
           aria-label={isInWishlist ? "Remove from Wishlist" : "Save to Wishlist"}
           className="absolute top-2.5 right-2.5 sm:top-3 sm:right-3 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/95 backdrop-blur-sm shadow-sm flex items-center justify-center transition-transform hover:scale-110 active:scale-95 z-10 border border-stone-200/60"
@@ -109,7 +130,14 @@ export function ProductCard({ product }: ProductCardProps) {
       <div className="pt-2 sm:pt-2.5 flex-1 flex flex-col justify-between">
         <div>
           {/* Title */}
-          <Link href={`/products/${product.slug}`} className="block group-hover:text-[#4A171C] transition-colors">
+          <Link
+            href={`/products/${product.slug}`}
+            prefetch={true}
+            className="block group-hover:text-[#4A171C] transition-colors"
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+          >
             <h3 className="text-xs sm:text-sm font-medium text-stone-900 line-clamp-1 leading-snug" title={product.title}>
               {product.title}
             </h3>
@@ -128,8 +156,9 @@ export function ProductCard({ product }: ProductCardProps) {
           </div>
         </div>
 
-        {/* Full-Width Add To Cart Button (Exact Reference Style) */}
+        {/* Full-Width Add To Cart Button */}
         <button
+          type="button"
           disabled={isOutOfStock}
           onClick={handleQuickAdd}
           className={`w-full py-2.5 sm:py-3 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all duration-300 mt-2.5 flex items-center justify-center gap-1.5 active:scale-[0.98] ${
@@ -148,7 +177,7 @@ export function ProductCard({ product }: ProductCardProps) {
               <span>Added</span>
             </>
           ) : (
-            <span>ADD TO CART</span>
+            <span>Add to Cart</span>
           )}
         </button>
       </div>

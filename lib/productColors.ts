@@ -99,6 +99,37 @@ export const KNOWN_COLOR_SWATCHES: Record<string, ColorSwatchInfo> = {
     cssBackground: "#A855F7",
     borderColor: "#7E22CE",
   },
+  lavender: {
+    label: "Lavender",
+    cssBackground: "linear-gradient(135deg, #EDE9FE 0%, #C4B5FD 50%, #8B5CF6 100%)",
+    borderColor: "#7C3AED",
+  },
+  maroon: {
+    label: "Maroon",
+    cssBackground: "linear-gradient(135deg, #991B1B 0%, #7F1D1D 50%, #450A0A 100%)",
+    borderColor: "#450A0A",
+  },
+  merroon: {
+    label: "Maroon",
+    cssBackground: "linear-gradient(135deg, #991B1B 0%, #7F1D1D 50%, #450A0A 100%)",
+    borderColor: "#450A0A",
+  },
+  brown: {
+    label: "Brown",
+    cssBackground: "linear-gradient(135deg, #A16207 0%, #78350F 50%, #451A03 100%)",
+    borderColor: "#451A03",
+  },
+  multi: {
+    label: "Multi",
+    cssBackground: "linear-gradient(135deg, #F43F5E 0%, #A855F7 35%, #3B82F6 70%, #10B981 100%)",
+    borderColor: "#A855F7",
+  },
+  classic: {
+    label: "Classic Gold",
+    cssBackground: "linear-gradient(135deg, #FDE68A 0%, #D4AF37 50%, #92400E 100%)",
+    borderColor: "#B45309",
+    isMetallic: true,
+  },
   "two-tone": {
     label: "Two-Tone",
     cssBackground: "linear-gradient(135deg, #D4AF37 50%, #C0C0C0 50%)",
@@ -132,32 +163,83 @@ export function getColorSwatch(colorName: string): ColorSwatchInfo {
   };
 }
 
+const COLOR_NAMES = [
+  "Yellow Gold", "Rose Gold", "Gold", "Silver", "Rhodium", "Platinum",
+  "White", "Black", "Green", "Emerald", "Red", "Ruby", "Blue", "Sapphire",
+  "Pink", "Yellow", "Purple", "Lavender", "Maroon", "Merroon", "Brown",
+  "Multi", "Two-Tone", "Black & White"
+];
+const colorRegexPart = COLOR_NAMES.map((c) => c.replace(/\s+/g, "\\s+")).join("|");
+
 /**
  * Extracts base product title and color name from product titles like:
  * - "Simple Tulip Bracelet - Red" -> base: "Simple Tulip Bracelet", color: "Red"
  * - "Simple Tulip Bracelet- White " -> base: "Simple Tulip Bracelet", color: "White"
  * - "Adjustable Full Stone Ring - Blue" -> base: "Adjustable Full Stone Ring", color: "Blue"
- * - "Full Stone Adjustable Ring - White" -> base: "Full Stone Adjustable Ring", color: "White"
- * - "Red Tulip Bracelet" -> base: "Tulip Bracelet", color: "Red"
+ * - "Adjustable full stone ring - lavender" -> base: "Adjustable full stone ring", color: "lavender"
+ * - "Wintage watch white Dial" -> base: "Wintage watch", color: "white"
+ * - "White dial sleak watch" -> base: "sleak watch", color: "White"
+ * - "Blue dial premium watch" -> base: "premium watch", color: "Blue"
+ * - "Double shade sleak watch merroon" -> base: "Double shade sleak watch", color: "merroon"
+ * - "Rose gold Bubble brown watch" -> base: "Rose gold bubble watch", color: "brown"
  */
 export function extractBaseTitleAndColor(title: string): { baseTitle: string; color: string | null } {
   if (!title) return { baseTitle: "", color: null };
   const t = title.trim();
 
   // Pattern 1: Title with separator and color at the end (e.g. "Simple Tulip Bracelet - Red")
-  const suffixMatch = t.match(
-    /^(.*?)\s*[-–—/]\s*(Gold|Yellow Gold|Rose Gold|Silver|Rhodium|Platinum|White|Black|Green|Emerald|Red|Ruby|Blue|Sapphire|Pink|Yellow|Purple|Two-Tone|Black & White)\s*$/i
-  );
-  if (suffixMatch && suffixMatch[1].trim()) {
+  const suffixSepRegex = new RegExp(`^(.*?)\\s*[-–—/]\\s*(${colorRegexPart})\\s*$`, "i");
+  const mSuffixSep = t.match(suffixSepRegex);
+  if (mSuffixSep && mSuffixSep[1].trim()) {
     return {
-      baseTitle: suffixMatch[1].trim(),
-      color: suffixMatch[2].trim(),
+      baseTitle: mSuffixSep[1].trim(),
+      color: mSuffixSep[2].trim(),
     };
   }
 
-  // Pattern 2: Title starting with color (e.g. "Red Tulip Bracelet", "Green Flies Bracelet")
+  // Pattern 2a: Watch with dial suffix (e.g. "Wintage watch white Dial", "Wintage watch pink dial")
+  const dialSuffixRegex = new RegExp(`^(.*?)\\s+(${colorRegexPart})\\s+dial\\s*$`, "i");
+  const mDialSuffix = t.match(dialSuffixRegex);
+  if (mDialSuffix && mDialSuffix[1].trim()) {
+    return {
+      baseTitle: mDialSuffix[1].trim(),
+      color: mDialSuffix[2].trim(),
+    };
+  }
+
+  // Pattern 2b: Watch with dial prefix (e.g. "White dial sleak watch", "Blue dial premium watch")
+  const dialPrefixRegex = new RegExp(`^(${colorRegexPart})\\s+dial\\s+(.*?)$`, "i");
+  const mDialPrefix = t.match(dialPrefixRegex);
+  if (mDialPrefix && mDialPrefix[2].trim()) {
+    return {
+      baseTitle: mDialPrefix[2].trim(),
+      color: mDialPrefix[1].trim(),
+    };
+  }
+
+  // Pattern 3: Bubble watch patterns (e.g. "Rose gold Bubble brown watch", "Rose gold green bubble watch")
+  const bubbleRegex = new RegExp(`^Rose gold\\s+(Bubble\\s+)?(${colorRegexPart})\\s+(bubble\\s+)?watch$`, "i");
+  const mBubble = t.match(bubbleRegex);
+  if (mBubble) {
+    return {
+      baseTitle: "Rose gold bubble watch",
+      color: mBubble[2].trim(),
+    };
+  }
+
+  // Pattern 4: Color at the very end without separator (e.g. "Double shade sleak watch merroon")
+  const endColorRegex = new RegExp(`^(.*?)\\s+(${colorRegexPart})\\s*$`, "i");
+  const mEndColor = t.match(endColorRegex);
+  if (mEndColor && mEndColor[1].trim()) {
+    return {
+      baseTitle: mEndColor[1].trim(),
+      color: mEndColor[2].trim(),
+    };
+  }
+
+  // Pattern 5: Title starting with color (e.g. "Red Tulip Bracelet", "Green Flies Bracelet")
   const prefixMatch = t.match(
-    /^(Gold|Yellow Gold|Rose Gold|Silver|Rhodium|Platinum|White|Black|Green|Emerald|Red|Ruby|Blue|Sapphire|Pink|Yellow)\s+(.*?)$/i
+    new RegExp(`^(${colorRegexPart})\\s+(.*?)$`, "i")
   );
   if (prefixMatch && prefixMatch[2].trim()) {
     return {
@@ -190,7 +272,10 @@ export interface UnifiedColorOption {
 function normalizeBaseTitle(title: string): string {
   return title
     .toLowerCase()
-    .replace(/\b(adjustable|free size|collection|ring|rings|bracelet|bracelets|necklace|necklaces|bangle|bangles)\b/gi, "")
+    .replace(
+      /\b(adjustable|free size|collection|ring|rings|bracelet|bracelets|necklace|necklaces|bangle|bangles|watch|watches|dial)\b/gi,
+      ""
+    )
     .replace(/[^a-z0-9]+/g, " ")
     .trim();
 }
@@ -246,10 +331,12 @@ export function getLinkedColorProducts(
 
   return matchingProducts.map(({ product, color }) => {
     const isCurrent = product.id === currentProduct.id || product.slug === currentProduct.slug;
+    const swatch = getColorSwatch(color);
+    const displayName = swatch.label || color;
     return {
       id: product.id,
-      name: color,
-      swatch: getColorSwatch(color),
+      name: displayName,
+      swatch,
       image: product.images?.[0] || "",
       isCurrent,
       productSlug: product.slug,
@@ -301,11 +388,12 @@ export function getAllColorOptionsForProduct(
       const isCurrent = optName === activeColor;
       const explicitImg = colorAttr.colorImages?.[optName];
       const fallbackImg = currentProduct.images?.[index] || currentProduct.images?.[0] || "";
+      const swatch = getColorSwatch(optName);
 
       return {
         id: `variant-color-${optName}`,
-        name: optName,
-        swatch: getColorSwatch(optName),
+        name: swatch.label || optName,
+        swatch,
         image: explicitImg || fallbackImg,
         isCurrent,
         price: currentProduct.price,
@@ -327,13 +415,14 @@ export function getAllColorOptionsForProduct(
   // 3. Fallback: single color piece
   const { color } = extractBaseTitleAndColor(currentProduct.title);
   const singleColorName = color || "Classic";
+  const singleSwatch = getColorSwatch(singleColorName);
 
   return {
     colorOptions: [
       {
         id: currentProduct.id,
-        name: singleColorName,
-        swatch: getColorSwatch(singleColorName),
+        name: singleSwatch.label || singleColorName,
+        swatch: singleSwatch,
         image: currentProduct.images?.[0] || "",
         isCurrent: true,
         productSlug: currentProduct.slug,
@@ -342,11 +431,10 @@ export function getAllColorOptionsForProduct(
         inStock: currentProduct.inStock !== false,
         stockCount: currentProduct.stockCount ?? 1,
         isLinkedProduct: false,
-        targetProduct: currentProduct,
       },
     ],
     hasMultipleColors: false,
-    currentColorName: singleColorName,
+    currentColorName: singleSwatch.label || singleColorName,
     isLinkedCatalogGroup: false,
   };
 }

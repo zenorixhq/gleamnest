@@ -77,10 +77,18 @@ export default async function ProductDetailPage({
 }: {
   params: { slug: string };
 }) {
-  const [product, allProducts] = await Promise.all([
-    getProductBySlugServer(params.slug),
-    getAllProductsServer(),
-  ]);
+  const allProducts = await getAllProductsServer();
+  const cleanSlug = decodeURIComponent(params.slug).toLowerCase().trim();
+  const product =
+    allProducts.find((p) => {
+      const pSlug = (p.slug || "").toLowerCase().trim();
+      const pId = (p.id || "").toLowerCase().trim();
+      if (pSlug === cleanSlug || pId === cleanSlug) return true;
+      if (cleanSlug.endsWith("s") && pSlug === cleanSlug.slice(0, -1)) return true;
+      if (!cleanSlug.endsWith("s") && pSlug === cleanSlug + "s") return true;
+      if (pSlug.replace(/[-_]/g, "") === cleanSlug.replace(/[-_]/g, "")) return true;
+      return false;
+    }) || null;
 
   return (
     <ProductDetailClient
