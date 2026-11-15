@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Product } from "@/types/store";
 import { useCartStore } from "@/store/useCartStore";
 import { formatPrice, getProductPrices } from "@/lib/utils";
@@ -12,6 +13,7 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
+  const router = useRouter();
   const [isAdded, setIsAdded] = useState(false);
   const selectedCurrency = useCartStore((s) => s.selectedCurrency);
   const addItem = useCartStore((s) => s.addItem);
@@ -60,6 +62,19 @@ export function ProductCard({ product }: ProductCardProps) {
     toggleWishlist(product.id);
   };
 
+  const productUrl = `/products/${product.slug}`;
+
+  const handleCardClick = (e: React.MouseEvent) => {
+    // If click originated from a button, do not navigate
+    if ((e.target as HTMLElement).closest("button")) {
+      return;
+    }
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "instant" });
+    }
+    router.push(productUrl);
+  };
+
   const displayImage =
     Array.isArray(product.images) && product.images.length > 0 && product.images[0]
       ? product.images[0]
@@ -68,38 +83,63 @@ export function ProductCard({ product }: ProductCardProps) {
       : "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&q=80&w=800";
 
   return (
-    <div className="group relative flex flex-col bg-transparent">
-      {/* 1. SINGLE UNIFIED NATIVE LINK FOR ENTIRE UPPER CARD: Image + Title + Price */}
+    <div
+      onClick={handleCardClick}
+      className="group relative flex flex-col bg-transparent cursor-pointer select-none touch-manipulation h-full"
+    >
+      {/* 1. Stretched Link Overlay: 100% of card surface is a native prefetching anchor */}
       <Link
-        href={`/products/${product.slug}`}
+        href={productUrl}
         prefetch={true}
-        className="block flex-1 group/card focus:outline-hidden"
+        className="absolute inset-0 z-10 focus:outline-hidden"
+        aria-label={product.title}
+        onClick={() => {
+          if (typeof window !== "undefined") {
+            window.scrollTo({ top: 0, behavior: "instant" });
+          }
+        }}
+      />
+
+      {/* Product Image Container (pointer-events-none so click passes directly to stretched Link) */}
+      <div className="relative aspect-square w-full rounded-2xl overflow-hidden bg-[#FAF8F5] border border-stone-200/50 shadow-2xs group-hover:shadow-md transition-shadow duration-300 pointer-events-none">
+        <img
+          src={displayImage}
+          alt={product.title}
+          loading="lazy"
+          className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out ${
+            isOutOfStock ? "opacity-70 grayscale-[25%]" : ""
+          }`}
+        />
+
+        {/* Out of Stock Pill Badge */}
+        {isOutOfStock && (
+          <div className="absolute top-2.5 left-2.5 z-10">
+            <span className="bg-stone-900/90 text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider backdrop-blur-sm">
+              Out of Stock
+            </span>
+          </div>
+        )}
+      </div>
+
+      {/* Floating Wishlist Heart Button - z-30 with pointer-events-auto sits above the Link */}
+      <button
+        type="button"
+        onClick={handleWishlistToggle}
+        aria-label={isInWishlist ? "Remove from Wishlist" : "Save to Wishlist"}
+        className="absolute top-2.5 right-2.5 sm:top-3 sm:right-3 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/95 backdrop-blur-sm shadow-sm flex items-center justify-center transition-transform hover:scale-110 active:scale-95 z-30 border border-stone-200/60 pointer-events-auto"
       >
-        {/* Product Image Container */}
-        <div className="relative aspect-square w-full rounded-2xl overflow-hidden bg-[#FAF8F5] border border-stone-200/50 shadow-2xs group-hover/card:shadow-md transition-shadow duration-300">
-          <img
-            src={displayImage}
-            alt={product.title}
-            loading="lazy"
-            className={`w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-500 ease-out ${
-              isOutOfStock ? "opacity-70 grayscale-[25%]" : ""
-            }`}
-          />
+        <Heart
+          className={`w-4 h-4 transition-colors ${
+            isInWishlist ? "fill-rose-500 text-rose-500" : "text-stone-700 hover:text-rose-600"
+          }`}
+        />
+      </button>
 
-          {/* Out of Stock Pill Badge */}
-          {isOutOfStock && (
-            <div className="absolute top-2.5 left-2.5 z-10 pointer-events-none">
-              <span className="bg-stone-900/90 text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider backdrop-blur-sm">
-                Out of Stock
-              </span>
-            </div>
-          )}
-        </div>
-
-        {/* Product Information (Title + Price) */}
-        <div className="pt-2 sm:pt-2.5">
+      {/* Product Information (Title + Price) */}
+      <div className="pt-2 sm:pt-2.5 flex-1 flex flex-col justify-between pointer-events-none">
+        <div>
           <h3
-            className="text-xs sm:text-sm font-medium text-stone-900 group-hover/card:text-[#4A171C] transition-colors line-clamp-1 leading-snug"
+            className="text-xs sm:text-sm font-medium text-stone-900 group-hover:text-[#4A171C] transition-colors line-clamp-1 leading-snug"
             title={product.title}
           >
             {product.title}
@@ -116,46 +156,32 @@ export function ProductCard({ product }: ProductCardProps) {
             )}
           </div>
         </div>
-      </Link>
 
-      {/* Floating Wishlist Heart Button - Positioned absolutely with z-20 so it sits ABOVE the Link */}
-      <button
-        type="button"
-        onClick={handleWishlistToggle}
-        aria-label={isInWishlist ? "Remove from Wishlist" : "Save to Wishlist"}
-        className="absolute top-2.5 right-2.5 sm:top-3 sm:right-3 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/95 backdrop-blur-sm shadow-sm flex items-center justify-center transition-transform hover:scale-110 active:scale-95 z-20 border border-stone-200/60"
-      >
-        <Heart
-          className={`w-4 h-4 transition-colors ${
-            isInWishlist ? "fill-rose-500 text-rose-500" : "text-stone-700 hover:text-rose-600"
+        {/* Full-Width Add To Cart Button - z-30 with pointer-events-auto sits above the Link */}
+        <button
+          type="button"
+          disabled={isOutOfStock}
+          onClick={handleQuickAdd}
+          className={`w-full py-2.5 sm:py-3 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all duration-300 mt-2.5 flex items-center justify-center gap-1.5 active:scale-[0.98] relative z-30 pointer-events-auto ${
+            isOutOfStock
+              ? "bg-stone-200 text-stone-400 cursor-not-allowed border border-stone-200"
+              : isAdded
+              ? "bg-emerald-700 text-white shadow-sm"
+              : "bg-[#4A171C] hover:bg-[#381014] text-[#FAF5EB] border border-[#D4AF37]/30 shadow-sm hover:shadow"
           }`}
-        />
-      </button>
-
-      {/* Full-Width Add To Cart Button - Positioned at bottom with relative z-20 */}
-      <button
-        type="button"
-        disabled={isOutOfStock}
-        onClick={handleQuickAdd}
-        className={`w-full py-2.5 sm:py-3 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all duration-300 mt-2.5 flex items-center justify-center gap-1.5 active:scale-[0.98] relative z-20 ${
-          isOutOfStock
-            ? "bg-stone-200 text-stone-400 cursor-not-allowed border border-stone-200"
-            : isAdded
-            ? "bg-emerald-700 text-white shadow-sm"
-            : "bg-[#4A171C] hover:bg-[#381014] text-[#FAF5EB] border border-[#D4AF37]/30 shadow-sm hover:shadow"
-        }`}
-      >
-        {isOutOfStock ? (
-          <span>Out of Stock</span>
-        ) : isAdded ? (
-          <>
-            <Check className="w-3.5 h-3.5" />
-            <span>Added</span>
-          </>
-        ) : (
-          <span>Add to Cart</span>
-        )}
-      </button>
+        >
+          {isOutOfStock ? (
+            <span>Out of Stock</span>
+          ) : isAdded ? (
+            <>
+              <Check className="w-3.5 h-3.5" />
+              <span>Added</span>
+            </>
+          ) : (
+            <span>Add to Cart</span>
+          )}
+        </button>
+      </div>
     </div>
   );
 }

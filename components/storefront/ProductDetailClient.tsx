@@ -79,9 +79,12 @@ export function ProductDetailClient({
   const [activeProductOverride, setActiveProductOverride] = useState<Product | null>(null);
   const product = activeProductOverride || matchedFromStore || initialProduct;
 
-  // Reset override when URL slug changes
+  // Reset override and scroll to top when URL slug changes
   useEffect(() => {
     setActiveProductOverride(null);
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "instant" });
+    }
   }, [cleanSlug]);
 
   // Keep address bar in sync if matched via plural alias (e.g. /flower-earrings -> /flower-earring)

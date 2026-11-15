@@ -92,6 +92,7 @@ export default async function ProductDetailPage({
 
   return (
     <ProductDetailClient
+      key={params.slug}
       initialProduct={product}
       allProducts={allProducts}
       rawSlug={params.slug}
