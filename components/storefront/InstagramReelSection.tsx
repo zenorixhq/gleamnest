@@ -98,11 +98,10 @@ function AutoPlayingInstaCard({
               ? vid.poster
               : "/uploads/images/charm-bangles-poster.jpg"
           }
-          autoPlay
           loop
           muted={isMuted}
           playsInline
-          preload="metadata"
+          preload="none"
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
         />
       ) : (
@@ -232,7 +231,7 @@ export function InstagramReelSection() {
   }, [activeVideo]);
 
   useEffect(() => {
-    fetch(`/api/reviews?t=${Date.now()}`, { cache: "no-store" })
+    fetch("/api/reviews")
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data.instagramVideos)) {

@@ -80,9 +80,9 @@ function ProductCatalogContent() {
     return defaultCategories;
   });
 
-  // Sync with database on mount (force fresh to show newly added products immediately)
+  // Sync with catalog on mount
   useEffect(() => {
-    fetchProducts(true);
+    fetchProducts();
     fetch("/api/categories")
       .then((r) => r.json())
       .then((data) => {

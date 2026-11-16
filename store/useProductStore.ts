@@ -39,7 +39,7 @@ function getInitialProducts(): { products: Product[]; hasLoaded: boolean } {
       }
     } catch (e) {}
   }
-  return { products: fallbackProducts, hasLoaded: false };
+  return { products: fallbackProducts, hasLoaded: true };
 }
 
 function persistProducts(prods: Product[]) {
@@ -74,45 +74,39 @@ const initial = getInitialProducts();
 export const useProductStore = create<ProductStore>((set, get) => ({
   products: initial.products,
   signatureCoutureIds: [],
-  isLoading: !initial.hasLoaded,
-  hasLoaded: initial.hasLoaded,
+  isLoading: false,
+  hasLoaded: true,
   error: null,
 
-  fetchProducts: async (forceFresh = true) => {
+  fetchProducts: async (forceFresh = false) => {
     try {
       const currentProducts = get().products;
       if (!currentProducts || currentProducts.length === 0) {
         set({ isLoading: true });
       }
 
-      // Always bypass browser cache with fresh timestamp & cache: "no-store"
-      const url = `/api/products?t=${Date.now()}${forceFresh ? "&fresh=true" : ""}`;
-      const res = await fetch(url, { cache: "no-store" });
+      // If fresh requested by admin, bypass cache; otherwise use fast Edge CDN cache
+      const url = forceFresh
+        ? `/api/products?t=${Date.now()}&fresh=true`
+        : `/api/products`;
+      const res = await fetch(url, forceFresh ? { cache: "no-store" } : undefined);
       if (!res.ok) throw new Error("Failed to fetch products");
       const data = await res.json();
       if (Array.isArray(data) && data.length > 0) {
         set({ products: data, hasLoaded: true, isLoading: false, error: null });
         persistProducts(data);
       } else {
-        if (get().products.length === 0) {
-          set({ products: fallbackProducts, hasLoaded: true, isLoading: false });
-        } else {
-          set({ hasLoaded: true, isLoading: false });
-        }
+        set({ hasLoaded: true, isLoading: false });
       }
     } catch (err: any) {
-      console.error("fetchProducts error:", err);
-      if (get().products.length === 0) {
-        set({ products: fallbackProducts, hasLoaded: true, isLoading: false });
-      } else {
-        set({ error: err.message, isLoading: false, hasLoaded: true });
-      }
+      console.warn("fetchProducts note, maintaining catalog:", err.message);
+      set({ hasLoaded: true, isLoading: false });
     }
   },
 
   fetchSignatureCouture: async () => {
     try {
-      const res = await fetch(`/api/signature-couture?t=${Date.now()}`, { cache: "no-store" });
+      const res = await fetch("/api/signature-couture");
       if (res.ok) {
         const data = await res.json();
         if (Array.isArray(data.productIds)) {

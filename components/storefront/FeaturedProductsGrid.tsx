@@ -18,7 +18,7 @@ export function FeaturedProductsGrid() {
   const [activeTab, setActiveTab] = useState<"all" | "featured" | "bestseller">("all");
 
   useEffect(() => {
-    fetchProducts(true);
+    fetchProducts();
     fetchSignatureCouture();
   }, [fetchProducts, fetchSignatureCouture]);
 

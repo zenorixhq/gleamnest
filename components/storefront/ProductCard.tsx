@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { Product } from "@/types/store";
 import { useCartStore } from "@/store/useCartStore";
 import { formatPrice, getProductPrices } from "@/lib/utils";
@@ -13,7 +12,6 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
-  const router = useRouter();
   const [isAdded, setIsAdded] = useState(false);
   const selectedCurrency = useCartStore((s) => s.selectedCurrency);
   const addItem = useCartStore((s) => s.addItem);
@@ -64,17 +62,6 @@ export function ProductCard({ product }: ProductCardProps) {
 
   const productUrl = `/products/${product.slug}`;
 
-  const handleCardClick = (e: React.MouseEvent) => {
-    // If click originated from a button, do not navigate
-    if ((e.target as HTMLElement).closest("button")) {
-      return;
-    }
-    if (typeof window !== "undefined") {
-      window.scrollTo({ top: 0, behavior: "instant" });
-    }
-    router.push(productUrl);
-  };
-
   const displayImage =
     Array.isArray(product.images) && product.images.length > 0 && product.images[0]
       ? product.images[0]
@@ -83,10 +70,7 @@ export function ProductCard({ product }: ProductCardProps) {
       : "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&q=80&w=800";
 
   return (
-    <div
-      onClick={handleCardClick}
-      className="group relative flex flex-col bg-transparent cursor-pointer select-none touch-manipulation h-full"
-    >
+    <div className="group relative flex flex-col bg-transparent select-none touch-manipulation h-full">
       {/* 1. Stretched Link Overlay: 100% of card surface is a native prefetching anchor */}
       <Link
         href={productUrl}

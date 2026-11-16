@@ -116,17 +116,16 @@ function AutoPlayingReelCard({
       onClick={onClick}
       className="group relative w-full aspect-[9/15] max-h-[350px] rounded-xl sm:rounded-2xl overflow-hidden bg-stone-900 shadow-md cursor-pointer border border-[#EADBBE] hover:shadow-xl hover:-translate-y-1 transition-all duration-500 ease-out"
     >
-      {/* Autoplaying live video element */}
+      {/* Autoplaying live video element on scroll */}
       {isDirectVideo ? (
         <video
           ref={videoRef}
           src={reel.videoUrl}
           poster={reel.poster && !reel.poster.startsWith("data:image/webp") ? reel.poster : undefined}
-          autoPlay
           loop
           muted={isMuted}
           playsInline
-          preload="metadata"
+          preload="none"
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
         />
       ) : (
@@ -275,7 +274,7 @@ export function CustomerReviewsWithVideos() {
 
   // Fetch fresh data from API and cache in sessionStorage for 0ms subsequent loads
   useEffect(() => {
-    fetch(`/api/reviews?t=${Date.now()}`, { cache: "no-store" })
+    fetch("/api/reviews")
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data.videoReels)) {

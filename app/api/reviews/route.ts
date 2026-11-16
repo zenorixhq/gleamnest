@@ -14,6 +14,16 @@ const NO_CACHE_HEADERS = {
   Expires: "0",
 };
 
+const CACHE_HEADERS = {
+  "Cache-Control": "public, s-maxage=300, stale-while-revalidate=86400",
+  "CDN-Cache-Control": "public, s-maxage=300, stale-while-revalidate=86400",
+  "Vercel-CDN-Cache-Control": "public, s-maxage=300, stale-while-revalidate=86400",
+};
+
+let memoryCachedReviews: any = null;
+let lastReviewsCacheTime = 0;
+const REVIEWS_CACHE_TTL = 120 * 1000;
+
 function getInitialData() {
   return {
     reviews: [],
@@ -198,11 +208,25 @@ async function writeData(data: any) {
       console.warn("File write skipped on read-only filesystem and DB write was unsuccessful.");
     }
   }
+
+  memoryCachedReviews = data;
+  lastReviewsCacheTime = Date.now();
 }
 
-export async function GET() {
+export async function GET(req: Request) {
+  const url = new URL(req.url);
+  const forceFresh = url.searchParams.get("fresh") === "true";
+
+  if (!forceFresh && memoryCachedReviews && Date.now() - lastReviewsCacheTime < REVIEWS_CACHE_TTL) {
+    return NextResponse.json(memoryCachedReviews, { headers: CACHE_HEADERS });
+  }
+
   const data = await readData();
-  return NextResponse.json(data, { headers: NO_CACHE_HEADERS });
+  memoryCachedReviews = data;
+  lastReviewsCacheTime = Date.now();
+  return NextResponse.json(data, {
+    headers: forceFresh ? NO_CACHE_HEADERS : CACHE_HEADERS,
+  });
 }
 
 export async function POST(req: Request) {

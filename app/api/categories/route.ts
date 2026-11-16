@@ -14,6 +14,8 @@ const NO_CACHE_HEADERS = {
 
 const CACHE_HEADERS = {
   "Cache-Control": "public, s-maxage=300, stale-while-revalidate=86400",
+  "CDN-Cache-Control": "public, s-maxage=300, stale-while-revalidate=86400",
+  "Vercel-CDN-Cache-Control": "public, s-maxage=300, stale-while-revalidate=86400",
 };
 
 let memoryCachedCategories: Category[] | null = null;
@@ -79,7 +81,9 @@ export async function GET(req: Request) {
   const url = new URL(req.url);
   const forceFresh = url.searchParams.get("fresh") === "true";
   const categoriesList = await getStoredCategories(forceFresh);
-  return NextResponse.json(categoriesList, { headers: NO_CACHE_HEADERS });
+  return NextResponse.json(categoriesList, {
+    headers: forceFresh ? NO_CACHE_HEADERS : CACHE_HEADERS,
+  });
 }
 
 export async function POST(req: Request) {
