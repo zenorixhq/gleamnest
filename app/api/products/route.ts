@@ -55,12 +55,6 @@ function formatProduct(p: any, signatureSet?: Set<string>) {
   };
 }
 
-const CACHE_HEADERS = {
-  "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
-  "CDN-Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
-  "Vercel-CDN-Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
-};
-
 const NO_CACHE_HEADERS = {
   "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
   Pragma: "no-cache",
@@ -72,15 +66,15 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const forceFresh = searchParams.get("fresh") === "true";
 
-    // 1. Fast path: Serve from server in-memory cache (< 1ms) if not requested fresh
+    // 1. Fast in-memory cache hit (< 0.1ms) if cached recently (TTL: 20s) and not forced fresh
     if (!forceFresh) {
       const memoryHit = getCachedProducts();
       if (memoryHit && memoryHit.length > 0) {
-        return NextResponse.json(memoryHit, { headers: CACHE_HEADERS });
+        return NextResponse.json(memoryHit, { headers: NO_CACHE_HEADERS });
       }
     }
 
-    // 2. Query Neon PostgreSQL database & Signature Couture selection with 300ms race
+    // 2. Query Neon PostgreSQL database & Signature Couture selection
     const fetchNeonData = async () => {
       const [dbProducts, signatureRow] = await Promise.all([
         prisma.product.findMany({
@@ -98,19 +92,16 @@ export async function GET(req: Request) {
     let result: { dbProducts: any[]; signatureRow: any } | null = null;
     try {
       const timeoutPromise = new Promise<null>((_, reject) =>
-        setTimeout(() => reject(new Error("Neon DB timeout")), 300)
+        setTimeout(() => reject(new Error("Neon DB timeout")), 3500)
       );
       result = await Promise.race([fetchNeonData(), timeoutPromise]);
-    } catch {
-      // Neon DB is sleeping or timed out -> return cached catalog instantly (< 1ms)
-      const fallback = getCachedProducts() || fallbackProducts;
-      return NextResponse.json(fallback, { headers: CACHE_HEADERS });
+    } catch (err) {
+      console.warn("GET /api/products DB query timed out or failed, using fallback:", err);
+      return NextResponse.json(fallbackProducts, { headers: NO_CACHE_HEADERS });
     }
 
     if (!result || !result.dbProducts || result.dbProducts.length === 0) {
-      return NextResponse.json(fallbackProducts, {
-        headers: forceFresh ? NO_CACHE_HEADERS : CACHE_HEADERS,
-      });
+      return NextResponse.json(fallbackProducts, { headers: NO_CACHE_HEADERS });
     }
 
     let signatureSet = new Set<string>();
@@ -126,13 +117,10 @@ export async function GET(req: Request) {
     // Format DB products into application Product interface
     const formatted = result.dbProducts.map((p) => formatProduct(p, signatureSet));
     setCachedProducts(formatted);
-    return NextResponse.json(formatted, {
-      headers: forceFresh ? NO_CACHE_HEADERS : CACHE_HEADERS,
-    });
+    return NextResponse.json(formatted, { headers: NO_CACHE_HEADERS });
   } catch (err) {
     console.error("GET /api/products error:", err);
-    const fallback = getCachedProducts() || fallbackProducts;
-    return NextResponse.json(fallback, { headers: CACHE_HEADERS });
+    return NextResponse.json(fallbackProducts, { headers: NO_CACHE_HEADERS });
   }
 }
 

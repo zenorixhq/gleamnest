@@ -42,25 +42,25 @@ export function formatProduct(p: any): Product {
 
 /**
  * Server-side product retrieval for SSR & metadata.
- * - In-memory pre-seeded cache hit: 0.1ms instantaneous response.
- * - Non-blocking 250ms race with Neon PostgreSQL to eliminate cold-start freezes.
- * - 100% reliable return of complete 85-product catalog.
+ * - In-memory fresh cache hit: 0.1ms instantaneous response.
+ * - Queries Neon PostgreSQL with safe 2.5s timeout.
+ * - 100% reliable fallback to static catalog if DB is unreachable.
  */
 export async function getAllProductsServer(): Promise<Product[]> {
-  // 1. Instant path: if in-memory cache is fresh, return immediately (< 0.1ms)
+  // 1. Instant path: if in-memory cache is fresh (< 20s), return immediately (< 0.1ms)
   const cached = getCachedProducts();
   if (isCacheFresh() && cached && Array.isArray(cached) && cached.length > 0) {
     return cached;
   }
 
-  // 2. Query Neon PostgreSQL with safe 250ms timeout race (won't stall SSR)
+  // 2. Query Neon PostgreSQL database
   try {
     const dbPromise = prisma.product.findMany({
       orderBy: { createdAt: "desc" },
     });
 
     const timeoutPromise = new Promise<null>((_, reject) =>
-      setTimeout(() => reject(new Error("Neon DB timeout")), 250)
+      setTimeout(() => reject(new Error("Neon DB timeout")), 2500)
     );
 
     const dbProducts = await Promise.race([dbPromise, timeoutPromise]);
@@ -69,8 +69,8 @@ export async function getAllProductsServer(): Promise<Product[]> {
       setCachedProducts(formatted);
       return formatted;
     }
-  } catch {
-    // Neon DB is sleeping or timed out -> return cached catalog instantly (< 1ms)
+  } catch (err) {
+    console.warn("getAllProductsServer DB query failed/timed out, using fallback catalog:", err);
   }
 
   return cached || fallbackProducts;

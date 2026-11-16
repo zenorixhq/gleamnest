@@ -96,6 +96,23 @@ export function ProductDetailClient({
     }
   }, [product, rawSlug]);
 
+  // Direct single-product fetch fallback for freshly created products or direct deep-links
+  useEffect(() => {
+    if (!product && cleanSlug) {
+      fetch(`/api/products/${encodeURIComponent(cleanSlug)}`, { cache: "no-store" })
+        .then((res) => (res.ok ? res.json() : null))
+        .then((fetched) => {
+          if (fetched && (fetched.id || fetched.title)) {
+            setActiveProductOverride(fetched);
+          }
+        })
+        .catch(() => {})
+        .finally(() => {
+          setHasAttemptedFetch(true);
+        });
+    }
+  }, [product, cleanSlug]);
+
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [selectedOptions, setSelectedOptions] = useState<{ [key: string]: string }>({});
@@ -125,7 +142,7 @@ export function ProductDetailClient({
   }, [product?.id]);
 
   if (!product) {
-    if (!hasAttemptedFetch && effectiveProducts.length === 0) {
+    if (!hasAttemptedFetch) {
       return (
         <div className="max-w-7xl mx-auto px-4 py-24 text-center">
           <div className="inline-block p-4 rounded-full bg-[#FAF5EB] text-[#C5A059] mb-4">

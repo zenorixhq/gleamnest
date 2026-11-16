@@ -1,17 +1,14 @@
-import { products as fallbackProducts } from "@/data/mockData";
-
-// In-memory cache for product catalog to eliminate cold Neon PostgreSQL query latency
-// Pre-seeded with the verified 85-product client catalog for 0ms cold-start response
-let memoryCachedProducts: any[] | null = fallbackProducts;
-let lastCacheTimestamp = Date.now();
-const CACHE_TTL_MS = 120 * 1000; // 120 seconds
+// In-memory cache for live Neon PostgreSQL product catalog
+// Kept in sync with live database queries and invalidated on product create/update/delete
+let memoryCachedProducts: any[] | null = null;
+let lastCacheTimestamp = 0;
+const CACHE_TTL_MS = 20 * 1000; // 20-second in-memory SWR cache to prevent database hammering
 
 export function getCachedProducts(): any[] | null {
   if (memoryCachedProducts && Date.now() - lastCacheTimestamp < CACHE_TTL_MS) {
     return memoryCachedProducts;
   }
-  // If expired but we have cached data, still return it as stale-while-revalidate fallback
-  return memoryCachedProducts || fallbackProducts;
+  return null;
 }
 
 export function isCacheFresh(): boolean {

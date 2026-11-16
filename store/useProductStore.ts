@@ -2,12 +2,12 @@ import { create } from "zustand";
 import { Product } from "@/types/store";
 import { products as fallbackProducts } from "@/data/mockData";
 
-const STORAGE_KEY = "noomis_catalog_live_v11";
+const STORAGE_KEY = "noomis_catalog_live_v12";
 
 // Auto-purge obsolete and legacy catalog cache keys from previous versions
 if (typeof window !== "undefined") {
   try {
-    for (let i = 1; i <= 10; i++) {
+    for (let i = 1; i <= 11; i++) {
       localStorage.removeItem(`noomis_catalog_live_v${i}`);
       sessionStorage.removeItem(`noomis_catalog_live_v${i}`);
       localStorage.removeItem(`noomis_products_catalog_v${i}`);
@@ -22,7 +22,7 @@ function getInitialProducts(): { products: Product[]; hasLoaded: boolean } {
       const cached = localStorage.getItem(STORAGE_KEY) || sessionStorage.getItem(STORAGE_KEY);
       if (cached) {
         const parsed = JSON.parse(cached);
-        if (Array.isArray(parsed) && parsed.length > 0) {
+        if (Array.isArray(parsed) && parsed.length >= fallbackProducts.length) {
           const isStale = parsed.some(
             (p: any) =>
               p.slug === "imperial-emerald-cuban-pendant" ||
@@ -33,9 +33,9 @@ function getInitialProducts(): { products: Product[]; hasLoaded: boolean } {
           if (!isStale) {
             return { products: parsed, hasLoaded: true };
           }
-          localStorage.removeItem(STORAGE_KEY);
-          sessionStorage.removeItem(STORAGE_KEY);
         }
+        localStorage.removeItem(STORAGE_KEY);
+        sessionStorage.removeItem(STORAGE_KEY);
       }
     } catch (e) {}
   }
@@ -85,11 +85,11 @@ export const useProductStore = create<ProductStore>((set, get) => ({
         set({ isLoading: true });
       }
 
-      // If fresh requested by admin, bypass cache; otherwise use fast Edge CDN cache
+      // Always pass { cache: 'no-store' } to avoid stale disk or CDN browser responses
       const url = forceFresh
         ? `/api/products?t=${Date.now()}&fresh=true`
-        : `/api/products`;
-      const res = await fetch(url, forceFresh ? { cache: "no-store" } : undefined);
+        : `/api/products?t=${Math.floor(Date.now() / 15000)}`;
+      const res = await fetch(url, { cache: "no-store" });
       if (!res.ok) throw new Error("Failed to fetch products");
       const data = await res.json();
       if (Array.isArray(data) && data.length > 0) {
@@ -236,6 +236,13 @@ export const useProductStore = create<ProductStore>((set, get) => ({
   },
 
   getProductBySlug: (slug: string) => {
-    return get().products.find((p) => p.slug === slug);
+    if (!slug) return undefined;
+    const decoded = decodeURIComponent(slug).trim().toLowerCase();
+    return get().products.find(
+      (p) =>
+        (p.slug && p.slug.trim().toLowerCase() === decoded) ||
+        (p.id && p.id.trim().toLowerCase() === decoded) ||
+        (p.title && p.title.trim().toLowerCase() === decoded)
+    );
   },
 }));

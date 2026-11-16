@@ -60,7 +60,7 @@ export function ProductCard({ product }: ProductCardProps) {
     toggleWishlist(product.id);
   };
 
-  const productUrl = `/products/${product.slug}`;
+  const productUrl = `/products/${encodeURIComponent((product.slug || product.id || "").trim())}`;
 
   const displayImage =
     Array.isArray(product.images) && product.images.length > 0 && product.images[0]
@@ -77,11 +77,6 @@ export function ProductCard({ product }: ProductCardProps) {
         prefetch={true}
         className="absolute inset-0 z-10 focus:outline-hidden"
         aria-label={product.title}
-        onClick={() => {
-          if (typeof window !== "undefined") {
-            window.scrollTo({ top: 0, behavior: "instant" });
-          }
-        }}
       />
 
       {/* Product Image Container (pointer-events-none so click passes directly to stretched Link) */}
