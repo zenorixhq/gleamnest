@@ -87,7 +87,6 @@ function AutoPlayingReelCard({
     );
 
     observer.observe(video);
-    video.play().catch(() => {});
 
     return () => {
       observer.disconnect();

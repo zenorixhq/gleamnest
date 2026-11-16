@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Playfair_Display, Cormorant_Garamond, Alex_Brush } from "next/font/google";
 import "./globals.css";
 import { storeConfig } from "@/config/store.config";
 import { Header } from "@/components/storefront/Header";
@@ -7,6 +8,26 @@ import { CartDrawer } from "@/components/storefront/CartDrawer";
 import { QuickViewModal } from "@/components/storefront/QuickViewModal";
 import { WhatsAppFloat } from "@/components/storefront/WhatsAppFloat";
 import { SmoothScrollProvider } from "@/components/common/SmoothScrollProvider";
+
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  variable: "--font-playfair",
+  display: "swap",
+});
+
+const cormorant = Cormorant_Garamond({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-cormorant",
+  display: "swap",
+});
+
+const alexBrush = Alex_Brush({
+  subsets: ["latin"],
+  weight: ["400"],
+  variable: "--font-alex-brush",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://noomiscouture.com"),
@@ -64,7 +85,7 @@ export default function RootLayout({
   } as React.CSSProperties;
 
   return (
-    <html lang="en" style={dynamicThemeStyles}>
+    <html lang="en" className={`${playfair.variable} ${cormorant.variable} ${alexBrush.variable}`} style={dynamicThemeStyles}>
       <body className="min-h-screen flex flex-col font-sans bg-background text-foreground">
         <SmoothScrollProvider>
           <Header />

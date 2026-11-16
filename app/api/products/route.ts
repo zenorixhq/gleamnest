@@ -92,7 +92,7 @@ export async function GET(req: Request) {
     let result: { dbProducts: any[]; signatureRow: any } | null = null;
     try {
       const timeoutPromise = new Promise<null>((_, reject) =>
-        setTimeout(() => reject(new Error("Neon DB timeout")), 3500)
+        setTimeout(() => reject(new Error("Neon DB timeout")), 1500)
       );
       result = await Promise.race([fetchNeonData(), timeoutPromise]);
     } catch (err) {

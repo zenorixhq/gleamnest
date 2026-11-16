@@ -77,6 +77,8 @@ export default function HomePage() {
                   <img
                     src={cat.image}
                     alt={cat.name}
+                    loading={idx < 4 ? "eager" : "lazy"}
+                    decoding="async"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-3.5 sm:p-4 md:p-5 text-white transition-opacity duration-300">

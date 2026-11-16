@@ -59,7 +59,6 @@ function AutoPlayingInstaCard({
     );
 
     observer.observe(video);
-    video.play().catch(() => {});
 
     return () => {
       observer.disconnect();

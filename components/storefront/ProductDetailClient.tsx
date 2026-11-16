@@ -338,6 +338,9 @@ export function ProductDetailClient({
             <img
               src={product.images[activeImageIndex] || product.images[0]}
               alt={product.title}
+              // @ts-ignore
+              fetchPriority="high"
+              decoding="async"
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
             />
             {discountPercent && discountPercent > 0 && (
@@ -370,7 +373,7 @@ export function ProductDetailClient({
                     activeImageIndex === idx ? "border-primary ring-2 ring-primary/20 scale-95" : "border-border hover:border-muted-foreground"
                   }`}
                 >
-                  <img src={img} alt={`${product.title} ${idx + 1}`} className="w-full h-full object-cover" />
+                  <img src={img} alt={`${product.title} ${idx + 1}`} loading="lazy" decoding="async" className="w-full h-full object-cover" />
                 </button>
               ))}
             </div>

@@ -36,8 +36,8 @@ export async function POST(req: Request) {
       try {
         const compressed = await sharp(buffer)
           .rotate() // Auto-orient based on EXIF
-          .resize(1200, 1200, { fit: "inside", withoutEnlargement: true })
-          .webp({ quality: 80, effort: 4 })
+          .resize(800, 800, { fit: "inside", withoutEnlargement: true })
+          .webp({ quality: 75, effort: 4 })
           .toBuffer();
 
         buffer = compressed;
