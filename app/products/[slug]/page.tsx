@@ -4,13 +4,11 @@ import { ProductDetailClient } from "@/components/storefront/ProductDetailClient
 import { storeConfig } from "@/config/store.config";
 
 /**
- * Dynamic Server Rendering (SSR).
- * - Queries Neon PostgreSQL directly on every request to ensure 100% real-time accuracy
- *   for price, stock, color options, and newly added/updated products.
- * - ZERO ISR Writes: eliminates Vercel Hobby 200k ISR write quota limits completely.
+ * Optimized Edge Caching with ISR (revalidate: 3600).
+ * - Caches rendered product pages on Vercel's global Edge Network for 1 hour.
+ * - Drastically cuts Fast Origin Transfer to near zero while preserving instant page loads.
  */
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const revalidate = 3600;
 
 /**
  * Dynamic OpenGraph & SEO Metadata for each pre-rendered product page.
@@ -77,24 +75,13 @@ export default async function ProductDetailPage({
 }: {
   params: { slug: string };
 }) {
-  const allProducts = await getAllProductsServer();
-  const cleanSlug = decodeURIComponent(params.slug).toLowerCase().trim();
-  const product =
-    allProducts.find((p) => {
-      const pSlug = (p.slug || "").toLowerCase().trim();
-      const pId = (p.id || "").toLowerCase().trim();
-      if (pSlug === cleanSlug || pId === cleanSlug) return true;
-      if (cleanSlug.endsWith("s") && pSlug === cleanSlug.slice(0, -1)) return true;
-      if (!cleanSlug.endsWith("s") && pSlug === cleanSlug + "s") return true;
-      if (pSlug.replace(/[-_]/g, "") === cleanSlug.replace(/[-_]/g, "")) return true;
-      return false;
-    }) || null;
+  const product = await getProductBySlugServer(params.slug);
 
   return (
     <ProductDetailClient
       key={params.slug}
       initialProduct={product}
-      allProducts={allProducts}
+      allProducts={[]}
       rawSlug={params.slug}
     />
   );

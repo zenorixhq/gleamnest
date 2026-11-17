@@ -70,6 +70,8 @@ interface ProductStore {
 }
 
 const initial = getInitialProducts();
+let lastCatalogFetchTime = 0;
+const CLIENT_FETCH_COOLDOWN = 60 * 1000; // 60s cooldown prevents redundant origin calls on navigation
 
 export const useProductStore = create<ProductStore>((set, get) => ({
   products: initial.products,
@@ -80,16 +82,24 @@ export const useProductStore = create<ProductStore>((set, get) => ({
 
   fetchProducts: async (forceFresh = false) => {
     try {
+      // In client session: if already loaded catalog, throttle background re-fetches to save origin bandwidth
+      if (
+        !forceFresh &&
+        get().products.length >= fallbackProducts.length &&
+        Date.now() - lastCatalogFetchTime < CLIENT_FETCH_COOLDOWN
+      ) {
+        return;
+      }
+      lastCatalogFetchTime = Date.now();
+
       const currentProducts = get().products;
       if (!currentProducts || currentProducts.length === 0) {
         set({ isLoading: true });
       }
 
-      // Always pass { cache: 'no-store' } to avoid stale disk or CDN browser responses
-      const url = forceFresh
-        ? `/api/products?t=${Date.now()}&fresh=true`
-        : `/api/products?t=${Math.floor(Date.now() / 15000)}`;
-      const res = await fetch(url, { cache: "no-store" });
+      // Storefront traffic uses standard Edge CDN caching; admin forces fresh DB
+      const url = forceFresh ? `/api/products?t=${Date.now()}&fresh=true` : "/api/products";
+      const res = await fetch(url, forceFresh ? { cache: "no-store" } : undefined);
       if (!res.ok) throw new Error("Failed to fetch products");
       const data = await res.json();
       if (Array.isArray(data) && data.length > 0) {

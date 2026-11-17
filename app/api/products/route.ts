@@ -61,16 +61,23 @@ const NO_CACHE_HEADERS = {
   Expires: "0",
 };
 
+const STOREFRONT_CACHE_HEADERS = {
+  "Cache-Control": "public, s-maxage=120, stale-while-revalidate=86400",
+  "CDN-Cache-Control": "public, s-maxage=120, stale-while-revalidate=86400",
+  "Vercel-CDN-Cache-Control": "public, s-maxage=120, stale-while-revalidate=86400",
+};
+
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
     const forceFresh = searchParams.get("fresh") === "true";
+    const headers = forceFresh ? NO_CACHE_HEADERS : STOREFRONT_CACHE_HEADERS;
 
     // 1. Fast in-memory cache hit (< 0.1ms) if cached recently (TTL: 20s) and not forced fresh
     if (!forceFresh) {
       const memoryHit = getCachedProducts();
       if (memoryHit && memoryHit.length > 0) {
-        return NextResponse.json(memoryHit, { headers: NO_CACHE_HEADERS });
+        return NextResponse.json(memoryHit, { headers });
       }
     }
 
@@ -100,17 +107,17 @@ export async function GET(req: Request) {
       console.warn("GET /api/products DB query timed out or failed, using fallback:", err);
       const memoryHit = getCachedProducts();
       if (memoryHit && memoryHit.length > 0) {
-        return NextResponse.json(memoryHit, { headers: NO_CACHE_HEADERS });
+        return NextResponse.json(memoryHit, { headers });
       }
-      return NextResponse.json(fallbackProducts, { headers: NO_CACHE_HEADERS });
+      return NextResponse.json(fallbackProducts, { headers });
     }
 
     if (!result || !result.dbProducts || result.dbProducts.length === 0) {
       const memoryHit = getCachedProducts();
       if (memoryHit && memoryHit.length > 0) {
-        return NextResponse.json(memoryHit, { headers: NO_CACHE_HEADERS });
+        return NextResponse.json(memoryHit, { headers });
       }
-      return NextResponse.json(fallbackProducts, { headers: NO_CACHE_HEADERS });
+      return NextResponse.json(fallbackProducts, { headers });
     }
 
     let signatureSet = new Set<string>();
@@ -126,7 +133,7 @@ export async function GET(req: Request) {
     // Format DB products into application Product interface
     const formatted = result.dbProducts.map((p) => formatProduct(p, signatureSet));
     setCachedProducts(formatted);
-    return NextResponse.json(formatted, { headers: NO_CACHE_HEADERS });
+    return NextResponse.json(formatted, { headers });
   } catch (err) {
     console.error("GET /api/products error:", err);
     return NextResponse.json(fallbackProducts, { headers: NO_CACHE_HEADERS });
