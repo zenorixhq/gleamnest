@@ -2,12 +2,12 @@ import { create } from "zustand";
 import { Product } from "@/types/store";
 import { products as fallbackProducts } from "@/data/mockData";
 
-const STORAGE_KEY = "noomis_catalog_live_v14";
+const STORAGE_KEY = "noomis_catalog_live_v15";
 
 // Auto-purge obsolete and legacy catalog cache keys from previous versions
 if (typeof window !== "undefined") {
   try {
-    for (let i = 1; i <= 13; i++) {
+    for (let i = 1; i <= 14; i++) {
       localStorage.removeItem(`noomis_catalog_live_v${i}`);
       sessionStorage.removeItem(`noomis_catalog_live_v${i}`);
       localStorage.removeItem(`noomis_products_catalog_v${i}`);
@@ -22,13 +22,16 @@ function getInitialProducts(): { products: Product[]; hasLoaded: boolean } {
       const cached = localStorage.getItem(STORAGE_KEY) || sessionStorage.getItem(STORAGE_KEY);
       if (cached) {
         const parsed = JSON.parse(cached);
-        if (Array.isArray(parsed) && parsed.length >= fallbackProducts.length) {
+        if (Array.isArray(parsed) && parsed.length >= 50) {
           const isStale = parsed.some(
             (p: any) =>
               p.slug === "imperial-emerald-cuban-pendant" ||
               p.title === "Statement Ring" ||
               p.slug === "statement-ring" ||
-              p.title === "Imperial Emerald & Gold Cuban Pendant"
+              p.title === "Imperial Emerald & Gold Cuban Pendant" ||
+              p.slug === "r1" ||
+              p.title === "R1" ||
+              p.id === "cmwkem55i0000l00843c62qpz"
           );
           if (!isStale) {
             return { products: parsed, hasLoaded: true };
@@ -85,7 +88,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       // In client session: if already loaded catalog, throttle background re-fetches to save origin bandwidth
       if (
         !forceFresh &&
-        get().products.length >= fallbackProducts.length &&
+        get().products.length >= 50 &&
         Date.now() - lastCatalogFetchTime < CLIENT_FETCH_COOLDOWN
       ) {
         return;
@@ -103,9 +106,9 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       if (!res.ok) throw new Error("Failed to fetch products");
       const data = await res.json();
       if (Array.isArray(data) && data.length > 0) {
-        // Protect against accidental downgrade: if current state has more items and incoming data is smaller than fallback length, preserve current state
+        // Protect against accidental downgrade: if incoming data is suspiciously small (< 50) and current catalog is full, preserve current state
         const currentCount = get().products?.length || 0;
-        if (!forceFresh && currentCount > data.length && data.length < fallbackProducts.length) {
+        if (!forceFresh && currentCount > 50 && data.length < 50) {
           console.warn(`Preserving larger catalog (${currentCount} > ${data.length})`);
           set({ hasLoaded: true, isLoading: false });
           return;

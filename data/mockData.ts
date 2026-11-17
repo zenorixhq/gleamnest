@@ -104,34 +104,6 @@ export const categories: Category[] = [
 
 export const products: Product[] = [
   {
-    "id": "cmwkem55i0000l00843c62qpz",
-    "slug": "r1",
-    "title": "R1",
-    "shortDescription": "R1",
-    "description": "R1",
-    "price": 23,
-    "salePrice": 2,
-    "priceQatar": 10,
-    "category": "bracelets",
-    "tags": [
-      "bracelets",
-      "New"
-    ],
-    "images": [
-      "/uploads/products/r1-1.webp"
-    ],
-    "rating": 5,
-    "reviewCount": 0,
-    "inStock": true,
-    "stockCount": 11,
-    "featured": false,
-    "isNewArrival": true,
-    "isBestSeller": false,
-    "variantAttributes": [],
-    "createdAt": "2026-11-17T08:01:55.895Z",
-    "updatedAt": "2026-11-17T08:10:03.096Z"
-  },
-  {
     "id": "cmwke78rv0000ih08zs83ee8d",
     "slug": "statement-pendant-with-photo-hide",
     "title": "Statement pendant with photo hide",
