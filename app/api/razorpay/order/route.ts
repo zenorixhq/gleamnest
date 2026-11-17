@@ -15,8 +15,18 @@ export async function POST(req: Request) {
       );
     }
 
-    // Server-side database verification: NOOMI5 coupon is restricted to first-time buyers only
-    if (couponCode === "NOOMI5" || firstPurchaseOnly) {
+    // Reject expired first-purchase coupons
+    if (couponCode === "NOOMI5" || couponCode === "WELCOME5") {
+      return NextResponse.json(
+        {
+          error: "This promotional offer has expired.",
+          couponRejected: true,
+        },
+        { status: 400 }
+      );
+    }
+
+    if (firstPurchaseOnly) {
       const cleanPhone = (phone || "").replace(/\D/g, "");
       const cleanEmail = (email || "").trim();
       const orConditions: any[] = [];

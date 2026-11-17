@@ -190,27 +190,15 @@ export const useCartStore = create<CartStore>()(
         }
       },
 
-      // Automatically apply 5% discount for 1st purchase; enforce normal rates on repeat orders
-      autoCheckAndApplyFirstPurchaseDiscount: (phone?: string) => {
-        const isFirst = get().isFirstPurchaseCustomer(phone);
+      // Automatically check and purge obsolete first-purchase discounts
+      autoCheckAndApplyFirstPurchaseDiscount: (_phone?: string) => {
         const currentCoupon = get().appliedCoupon;
-        if (!isFirst) {
-          // Returning customer -> enforce normal rates
-          if (currentCoupon?.firstPurchaseOnly) {
-            set({ appliedCoupon: null });
-          }
-        } else {
-          // First purchase customer -> automatically apply the 5% first purchase discount
-          if (!currentCoupon && get().items.length > 0) {
-            const defaultCoupon = storeConfig.commerce.activeCoupons.find((c) => c.code === "NOOMI5") || {
-              code: "NOOMI5",
-              discountType: "percentage" as const,
-              amount: 5,
-              firstPurchaseOnly: true,
-              description: "5% off your 1st purchase (new customer special)",
-            };
-            set({ appliedCoupon: defaultCoupon });
-          }
+        if (
+          currentCoupon?.firstPurchaseOnly ||
+          currentCoupon?.code === "NOOMI5" ||
+          currentCoupon?.code === "WELCOME5"
+        ) {
+          set({ appliedCoupon: null });
         }
       },
 
@@ -236,7 +224,7 @@ export const useCartStore = create<CartStore>()(
         if (!found) {
           return {
             success: false,
-            message: "Invalid promo code. Use NOOMI5 for 5% off your 1st purchase.",
+            message: "Invalid promo code.",
           };
         }
 

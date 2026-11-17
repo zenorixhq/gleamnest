@@ -17,7 +17,7 @@ export function AnnouncementBar() {
 
   const tickerItems = [
     "✨ Free Pan-India Delivery on Orders Above ₹999",
-    "🎁 5% OFF On 1st Order with Code NOOMI5",
+    "💎 100% Anti-Tarnish & Waterproof Luxury Jewellery",
     "⚡ Kerala Express Delivery ₹50 • Outside Kerala ₹70",
     "Noomi's Couture • Wear Your Confidence",
     "Secure Online Payment & Instant Razorpay Checkout",

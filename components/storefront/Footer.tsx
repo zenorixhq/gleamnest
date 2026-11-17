@@ -184,13 +184,13 @@ export function Footer() {
               Stay in Touch
             </h5>
             <p className="text-xs text-stone-400 leading-relaxed font-light">
-              Receive private previews, secret seasonal catalogs, and 5% off your first purchase.
+              Receive private previews, secret seasonal catalogs, and VIP access to new couture arrivals.
             </p>
 
             {subscribed ? (
               <div className="p-3 rounded-xl bg-[#C5A059]/10 border border-[#C5A059]/30 text-xs text-[#FAF7F2] font-medium flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-[#C5A059] flex-shrink-0" />
-                <span>Thank you! Your 5% first purchase voucher (NOOMI5) has been sent.</span>
+                <span>Thank you for subscribing to Noomi&apos;s Couture VIP previews.</span>
               </div>
             ) : (
               <form onSubmit={handleSubscribe} className="relative flex items-center pt-1">

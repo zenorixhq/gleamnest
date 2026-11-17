@@ -89,14 +89,10 @@ export default function CheckoutPage() {
       typeof window !== "undefined" &&
       localStorage.getItem("noomis_has_purchased") === "true";
 
-    if (hasPurchased) {
-      if (appliedCoupon?.firstPurchaseOnly) {
-        removeCoupon();
-      }
-    } else {
-      autoCheckAndApplyFirstPurchaseDiscount();
+    if (appliedCoupon?.firstPurchaseOnly || appliedCoupon?.code === "NOOMI5") {
+      removeCoupon();
     }
-  }, [appliedCoupon, autoCheckAndApplyFirstPurchaseDiscount, removeCoupon]);
+  }, [appliedCoupon, removeCoupon]);
 
   // Check Neon PostgreSQL database to verify whether phone / email has placed an order previously
   const verifyFirstPurchaseServer = async (phoneStr: string, emailStr: string): Promise<boolean> => {
@@ -131,12 +127,8 @@ export default function CheckoutPage() {
             if (cleanPhone) localStorage.setItem("noomis_customer_phone", cleanPhone);
           } catch (e) {}
 
-          if (appliedCoupon?.firstPurchaseOnly) {
+          if (appliedCoupon?.firstPurchaseOnly || appliedCoupon?.code === "NOOMI5") {
             removeCoupon();
-            setCouponMsg({
-              type: "error",
-              text: "Welcome back! The NOOMI5 5% first-purchase offer was already redeemed on an earlier order with this mobile number or email. Standard pricing has been applied.",
-            });
           }
         }
       });
@@ -178,24 +170,6 @@ export default function CheckoutPage() {
     e.preventDefault();
     const code = couponCode.trim();
     if (!code) return;
-
-    // Strict database check if attempting to apply NOOMI5
-    if (code.toUpperCase() === "NOOMI5") {
-      const cleanPhone = formData.phone.replace(/\D/g, "");
-      const cleanEmail = formData.email.trim();
-      if (cleanPhone.length >= 10 || (cleanEmail && cleanEmail.includes("@"))) {
-        const isFirst = await verifyFirstPurchaseServer(cleanPhone, cleanEmail);
-        if (!isFirst) {
-          removeCoupon();
-          setCouponMsg({
-            type: "error",
-            text: "The NOOMI5 5% first-purchase offer was already redeemed on an earlier order. Normal rates apply.",
-          });
-          setCouponCode("");
-          return;
-        }
-      }
-    }
 
     const res = applyCoupon(code);
     if (res.success) {
@@ -241,7 +215,7 @@ export default function CheckoutPage() {
 
         setIsSubmitting(false);
         alert(
-          "Welcome back! The NOOMI5 5% first-purchase discount was already redeemed on an earlier order with this mobile number or email. Your order has been updated to standard rates."
+          "This promotional discount is no longer available. Your order has been updated to standard rates."
         );
         return;
       }
@@ -762,7 +736,7 @@ export default function CheckoutPage() {
                       <div className="flex gap-2">
                         <input
                           type="text"
-                          placeholder="Promo code (e.g. NOOMI5)"
+                          placeholder="Promo code"
                           value={couponCode}
                           onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
                           className="flex-1 px-3 py-2 text-xs rounded-xl bg-white border border-[#EADBBE] focus:ring-1 focus:ring-[#4A171C] outline-none uppercase"

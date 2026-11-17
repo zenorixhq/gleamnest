@@ -95,14 +95,6 @@ export function CartDrawer() {
     e.preventDefault();
     if (!couponCode.trim()) return;
 
-    if (!isFirstPurchaseCustomer()) {
-      setCouponMsg({
-        type: "error",
-        text: "The 5% discount is valid on your 1st purchase only. Normal rate applies for repeat orders.",
-      });
-      return;
-    }
-
     const res = applyCoupon(couponCode);
     if (res.success) {
       setCouponMsg({ type: "success", text: res.message });
@@ -281,7 +273,7 @@ export function CartDrawer() {
                   <div className="flex items-center justify-between bg-primary/10 border border-primary/20 px-3 py-2 rounded-lg text-xs">
                     <div className="flex items-center gap-2 text-primary font-semibold">
                       <Tag className="w-3.5 h-3.5" />
-                      <span>{appliedCoupon.code} (5% 1st Purchase Special -{formatPrice(discount, selectedCurrency)})</span>
+                      <span>{appliedCoupon.code} (-{formatPrice(discount, selectedCurrency)})</span>
                     </div>
                     <button
                       onClick={removeCoupon}
@@ -294,7 +286,7 @@ export function CartDrawer() {
                   <form onSubmit={handleApplyCoupon} className="flex gap-2">
                     <input
                       type="text"
-                      placeholder="Promo code (e.g. NOOMI5)"
+                      placeholder="Promo code"
                       value={couponCode}
                       onChange={(e) => {
                         setCouponCode(e.target.value);

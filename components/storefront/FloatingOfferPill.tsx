@@ -28,10 +28,10 @@ export function FloatingOfferPill() {
   const handleCopyCode = (e: React.MouseEvent) => {
     e.stopPropagation();
     try {
-      navigator.clipboard.writeText("NOOMI5");
+      navigator.clipboard.writeText("CONFIDENCE10");
     } catch {}
     // Automatically apply coupon to cart store
-    applyCoupon("NOOMI5");
+    applyCoupon("CONFIDENCE10");
     setCopied(true);
     setTimeout(() => setCopied(false), 3000);
   };
@@ -59,7 +59,7 @@ export function FloatingOfferPill() {
         >
           <Gift className="w-4 h-4 text-[#C5A059] animate-pulse" />
           <span className="text-[11px] font-bold tracking-wider uppercase text-[#F7EEDD]">
-            5% OFF + Free Delivery
+            Special Offer + Free Delivery
           </span>
           <span className="w-2 h-2 rounded-full bg-[#C5A059] animate-ping ml-0.5" />
         </button>
@@ -89,10 +89,10 @@ export function FloatingOfferPill() {
             <div className="space-y-1">
               <div className="flex items-center gap-1.5 flex-wrap">
                 <span className="text-xs sm:text-[13px] font-bold text-white tracking-wide">
-                  5% OFF on 1st Order
+                  10% OFF on Orders &gt; ₹1499
                 </span>
                 <span className="text-[9px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-[#C5A059] text-[#1C1917]">
-                  New
+                  Special
                 </span>
               </div>
 
@@ -107,7 +107,7 @@ export function FloatingOfferPill() {
               {/* Coupon Code Pill & Copy Button */}
               <div className="pt-1.5 flex items-center gap-2">
                 <div className="px-2 py-0.5 rounded bg-black/40 border border-[#C5A059]/40 font-mono text-[11px] font-bold tracking-widest text-[#F7EEDD]">
-                  NOOMI5
+                  CONFIDENCE10
                 </div>
 
                 <button

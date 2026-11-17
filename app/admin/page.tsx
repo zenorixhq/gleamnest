@@ -2941,7 +2941,7 @@ export default function AdminDashboardPage() {
                     </strong>
                   </p>
                   <p>Ordering Method: <strong className="text-foreground">Razorpay Instant Gateway Checkout (Cards, UPI, Netbanking)</strong></p>
-                  <p>Discount Policy: <strong className="text-emerald-700 font-semibold">5% Automatic Welcome Discount on 1st Purchase (Code: NOOMI5) • Standard rate from 2nd purchase</strong></p>
+                  <p>Discount Policy: <strong className="text-foreground font-semibold">Standard Store Rates • Promotional Code Discretion</strong></p>
                 </div>
               </div>
 
