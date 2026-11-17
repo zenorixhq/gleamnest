@@ -104,6 +104,371 @@ export const categories: Category[] = [
 
 export const products: Product[] = [
   {
+    "id": "cmwkem55i0000l00843c62qpz",
+    "slug": "r1",
+    "title": "R1",
+    "shortDescription": "R1",
+    "description": "R1",
+    "price": 23,
+    "salePrice": 2,
+    "priceQatar": 10,
+    "category": "bracelets",
+    "tags": [
+      "bracelets",
+      "New"
+    ],
+    "images": [
+      "/uploads/products/r1-1.webp"
+    ],
+    "rating": 5,
+    "reviewCount": 0,
+    "inStock": true,
+    "stockCount": 11,
+    "featured": false,
+    "isNewArrival": true,
+    "isBestSeller": false,
+    "variantAttributes": [],
+    "createdAt": "2026-11-17T08:01:55.895Z",
+    "updatedAt": "2026-11-17T08:10:03.096Z"
+  },
+  {
+    "id": "cmwke78rv0000ih08zs83ee8d",
+    "slug": "statement-pendant-with-photo-hide",
+    "title": "Statement pendant with photo hide",
+    "shortDescription": "Stainless steel",
+    "description": "Daily wear,water proof,skin safe\npremium quality with affordable price🫰",
+    "price": 399,
+    "salePrice": 299,
+    "priceQatar": 20,
+    "category": "Pendants",
+    "tags": [
+      "Pendants",
+      "New"
+    ],
+    "images": [
+      "/uploads/products/statement-pendant-with-photo-hide-1.webp",
+      "/uploads/products/statement-pendant-with-photo-hide-2.webp"
+    ],
+    "rating": 5,
+    "reviewCount": 0,
+    "inStock": true,
+    "stockCount": 1,
+    "featured": false,
+    "isNewArrival": true,
+    "isBestSeller": true,
+    "variantAttributes": [],
+    "createdAt": "2026-11-17T07:50:20.749Z",
+    "updatedAt": "2026-11-17T08:10:03.296Z"
+  },
+  {
+    "id": "cmwkdzv6s0000l5082u033a21",
+    "slug": "love-with-emarald-charm-pendant",
+    "title": "Love with emarald charm pendant",
+    "shortDescription": "stainless steel",
+    "description": "Daily wear,water proof,skin safe",
+    "price": 399,
+    "salePrice": 249,
+    "priceQatar": 20,
+    "category": "Pendants",
+    "tags": [
+      "Pendants",
+      "New"
+    ],
+    "images": [
+      "/uploads/products/love-with-emarald-charm-pendant-1.webp"
+    ],
+    "rating": 5,
+    "reviewCount": 0,
+    "inStock": true,
+    "stockCount": 1,
+    "featured": false,
+    "isNewArrival": true,
+    "isBestSeller": false,
+    "variantAttributes": [],
+    "createdAt": "2026-11-17T07:44:36.552Z",
+    "updatedAt": "2026-11-17T08:10:03.433Z"
+  },
+  {
+    "id": "cmwkdb2il0009ig088cyszz7r",
+    "slug": "minimal-dainty-diamond-pendant",
+    "title": "Minimal dainty diamond pendant",
+    "shortDescription": "stainless steel",
+    "description": "Daily wear,water proof,skin safe\npremium quality with affordable price🫰",
+    "price": 399,
+    "salePrice": 289,
+    "priceQatar": 20,
+    "category": "Pendants",
+    "tags": [
+      "Pendants",
+      "New"
+    ],
+    "images": [
+      "/uploads/products/minimal-dainty-diamond-pendant-1.webp"
+    ],
+    "rating": 5,
+    "reviewCount": 0,
+    "inStock": true,
+    "stockCount": 1,
+    "featured": false,
+    "isNewArrival": true,
+    "isBestSeller": true,
+    "variantAttributes": [],
+    "createdAt": "2026-11-17T07:25:17.933Z",
+    "updatedAt": "2026-11-17T08:10:03.668Z"
+  },
+  {
+    "id": "cmwkd46jy0008ig08v7umwb8i",
+    "slug": "diamond-pendant-with-snake-chain",
+    "title": "Diamond pendant with snake chain",
+    "shortDescription": "316L stainless steel",
+    "description": "Daily wear,water proof,skin safe\npremium quality with affordable price🫰",
+    "price": 499,
+    "salePrice": 289,
+    "priceQatar": 25,
+    "category": "Pendants",
+    "tags": [
+      "Pendants",
+      "New"
+    ],
+    "images": [
+      "/uploads/products/diamond-pendant-with-snake-chain-1.webp"
+    ],
+    "rating": 5,
+    "reviewCount": 0,
+    "inStock": true,
+    "stockCount": 1,
+    "featured": false,
+    "isNewArrival": true,
+    "isBestSeller": true,
+    "variantAttributes": [],
+    "createdAt": "2026-11-17T07:19:57.103Z",
+    "updatedAt": "2026-11-17T08:10:03.779Z"
+  },
+  {
+    "id": "cmwkcxocq0007ig08rt2s5r7s",
+    "slug": "emarald-cascade-necklace",
+    "title": "Emarald cascade necklace",
+    "shortDescription": "316L stainless steel",
+    "description": "Daily wear,Water proof,Skin safe\nPremium quality with affordable price🫰",
+    "price": 499,
+    "salePrice": 299,
+    "priceQatar": 25,
+    "category": "Pendants",
+    "tags": [
+      "Pendants",
+      "New"
+    ],
+    "images": [
+      "/uploads/products/emarald-cascade-necklace-1.webp"
+    ],
+    "rating": 5,
+    "reviewCount": 0,
+    "inStock": true,
+    "stockCount": 3,
+    "featured": false,
+    "isNewArrival": true,
+    "isBestSeller": true,
+    "variantAttributes": [],
+    "createdAt": "2026-11-17T07:14:53.696Z",
+    "updatedAt": "2026-11-17T08:10:03.853Z"
+  },
+  {
+    "id": "cmwkct2ea0006ig08eyoxncix",
+    "slug": "little-bee-stone-pendant",
+    "title": "Little bee Stone pendant",
+    "shortDescription": "Stainless steel",
+    "description": "Daily wear,water proof,skin safe\npremium quality with affordable price🫰",
+    "price": 299,
+    "salePrice": 199,
+    "priceQatar": 15,
+    "category": "Pendants",
+    "tags": [
+      "Pendants",
+      "New"
+    ],
+    "images": [
+      "/uploads/products/little-bee-stone-pendant-1.webp"
+    ],
+    "rating": 5,
+    "reviewCount": 0,
+    "inStock": true,
+    "stockCount": 3,
+    "featured": false,
+    "isNewArrival": true,
+    "isBestSeller": true,
+    "variantAttributes": [],
+    "createdAt": "2026-11-17T07:11:19.687Z",
+    "updatedAt": "2026-11-17T08:10:03.922Z"
+  },
+  {
+    "id": "cmwkco2hk0005ig084p8jd5jh",
+    "slug": "unique-crystal-pendant",
+    "title": "Unique crystal pendant",
+    "shortDescription": "316L stainless steel",
+    "description": "Daily wear,Water proof,skin safe\nPremium quality with affordable price🫰",
+    "price": 499,
+    "salePrice": 299,
+    "priceQatar": 25,
+    "category": "Pendants",
+    "tags": [
+      "Pendants",
+      "New"
+    ],
+    "images": [
+      "/uploads/products/unique-crystal-pendant-1.webp"
+    ],
+    "rating": 5,
+    "reviewCount": 0,
+    "inStock": true,
+    "stockCount": 1,
+    "featured": true,
+    "isNewArrival": true,
+    "isBestSeller": false,
+    "variantAttributes": [],
+    "createdAt": "2026-11-17T07:07:25.338Z",
+    "updatedAt": "2026-11-17T08:10:04.049Z"
+  },
+  {
+    "id": "cmwkcl2lb0004ig08ami9cpo5",
+    "slug": "ocean-blue-crystel-flower-pendant",
+    "title": "Ocean blue crystel flower pendant",
+    "shortDescription": "316L stainless steel",
+    "description": "Daily wear,water proof,skin safe\npremium quality with affordable price🫰",
+    "price": 399,
+    "salePrice": 269,
+    "priceQatar": 20,
+    "category": "Pendants",
+    "tags": [
+      "Pendants",
+      "New"
+    ],
+    "images": [
+      "/uploads/products/ocean-blue-crystel-flower-pendant-1.webp"
+    ],
+    "rating": 5,
+    "reviewCount": 0,
+    "inStock": true,
+    "stockCount": 2,
+    "featured": false,
+    "isNewArrival": true,
+    "isBestSeller": true,
+    "variantAttributes": [],
+    "createdAt": "2026-11-17T07:05:06.688Z",
+    "updatedAt": "2026-11-17T08:10:04.137Z"
+  },
+  {
+    "id": "cmwkcfiol0003ig083wrcuhku",
+    "slug": "ocean-blue-charm-pendant",
+    "title": "Ocean blue charm pendant",
+    "shortDescription": "316L stainless steel",
+    "description": "Daily wear,water proof,skin safe\npremium quality with affordable price🫰",
+    "price": 399,
+    "salePrice": 269,
+    "priceQatar": 20,
+    "category": "Pendants",
+    "tags": [
+      "Pendants",
+      "New"
+    ],
+    "images": [
+      "/uploads/products/ocean-blue-charm-pendant-1.webp"
+    ],
+    "rating": 5,
+    "reviewCount": 0,
+    "inStock": true,
+    "stockCount": 1,
+    "featured": false,
+    "isNewArrival": true,
+    "isBestSeller": true,
+    "variantAttributes": [],
+    "createdAt": "2026-11-17T07:00:43.961Z",
+    "updatedAt": "2026-11-17T08:10:04.236Z"
+  },
+  {
+    "id": "cmwkc4poy0002ig08yc1qlhpg",
+    "slug": "simple-elagant-pendant",
+    "title": "Simple elagant pendant",
+    "shortDescription": "316L stainless steel",
+    "description": "Daily wear,water proof,Skin safe\npremium quality with affordable price🫰",
+    "price": 399,
+    "salePrice": 249,
+    "priceQatar": 20,
+    "category": "Pendants",
+    "tags": [
+      "Pendants",
+      "New"
+    ],
+    "images": [
+      "/uploads/products/simple-elagant-pendant-1.webp"
+    ],
+    "rating": 5,
+    "reviewCount": 0,
+    "inStock": true,
+    "stockCount": 1,
+    "featured": true,
+    "isNewArrival": true,
+    "isBestSeller": false,
+    "variantAttributes": [],
+    "createdAt": "2026-11-17T06:52:22.298Z",
+    "updatedAt": "2026-11-17T08:10:04.323Z"
+  },
+  {
+    "id": "cmwkc04830001ig08wm2bjuyq",
+    "slug": "forever-white-rose-pendant",
+    "title": "Forever white Rose pendant",
+    "shortDescription": "316L stainless steel",
+    "description": "Daily wear,Water proof,skin safe\npremium quality with affordable price🫰",
+    "price": 399,
+    "salePrice": 199,
+    "priceQatar": 20,
+    "category": "Pendants",
+    "tags": [
+      "Pendants",
+      "New"
+    ],
+    "images": [
+      "/uploads/products/forever-white-rose-pendant-1.webp"
+    ],
+    "rating": 5,
+    "reviewCount": 0,
+    "inStock": true,
+    "stockCount": 1,
+    "featured": false,
+    "isNewArrival": true,
+    "isBestSeller": true,
+    "variantAttributes": [],
+    "createdAt": "2026-11-17T06:48:49.031Z",
+    "updatedAt": "2026-11-17T08:10:04.421Z"
+  },
+  {
+    "id": "cmwkby4y50000ig08ew8s87iy",
+    "slug": "forever-golden-rose-pendant",
+    "title": "Forever Golden Rose pendant",
+    "shortDescription": "316L stainless steel",
+    "description": "Daily wear,water proof,skin safe\nPremium quality with affordable price🫰",
+    "price": 350,
+    "salePrice": 199,
+    "priceQatar": 18,
+    "category": "Pendants",
+    "tags": [
+      "Pendants",
+      "New"
+    ],
+    "images": [
+      "/uploads/products/forever-golden-rose-pendant-1.webp"
+    ],
+    "rating": 5,
+    "reviewCount": 0,
+    "inStock": true,
+    "stockCount": 1,
+    "featured": false,
+    "isNewArrival": true,
+    "isBestSeller": true,
+    "variantAttributes": [],
+    "createdAt": "2026-11-17T06:47:13.672Z",
+    "updatedAt": "2026-11-17T08:10:04.655Z"
+  },
+  {
     "id": "cmwj7jj2r0001l008l4jz99g0",
     "slug": "lock-line-stone-pendant",
     "title": "Lock line stone pendant",

@@ -60,7 +60,7 @@ export async function getAllProductsServer(): Promise<Product[]> {
     });
 
     const timeoutPromise = new Promise<null>((_, reject) =>
-      setTimeout(() => reject(new Error("Neon DB timeout")), 900)
+      setTimeout(() => reject(new Error("Neon DB timeout")), 3500)
     );
 
     const dbProducts = await Promise.race([dbPromise, timeoutPromise]);

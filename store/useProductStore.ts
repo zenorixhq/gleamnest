@@ -2,12 +2,12 @@ import { create } from "zustand";
 import { Product } from "@/types/store";
 import { products as fallbackProducts } from "@/data/mockData";
 
-const STORAGE_KEY = "noomis_catalog_live_v13";
+const STORAGE_KEY = "noomis_catalog_live_v14";
 
 // Auto-purge obsolete and legacy catalog cache keys from previous versions
 if (typeof window !== "undefined") {
   try {
-    for (let i = 1; i <= 12; i++) {
+    for (let i = 1; i <= 13; i++) {
       localStorage.removeItem(`noomis_catalog_live_v${i}`);
       sessionStorage.removeItem(`noomis_catalog_live_v${i}`);
       localStorage.removeItem(`noomis_products_catalog_v${i}`);
@@ -93,6 +93,13 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       if (!res.ok) throw new Error("Failed to fetch products");
       const data = await res.json();
       if (Array.isArray(data) && data.length > 0) {
+        // Protect against accidental downgrade: if current state has more items and incoming data is smaller than fallback length, preserve current state
+        const currentCount = get().products?.length || 0;
+        if (!forceFresh && currentCount > data.length && data.length < fallbackProducts.length) {
+          console.warn(`Preserving larger catalog (${currentCount} > ${data.length})`);
+          set({ hasLoaded: true, isLoading: false });
+          return;
+        }
         set({ products: data, hasLoaded: true, isLoading: false, error: null });
         persistProducts(data);
       } else {
@@ -166,7 +173,10 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       }
 
       const createdProduct = await res.json();
-      const updatedProducts = [createdProduct, ...get().products.filter((p) => p.id !== createdProduct.id)];
+      const updatedProducts = [
+        createdProduct,
+        ...get().products.filter((p) => p.id !== createdProduct.id && p.slug !== createdProduct.slug),
+      ];
       set({ products: updatedProducts, isLoading: false });
       persistProducts(updatedProducts);
 

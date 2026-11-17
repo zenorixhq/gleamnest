@@ -89,18 +89,27 @@ export async function GET(req: Request) {
       return { dbProducts, signatureRow };
     };
 
+    const dbTimeoutMs = forceFresh ? 9000 : 4500;
     let result: { dbProducts: any[]; signatureRow: any } | null = null;
     try {
       const timeoutPromise = new Promise<null>((_, reject) =>
-        setTimeout(() => reject(new Error("Neon DB timeout")), 1500)
+        setTimeout(() => reject(new Error("Neon DB timeout")), dbTimeoutMs)
       );
       result = await Promise.race([fetchNeonData(), timeoutPromise]);
     } catch (err) {
       console.warn("GET /api/products DB query timed out or failed, using fallback:", err);
+      const memoryHit = getCachedProducts();
+      if (memoryHit && memoryHit.length > 0) {
+        return NextResponse.json(memoryHit, { headers: NO_CACHE_HEADERS });
+      }
       return NextResponse.json(fallbackProducts, { headers: NO_CACHE_HEADERS });
     }
 
     if (!result || !result.dbProducts || result.dbProducts.length === 0) {
+      const memoryHit = getCachedProducts();
+      if (memoryHit && memoryHit.length > 0) {
+        return NextResponse.json(memoryHit, { headers: NO_CACHE_HEADERS });
+      }
       return NextResponse.json(fallbackProducts, { headers: NO_CACHE_HEADERS });
     }
 
