@@ -124,7 +124,7 @@ export function generateWhatsAppOrderMessage(
   const discountVal = order.discountTotal || order.discount || 0;
   const discountLine =
     discountVal > 0
-      ? `• *1st Purchase Special (5% OFF):* -${formatPrice(discountVal)}\n`
+      ? `• *Promo Discount:* -${formatPrice(discountVal)}\n`
       : "";
 
   const courier = options.courierName || "DTDC Express / India Post";

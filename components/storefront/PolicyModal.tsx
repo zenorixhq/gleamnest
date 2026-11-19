@@ -208,7 +208,7 @@ export function PolicyModal({
                         <span>Official Ring Measurement Chart</span>
                       </h5>
                       <span className="text-[11px] font-semibold text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
-                        Adjustable bands fit sizes 5–10
+                        Adjustable rings fit all finger sizes seamlessly
                       </span>
                     </div>
 
@@ -223,12 +223,6 @@ export function PolicyModal({
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-border">
-                          <tr className="hover:bg-muted/20">
-                            <td className="p-3 font-bold text-primary">Size 5</td>
-                            <td className="p-3 font-mono font-bold">5.0 cm</td>
-                            <td className="p-3 font-mono">50 mm</td>
-                            <td className="p-3 text-muted-foreground">Petite / Pinky Finger</td>
-                          </tr>
                           <tr className="hover:bg-muted/20">
                             <td className="p-3 font-bold text-primary">Size 6</td>
                             <td className="p-3 font-mono font-bold">5.5 cm</td>
@@ -257,36 +251,6 @@ export function PolicyModal({
                             <td className="p-3 font-mono font-bold">7.0 cm</td>
                             <td className="p-3 font-mono">70 mm</td>
                             <td className="p-3 text-muted-foreground">Middle / Index Finger</td>
-                          </tr>
-                          <tr className="hover:bg-muted/20">
-                            <td className="p-3 font-bold text-primary">Size 10</td>
-                            <td className="p-3 font-mono font-bold">7.5 cm</td>
-                            <td className="p-3 font-mono">75 mm</td>
-                            <td className="p-3 text-muted-foreground">Index / Thumb Ring</td>
-                          </tr>
-                          <tr className="hover:bg-muted/20">
-                            <td className="p-3 font-bold text-primary">Size 11</td>
-                            <td className="p-3 font-mono font-bold">8.0 cm</td>
-                            <td className="p-3 font-mono">80 mm</td>
-                            <td className="p-3 text-muted-foreground">Thumb / Statement Ring</td>
-                          </tr>
-                          <tr className="hover:bg-muted/20">
-                            <td className="p-3 font-bold text-primary">Size 12</td>
-                            <td className="p-3 font-mono font-bold">8.5 cm</td>
-                            <td className="p-3 font-mono">85 mm</td>
-                            <td className="p-3 text-muted-foreground">Statement / Large Fit</td>
-                          </tr>
-                          <tr className="hover:bg-muted/20">
-                            <td className="p-3 font-bold text-primary">Size 13</td>
-                            <td className="p-3 font-mono font-bold">9.0 cm</td>
-                            <td className="p-3 font-mono">90 mm</td>
-                            <td className="p-3 text-muted-foreground">Extra Large Fit</td>
-                          </tr>
-                          <tr className="hover:bg-muted/20">
-                            <td className="p-3 font-bold text-primary">Size 14</td>
-                            <td className="p-3 font-mono font-bold">9.5 cm</td>
-                            <td className="p-3 font-mono">95 mm</td>
-                            <td className="p-3 text-muted-foreground">Extra Large / Thumb Fit</td>
                           </tr>
                         </tbody>
                       </table>

@@ -233,7 +233,7 @@ export const useCartStore = create<CartStore>()(
           set({ appliedCoupon: null });
           return {
             success: false,
-            message: "The 5% first-purchase offer was already redeemed on an earlier order. Standard normal rates apply.",
+            message: "This first-purchase offer was already redeemed on an earlier order. Standard normal rates apply.",
           };
         }
 

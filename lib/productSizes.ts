@@ -8,32 +8,20 @@ export interface ProductSizeInfo {
 }
 
 export const RING_SPECIFIC_SIZES = [
-  "Size 5 (5.0 cm)",
-  "Size 6 (5.5 cm)",
-  "Size 7 (6.0 cm)",
-  "Size 8 (6.5 cm)",
-  "Size 9 (7.0 cm)",
-  "Size 10 (7.5 cm)",
-  "Size 11 (8.0 cm)",
-  "Size 12 (8.5 cm)",
-  "Size 13 (9.0 cm)",
-  "Size 14 (9.5 cm)",
+  "Size 6",
+  "Size 7",
+  "Size 8",
+  "Size 9",
 ];
 
 export const RING_SIZE_GUIDE_DATA = [
-  { size: "Size 5", cm: "5.0 cm", mm: "50 mm", fit: "Petite / Pinky Finger" },
   { size: "Size 6", cm: "5.5 cm", mm: "55 mm", fit: "Petite Ring Finger" },
   { size: "Size 7", cm: "6.0 cm", mm: "60 mm", fit: "Standard Ring Finger (Most Popular)", popular: true },
   { size: "Size 8", cm: "6.5 cm", mm: "65 mm", fit: "Medium / Middle Finger" },
   { size: "Size 9", cm: "7.0 cm", mm: "70 mm", fit: "Middle / Index Finger" },
-  { size: "Size 10", cm: "7.5 cm", mm: "75 mm", fit: "Index / Thumb Ring" },
-  { size: "Size 11", cm: "8.0 cm", mm: "80 mm", fit: "Thumb / Statement Ring" },
-  { size: "Size 12", cm: "8.5 cm", mm: "85 mm", fit: "Statement / Large Fit" },
-  { size: "Size 13", cm: "9.0 cm", mm: "90 mm", fit: "Extra Large Fit" },
-  { size: "Size 14", cm: "9.5 cm", mm: "95 mm", fit: "Extra Large / Thumb Fit" },
 ];
 
-export const RING_ADJUSTABLE_OPTION = "Adjustable / Free Size";
+export const RING_ADJUSTABLE_OPTION = "Adjustable";
 
 // Backwards compatibility export
 export const RING_SIZES = RING_SPECIFIC_SIZES;
@@ -101,28 +89,41 @@ export function getProductSizeInfo(product?: {
         return {
           type: "ring",
           label: explicitSizeAttr.name || "Ring Size",
-          defaultSize: explicitSizeAttr.options[0] || RING_ADJUSTABLE_OPTION,
-          options: [explicitSizeAttr.options[0] || RING_ADJUSTABLE_OPTION],
+          defaultSize: "Adjustable",
+          options: ["Adjustable"],
           sizeStock: explicitSizeAttr.sizeStock,
           isAdjustableOnly: true,
         };
       } else {
-        // Admin chose Specific Sizes -> Omit any adjustable option
-        const cleanedSizes = explicitSizeAttr.options.filter(
-          (o) => !/adjustable|free size/i.test(o)
-        );
-        const sizesToUse = cleanedSizes.length > 0 ? cleanedSizes : RING_SPECIFIC_SIZES;
-        const sizeStock = explicitSizeAttr.sizeStock;
+        // Admin chose Specific Sizes -> Omit any adjustable option and normalize to Size 6, 7, 8, 9
+        const cleanedSizes = explicitSizeAttr.options
+          .filter((o) => !/adjustable|free size/i.test(o))
+          .map((s) => {
+            const numMatch = s.match(/\b(6|7|8|9)\b/);
+            return numMatch ? `Size ${numMatch[1]}` : s;
+          });
+        const sizesToUse = cleanedSizes.length > 0 ? Array.from(new Set(cleanedSizes)) : RING_SPECIFIC_SIZES;
+        
+        let sizeStock = explicitSizeAttr.sizeStock;
+        if (sizeStock) {
+          const normalizedStock: Record<string, number> = {};
+          for (const [key, val] of Object.entries(sizeStock)) {
+            const numMatch = key.match(/\b(6|7|8|9)\b/);
+            const normalizedKey = numMatch ? `Size ${numMatch[1]}` : key;
+            normalizedStock[normalizedKey] = val;
+          }
+          sizeStock = normalizedStock;
+        }
 
         // Choose first in-stock size as default, or standard size
-        let defaultSize = sizesToUse.includes("Size 7 (6.0 cm)")
-          ? "Size 7 (6.0 cm)"
-          : sizesToUse.includes("Size 6 (5.5 cm)")
-          ? "Size 6 (5.5 cm)"
+        let defaultSize = sizesToUse.includes("Size 7")
+          ? "Size 7"
+          : sizesToUse.includes("Size 6")
+          ? "Size 6"
           : sizesToUse[0];
 
         if (sizeStock) {
-          const firstInStock = sizesToUse.find((s) => (sizeStock[s] ?? 0) > 0);
+          const firstInStock = sizesToUse.find((s) => (sizeStock![s] ?? 0) > 0);
           if (firstInStock) {
             defaultSize = firstInStock;
           }
@@ -149,8 +150,8 @@ export function getProductSizeInfo(product?: {
       return {
         type: "ring",
         label: "Ring Size",
-        defaultSize: RING_ADJUSTABLE_OPTION,
-        options: [RING_ADJUSTABLE_OPTION],
+        defaultSize: "Adjustable",
+        options: ["Adjustable"],
         isAdjustableOnly: true,
       };
     }
@@ -158,7 +159,7 @@ export function getProductSizeInfo(product?: {
     return {
       type: "ring",
       label: "Ring Size",
-      defaultSize: "Size 7 (6.0 cm)",
+      defaultSize: "Size 7",
       options: RING_SPECIFIC_SIZES,
       isAdjustableOnly: false,
     };

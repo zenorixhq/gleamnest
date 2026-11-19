@@ -3332,6 +3332,7 @@ export const products: Product[] = [
     "category": "rings",
     "tags": [
       "rings",
+      "Adjustable",
       "New"
     ],
     "images": [

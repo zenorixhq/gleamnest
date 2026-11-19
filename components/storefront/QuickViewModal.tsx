@@ -74,7 +74,7 @@ export function QuickViewModal() {
     if (isOutOfStock) return;
 
     const combinedOptions: { [key: string]: string } = { ...currentOptions };
-    if (sizeInfo && effectiveSize) {
+    if (sizeInfo && effectiveSize && !sizeInfo.isAdjustableOnly) {
       combinedOptions[sizeInfo.label] = effectiveSize;
     }
 
@@ -185,54 +185,48 @@ export function QuickViewModal() {
                 {product.description}
               </p>
 
-              {/* Ring / Bangle Dedicated Sizing (Adjustable vs Specific Sizes) */}
-              {sizeInfo && (
+              {/* Ring / Bangle Dedicated Sizing (Hidden when adjustable / free size) */}
+              {sizeInfo && !sizeInfo.isAdjustableOnly && (
                 <div className="space-y-1.5 p-2.5 rounded-lg bg-muted/30 border border-border/80">
                   <div className="flex justify-between items-center text-xs">
                     <label htmlFor="quickview-size-select" className="font-semibold text-foreground">
                       {sizeInfo.label}: <span className="font-bold text-primary">{selectedSize || sizeInfo.defaultSize}</span>
                     </label>
                   </div>
-                  {sizeInfo.isAdjustableOnly ? (
-                    <p className="text-[11px] text-muted-foreground pt-0.5">
-                      ✨ {sizeInfo.type === "ring" ? "Adjustable comfort band fits all finger sizes." : "Adjustable open cuff fits all wrist sizes."}
-                    </p>
-                  ) : (
-                    <div className="space-y-1.5">
-                      <div className="relative">
-                        <select
-                          id="quickview-size-select"
-                          value={effectiveSize}
-                          onChange={(e) => {
-                            setSelectedSize(e.target.value);
-                            setQuantity(1);
-                          }}
-                          className="w-full appearance-none px-3 py-2 text-xs font-semibold rounded-lg border border-border bg-background text-foreground focus:ring-1 focus:ring-primary outline-none transition-all pr-8 cursor-pointer shadow-sm hover:border-primary/50"
-                        >
-                          {sizeInfo.options.map((opt) => {
-                            const optStock = sizeInfo.sizeStock?.[opt];
-                            const isOptOut = optStock !== undefined && optStock <= 0;
-                            return (
-                              <option key={opt} value={opt}>
-                                {opt} {isOptOut ? "— (Out of Stock)" : optStock !== undefined ? `(${optStock} in stock)` : ""}
-                              </option>
-                            );
-                          })}
-                        </select>
-                        <ChevronDown className="w-3.5 h-3.5 text-muted-foreground absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                      </div>
-
-                      {isCurrentSizeOutOfStock ? (
-                        <p className="text-[11px] text-amber-600 font-medium">
-                          ⚠️ {effectiveSize} is currently out of stock. Please select another size.
-                        </p>
-                      ) : selectedSizeInventory !== undefined && selectedSizeInventory <= 3 ? (
-                        <p className="text-[11px] text-amber-600 font-medium">
-                          ✨ Only {selectedSizeInventory} left in {effectiveSize}!
-                        </p>
-                      ) : null}
+                  <div className="space-y-1.5">
+                    <div className="relative">
+                      <select
+                        id="quickview-size-select"
+                        value={effectiveSize}
+                        onChange={(e) => {
+                          setSelectedSize(e.target.value);
+                          setQuantity(1);
+                        }}
+                        className="w-full appearance-none px-3 py-2 text-xs font-semibold rounded-lg border border-border bg-background text-foreground focus:ring-1 focus:ring-primary outline-none transition-all pr-8 cursor-pointer shadow-sm hover:border-primary/50"
+                      >
+                        {sizeInfo.options.map((opt) => {
+                          const optStock = sizeInfo.sizeStock?.[opt];
+                          const isOptOut = optStock !== undefined && optStock <= 0;
+                          return (
+                            <option key={opt} value={opt}>
+                              {opt} {isOptOut ? "— (Out of Stock)" : optStock !== undefined ? `(${optStock} in stock)` : ""}
+                            </option>
+                          );
+                        })}
+                      </select>
+                      <ChevronDown className="w-3.5 h-3.5 text-muted-foreground absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                     </div>
-                  )}
+
+                    {isCurrentSizeOutOfStock ? (
+                      <p className="text-[11px] text-amber-600 font-medium">
+                        ⚠️ {effectiveSize} is currently out of stock. Please select another size.
+                      </p>
+                    ) : selectedSizeInventory !== undefined && selectedSizeInventory <= 3 ? (
+                      <p className="text-[11px] text-amber-600 font-medium">
+                        ✨ Only {selectedSizeInventory} left in {effectiveSize}!
+                      </p>
+                    ) : null}
+                  </div>
                 </div>
               )}
 

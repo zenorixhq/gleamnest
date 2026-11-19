@@ -319,17 +319,12 @@ export function CartDrawer() {
                   <span>Subtotal</span>
                   <span>{formatPrice(subtotal, selectedCurrency)}</span>
                 </div>
-                {discount > 0 ? (
+                {discount > 0 && (
                   <div className="flex justify-between text-emerald-600 font-medium">
-                    <span>1st Purchase Discount (5% OFF)</span>
+                    <span>Promo Discount ({appliedCoupon?.code || "Coupon"})</span>
                     <span>-{formatPrice(discount, selectedCurrency)}</span>
                   </div>
-                ) : !isFirstCustomer ? (
-                  <div className="flex justify-between text-muted-foreground text-[11px] bg-muted/40 p-2 rounded-lg">
-                    <span>Client Status:</span>
-                    <span className="font-semibold text-foreground">Repeat Client (Normal Rate)</span>
-                  </div>
-                ) : null}
+                )}
                 <div className="flex justify-between text-muted-foreground text-xs">
                   <span className="flex items-center gap-1">
                     <span>Estimated Delivery</span>

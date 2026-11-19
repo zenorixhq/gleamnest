@@ -253,7 +253,7 @@ export function ProductDetailClient({
 
     // Combine standard variant options with selected size and active color
     const combinedOptions: { [key: string]: string } = { ...currentOptions };
-    if (sizeInfo && effectiveSize) {
+    if (sizeInfo && effectiveSize && !sizeInfo.isAdjustableOnly) {
       combinedOptions[sizeInfo.label] = effectiveSize;
     }
     if (colorData && colorData.currentColorName) {
@@ -521,8 +521,8 @@ export function ProductDetailClient({
               </div>
             )}
 
-            {/* Size Guide & Selection */}
-            {sizeInfo && (
+            {/* Size Guide & Selection (Hidden when adjustable / free size) */}
+            {sizeInfo && !sizeInfo.isAdjustableOnly && (
               <div className="space-y-3 pt-3 border-t border-border">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
@@ -541,51 +541,42 @@ export function ProductDetailClient({
                   </button>
                 </div>
 
-                {sizeInfo.isAdjustableOnly ? (
-                  <div className="p-3 rounded-xl bg-card border border-border/80 flex items-center justify-between text-xs">
-                    <span className="font-medium text-foreground">{sizeInfo.defaultSize}</span>
-                    <span className="text-[11px] text-emerald-600 font-semibold bg-emerald-50 px-2 py-0.5 rounded-full">
-                      Fits all sizes seamlessly
-                    </span>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                    {sizeInfo.options.map((opt) => {
-                      const isSelected = effectiveSize === opt;
-                      const sizeStockCount = sizeInfo.sizeStock?.[opt];
-                      const isSizeSoldOut = sizeStockCount !== undefined && sizeStockCount <= 0;
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  {sizeInfo.options.map((opt) => {
+                    const isSelected = effectiveSize === opt;
+                    const sizeStockCount = sizeInfo.sizeStock?.[opt];
+                    const isSizeSoldOut = sizeStockCount !== undefined && sizeStockCount <= 0;
 
-                      return (
-                        <button
-                          key={opt}
-                          type="button"
-                          onClick={() => setSelectedSize(opt)}
-                          className={`p-2.5 rounded-xl border text-left transition-all relative ${
-                            isSelected
-                              ? "border-primary bg-primary/5 ring-2 ring-primary/20 shadow-sm"
-                              : isSizeSoldOut
-                              ? "border-border/60 bg-muted/40 text-muted-foreground opacity-60"
-                              : "border-border bg-card hover:border-primary/40 text-foreground"
-                          }`}
-                        >
-                          <div className="text-xs font-bold truncate pr-3">{opt}</div>
-                          <div className="text-[10px] mt-0.5">
-                            {isSizeSoldOut ? (
-                              <span className="text-destructive font-semibold">Out of Stock</span>
-                            ) : sizeStockCount !== undefined && sizeStockCount <= 2 ? (
-                              <span className="text-amber-600 font-medium">Only {sizeStockCount} left!</span>
-                            ) : (
-                              <span className="text-muted-foreground">In Stock</span>
-                            )}
-                          </div>
-                          {isSelected && (
-                            <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-primary" />
+                    return (
+                      <button
+                        key={opt}
+                        type="button"
+                        onClick={() => setSelectedSize(opt)}
+                        className={`p-2.5 rounded-xl border text-left transition-all relative ${
+                          isSelected
+                            ? "border-primary bg-primary/5 ring-2 ring-primary/20 shadow-sm"
+                            : isSizeSoldOut
+                            ? "border-border/60 bg-muted/40 text-muted-foreground opacity-60"
+                            : "border-border bg-card hover:border-primary/40 text-foreground"
+                        }`}
+                      >
+                        <div className="text-xs font-bold truncate pr-3">{opt}</div>
+                        <div className="text-[10px] mt-0.5">
+                          {isSizeSoldOut ? (
+                            <span className="text-destructive font-semibold">Out of Stock</span>
+                          ) : sizeStockCount !== undefined && sizeStockCount <= 2 ? (
+                            <span className="text-amber-600 font-medium">Only {sizeStockCount} left!</span>
+                          ) : (
+                            <span className="text-muted-foreground">In Stock</span>
                           )}
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
+                        </div>
+                        {isSelected && (
+                          <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-primary" />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             )}
 

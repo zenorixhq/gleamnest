@@ -2851,13 +2851,9 @@ export default function AdminDashboardPage() {
                           <p className="text-sm font-black text-foreground">
                             {formatPrice(order.grandTotal || 0)}
                           </p>
-                          {order.discountTotal && order.discountTotal > 0 ? (
+                          {order.discountTotal && order.discountTotal > 0 && (
                             <span className="inline-block text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200/60">
-                              1st Order (5% OFF)
-                            </span>
-                          ) : (
-                            <span className="inline-block text-[10px] font-medium px-1.5 py-0.5 rounded bg-muted text-muted-foreground border border-border/50">
-                              Repeat Order (Normal Rate)
+                              Discount (-{formatPrice(order.discountTotal)})
                             </span>
                           )}
                         </div>
@@ -4398,7 +4394,7 @@ export default function AdminDashboardPage() {
                       </div>
                       <p className="text-[11px] text-muted-foreground mt-1 leading-snug">
                         {isRingCategory(formState.category)
-                          ? "Manage inventory per ring size (Sizes 5–14 based on finger circumference in cm). Set 0 for out of stock sizes."
+                          ? "Manage inventory per ring size (Sizes 6, 7, 8, 9). Set 0 for out of stock sizes."
                           : "Manage inventory per bangle size (Sizes 2.2, 2.6, 2.8). Set 0 for out of stock sizes."}
                       </p>
                     </button>
