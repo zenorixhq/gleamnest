@@ -20,6 +20,7 @@ import {
   ChevronRight,
   ChevronDown,
   ArrowRight,
+  ArrowLeft,
   CheckCircle2,
   Sparkles,
   Ruler,
@@ -309,27 +310,113 @@ export function ProductDetailClient({
     }
   };
 
+  // Determine canonical category slug & customer-friendly display name
+  const categoryInfo = useMemo(() => {
+    let target = "";
+    if (typeof window !== "undefined") {
+      try {
+        const fromSession = sessionStorage.getItem("gleamnest_browsed_category");
+        if (fromSession && fromSession !== "all") {
+          target = fromSession;
+        }
+      } catch (e) {}
+    }
+    if (!target) {
+      target = product?.category || "";
+    }
+
+    const lower = target.toLowerCase().trim();
+    if (lower.includes("bangle") || lower.includes("kada")) {
+      return { slug: "bangles-kada", name: "Bangles" };
+    }
+    if (lower.includes("necklace") || lower.includes("chain")) {
+      return { slug: "necklaces-and-chains", name: "Necklaces & Chains" };
+    }
+    if (lower.includes("pendant") || lower.includes("charm")) {
+      return { slug: "charms", name: "Pendants & Charms" };
+    }
+    if (lower.includes("bracelet")) {
+      return { slug: "bracelets", name: "Bracelets" };
+    }
+    if (lower.includes("watch")) {
+      return { slug: "watches", name: "Watches" };
+    }
+    if (lower.includes("ring")) {
+      return { slug: "rings", name: "Rings" };
+    }
+    if (lower.includes("earring") || lower.includes("jhumka")) {
+      return { slug: "earrings", name: "Earrings" };
+    }
+    if (lower.includes("anklet")) {
+      return { slug: "anklets", name: "Anklets" };
+    }
+    if (lower.includes("hip")) {
+      return { slug: "hip-chains", name: "Hip Chains" };
+    }
+    if (lower.includes("kid") || lower.includes("baby")) {
+      return { slug: "kids-collection", name: "Kids Collection" };
+    }
+    if (lower === "new-arrivals") {
+      return { slug: "new-arrivals", name: "New Arrivals" };
+    }
+    return {
+      slug: target || "all",
+      name: target ? target.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) : "Jewelry",
+    };
+  }, [product?.category]);
+
+  const handleGoBack = () => {
+    if (typeof window !== "undefined") {
+      // If customer came from our site, router.back() restores their exact filtered view and scroll position
+      if (window.history.length > 1 && document.referrer && document.referrer.includes(window.location.host)) {
+        router.back();
+        return;
+      }
+    }
+    // Fallback: Return to their specific category collection
+    const targetUrl = categoryInfo.slug && categoryInfo.slug !== "all"
+      ? `/products?category=${encodeURIComponent(categoryInfo.slug)}`
+      : "/products";
+    router.push(targetUrl);
+  };
+
   // 8 pieces total: same category first, followed by catalog favorites (2*4 desktop, 2*2 mobile)
   const categoryProducts = effectiveProducts.filter(
-    (p) => p.id !== product.id && p.category === product.category
+    (p) => p.id !== product.id && (p.category === product.category || p.category.toLowerCase().includes(categoryInfo.name.toLowerCase().slice(0, 4)))
   );
   const otherProducts = effectiveProducts.filter(
-    (p) => p.id !== product.id && p.category !== product.category
+    (p) => p.id !== product.id && !categoryProducts.some((cp) => cp.id === p.id)
   );
   const relatedProducts = [...categoryProducts, ...otherProducts].slice(0, 8);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-12 space-y-12 sm:space-y-16 pb-24 sm:pb-12">
-      {/* Breadcrumb Navigation */}
-      <nav className="flex items-center space-x-2 text-xs text-muted-foreground overflow-x-auto pb-1">
-        <Link href="/" className="hover:text-foreground whitespace-nowrap">Home</Link>
-        <ChevronRight className="w-3.5 h-3.5 flex-shrink-0" />
-        <Link href={`/products?category=${product.category}`} className="capitalize hover:text-foreground whitespace-nowrap">
-          {product.category}
-        </Link>
-        <ChevronRight className="w-3.5 h-3.5 flex-shrink-0" />
-        <span className="text-foreground font-medium truncate max-w-[200px]">{product.title}</span>
-      </nav>
+      {/* Top Navigation Row: Dedicated "Back to Category" action & Breadcrumb Navigation */}
+      <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-stone-200/60">
+        <button
+          type="button"
+          onClick={handleGoBack}
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-stone-700 hover:text-stone-900 bg-stone-100 hover:bg-stone-200/80 px-3.5 py-1.5 rounded-full transition-all active:scale-95 shadow-2xs"
+          title={`Return to ${categoryInfo.name}`}
+        >
+          <ArrowLeft className="w-3.5 h-3.5" />
+          <span>Back to {categoryInfo.name}</span>
+        </button>
+
+        {/* Breadcrumb Navigation */}
+        <nav className="flex items-center space-x-2 text-xs text-muted-foreground overflow-x-auto py-0.5">
+          <Link href="/" className="hover:text-foreground whitespace-nowrap">Home</Link>
+          <ChevronRight className="w-3.5 h-3.5 flex-shrink-0 text-stone-400" />
+          <Link
+            href={`/products?category=${encodeURIComponent(categoryInfo.slug)}`}
+            className="capitalize hover:text-foreground whitespace-nowrap font-medium text-stone-600"
+          >
+            {categoryInfo.name}
+          </Link>
+          <ChevronRight className="w-3.5 h-3.5 flex-shrink-0 text-stone-400" />
+          <span className="text-foreground font-medium truncate max-w-[150px] sm:max-w-[240px]">{product.title}</span>
+        </nav>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-14">
         {/* Left Column: Product Visuals / Gallery */}
@@ -815,10 +902,10 @@ export function ProductDetailClient({
               </p>
             </div>
             <Link
-              href="/products"
+              href={categoryInfo.slug && categoryInfo.slug !== "all" ? `/products?category=${encodeURIComponent(categoryInfo.slug)}` : "/products"}
               className="text-xs sm:text-sm font-semibold text-primary hover:text-primary/80 flex items-center gap-1 group transition-colors"
             >
-              <span>View All</span>
+              <span>View All {categoryInfo.name}</span>
               <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
             </Link>
           </div>
@@ -832,13 +919,19 @@ export function ProductDetailClient({
             ))}
           </div>
 
-          <div className="pt-2 sm:pt-4 text-center">
+          <div className="pt-2 sm:pt-4 flex flex-wrap items-center justify-center gap-3">
+            <Link
+              href={categoryInfo.slug && categoryInfo.slug !== "all" ? `/products?category=${encodeURIComponent(categoryInfo.slug)}` : "/products"}
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[#2B2725] text-white hover:bg-stone-800 font-bold text-xs sm:text-sm transition-all shadow-sm active:scale-98"
+            >
+              <span>Explore More {categoryInfo.name}</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
             <Link
               href="/products"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground font-bold text-xs sm:text-sm transition-all shadow-sm active:scale-98"
+              className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl border border-stone-200 bg-white text-stone-700 hover:bg-stone-50 font-semibold text-xs sm:text-sm transition-all shadow-2xs"
             >
-              <span>View More Jewelry ({effectiveProducts.length} Pieces)</span>
-              <ArrowRight className="w-4 h-4" />
+              <span>Explore All Pieces ({effectiveProducts.length})</span>
             </Link>
           </div>
         </section>

@@ -15,53 +15,106 @@ import {
 
 const BATCH_SIZE = 12;
 
+export function isCategorySlugMatch(catSlug: string, targetSlug: string): boolean {
+  if (!catSlug || !targetSlug) return false;
+  const a = catSlug.toLowerCase().trim();
+  const b = targetSlug.toLowerCase().trim();
+  if (a === b) return true;
+  if (
+    (a === "bangles" || a === "bangles-kada" || a.includes("bangle")) &&
+    (b === "bangles" || b === "bangles-kada" || b.includes("bangle"))
+  ) return true;
+  if (
+    (a === "necklaces" || a === "necklaces-and-chains" || a.includes("necklace") || a.includes("chain")) &&
+    (b === "necklaces" || b === "necklaces-and-chains" || b.includes("necklace") || b.includes("chain"))
+  ) return true;
+  if (
+    (a === "pendants" || a === "charms" || a.includes("pendant") || a.includes("charm")) &&
+    (b === "pendants" || b === "charms" || b.includes("pendant") || b.includes("charm"))
+  ) return true;
+  if (
+    (a === "hand-chains" || a === "hip-chains" || a.includes("hip")) &&
+    (b === "hand-chains" || b === "hip-chains" || b.includes("hip"))
+  ) return true;
+  if (
+    (a === "rings" || a.includes("ring")) &&
+    (b === "rings" || b.includes("ring"))
+  ) return true;
+  if (
+    (a === "earrings" || a.includes("earring") || a.includes("jhumka")) &&
+    (b === "earrings" || b.includes("earring") || b.includes("jhumka"))
+  ) return true;
+  if (
+    (a === "bracelets" || a.includes("bracelet")) &&
+    (b === "bracelets" || b.includes("bracelet"))
+  ) return true;
+  if (
+    (a === "watches" || a.includes("watch")) &&
+    (b === "watches" || b.includes("watch"))
+  ) return true;
+  if (
+    (a === "anklets" || a.includes("anklet")) &&
+    (b === "anklets" || b.includes("anklet"))
+  ) return true;
+  if (
+    (a === "kids-collection" || a.includes("kid") || a.includes("baby")) &&
+    (b === "kids-collection" || b.includes("kid") || b.includes("baby"))
+  ) return true;
+  return false;
+}
+
 function matchesCategory(
   product: { category: string; isNewArrival?: boolean },
   targetSlug: string
 ): boolean {
-  if (targetSlug === "all") return true;
+  if (!targetSlug || targetSlug === "all") return true;
   if (targetSlug === "new-arrivals") {
     return Boolean(product.isNewArrival || product.category === "new-arrivals");
   }
   const pCat = (product.category || "").trim().toLowerCase();
   const tSlug = (targetSlug || "").trim().toLowerCase();
 
-  if (tSlug === "bangles" || tSlug === "bangles-kada") {
+  if (pCat === tSlug) return true;
+
+  if (tSlug === "bangles" || tSlug === "bangles-kada" || tSlug.includes("bangle")) {
     return pCat === "bangles" || pCat === "bangles-kada" || pCat.includes("bangle") || pCat.includes("kada");
   }
-  if (tSlug === "necklaces" || tSlug === "necklaces-and-chains") {
+  if (tSlug === "necklaces" || tSlug === "necklaces-and-chains" || tSlug.includes("necklace")) {
     return pCat === "necklaces" || pCat === "necklaces-and-chains" || pCat.includes("necklace") || pCat.includes("chain");
   }
-  if (tSlug === "bracelets") {
+  if (tSlug === "bracelets" || tSlug.includes("bracelet")) {
     return pCat === "bracelets" || pCat.includes("bracelet");
   }
-  if (tSlug === "pendants") {
-    return pCat === "pendants" || pCat.includes("pendant");
+  if (tSlug === "pendants" || tSlug === "charms" || tSlug.includes("pendant") || tSlug.includes("charm")) {
+    return pCat === "pendants" || pCat === "charms" || pCat.includes("pendant") || pCat.includes("charm");
   }
-  if (tSlug === "watches") {
+  if (tSlug === "watches" || tSlug.includes("watch")) {
     return pCat === "watches" || pCat.includes("watch");
   }
-  if (tSlug === "rings") {
+  if (tSlug === "rings" || tSlug.includes("ring")) {
     return pCat === "rings" || pCat.includes("ring");
   }
-  if (tSlug === "hand-chains" || tSlug === "hip-chains") {
-    return pCat === "hand-chains" || pCat === "hip-chains" || pCat.includes("hand-chain") || pCat.includes("chain");
+  if (tSlug === "hand-chains" || tSlug === "hip-chains" || tSlug.includes("hip")) {
+    return pCat === "hand-chains" || pCat === "hip-chains" || pCat.includes("hand-chain") || pCat.includes("hip");
   }
-  if (tSlug === "anklets") {
+  if (tSlug === "anklets" || tSlug.includes("anklet")) {
     return pCat === "anklets" || pCat.includes("anklet");
   }
-  if (tSlug === "earrings") {
-    return pCat === "earrings" || pCat.includes("earring");
+  if (tSlug === "earrings" || tSlug.includes("earring")) {
+    return pCat === "earrings" || pCat.includes("earring") || pCat.includes("jhumka");
   }
-  if (tSlug === "mangalsutra") {
+  if (tSlug === "mangalsutra" || tSlug.includes("mangal")) {
     return pCat === "mangalsutra" || pCat.includes("mangalsutra");
   }
-  return pCat === tSlug;
+  if (tSlug === "kids-collection" || tSlug.includes("kid")) {
+    return pCat.includes("kid") || pCat.includes("baby");
+  }
+  return pCat === tSlug || pCat.includes(tSlug) || tSlug.includes(pCat);
 }
 
 function ProductCatalogContent() {
   const searchParams = useSearchParams();
-  const initialCategory = searchParams.get("category") || "all";
+  const urlCategory = searchParams.get("category");
   const initialSearch = searchParams.get("search") || "";
 
   const products = useProductStore((s) => s.products);
@@ -96,7 +149,16 @@ function ProductCatalogContent() {
       .catch(() => {});
   }, [fetchProducts]);
 
-  const [selectedCategory, setSelectedCategory] = useState<string>(initialCategory);
+  const [selectedCategory, setSelectedCategory] = useState<string>(() => {
+    if (urlCategory) return urlCategory;
+    if (typeof window !== "undefined") {
+      try {
+        const saved = sessionStorage.getItem("gleamnest_browsed_category");
+        if (saved && saved !== "all") return saved;
+      } catch (e) {}
+    }
+    return "all";
+  });
   const [searchTerm, setSearchTerm] = useState<string>(initialSearch);
   const [priceRange, setPriceRange] = useState<string>("all");
   const [inStockOnly, setInStockOnly] = useState<boolean>(false);
@@ -107,17 +169,67 @@ function ProductCatalogContent() {
   // Sentinel ref for infinite scroll
   const sentinelRef = useRef<HTMLDivElement | null>(null);
 
+  // Sync category with URL searchParams & sessionStorage
+  const handleSelectCategory = (slug: string) => {
+    setSelectedCategory(slug);
+    if (typeof window !== "undefined") {
+      try {
+        sessionStorage.setItem("gleamnest_browsed_category", slug);
+      } catch (e) {}
+
+      // Keep URL address bar in sync without a full page reload or scroll reset
+      const url = new URL(window.location.href);
+      if (slug === "all") {
+        url.searchParams.delete("category");
+      } else {
+        url.searchParams.set("category", slug);
+      }
+      window.history.replaceState(null, "", url.toString());
+    }
+  };
+
   // Reset batch count when filters change
   useEffect(() => {
     setVisibleCount(BATCH_SIZE);
   }, [selectedCategory, searchTerm, priceRange, inStockOnly, sortBy]);
 
-  // Sync category if URL searchParams changes
+  // Sync category when browser back / forward buttons change urlCategory
   useEffect(() => {
-    if (searchParams.get("category")) {
-      setSelectedCategory(searchParams.get("category") || "all");
+    if (urlCategory) {
+      setSelectedCategory(urlCategory);
+      try {
+        sessionStorage.setItem("gleamnest_browsed_category", urlCategory);
+      } catch (e) {}
+    } else if (urlCategory === null && typeof window !== "undefined") {
+      // If returning back to /products without query param, restore last browsed category
+      try {
+        const saved = sessionStorage.getItem("gleamnest_browsed_category");
+        if (saved && saved !== "all" && window.history.state) {
+          setSelectedCategory(saved);
+          return;
+        }
+      } catch (e) {}
+      setSelectedCategory("all");
     }
-  }, [searchParams]);
+  }, [urlCategory]);
+
+  // Restore scroll position when returning from product detail page
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const savedY = sessionStorage.getItem("gleamnest_catalog_scroll_y");
+        if (savedY) {
+          const y = parseInt(savedY, 10);
+          if (!isNaN(y) && y > 0) {
+            setTimeout(() => {
+              window.scrollTo({ top: y, behavior: "instant" });
+              sessionStorage.removeItem("gleamnest_catalog_scroll_y");
+            }, 80);
+          }
+        }
+      } catch (e) {}
+    }
+  }, [hasLoaded]);
 
   // Filter & Sort Logic
   const filteredProducts = useMemo(() => {
@@ -213,7 +325,7 @@ function ProductCatalogContent() {
   };
 
   const resetFilters = () => {
-    setSelectedCategory("all");
+    handleSelectCategory("all");
     setSearchTerm("");
     setPriceRange("all");
     setInStockOnly(false);
@@ -237,14 +349,18 @@ function ProductCatalogContent() {
   }, [categoryList]);
 
   const currentCategoryName = useMemo(() => {
-    if (selectedCategory === "all") return "All Jewelry";
-    const found = categoryList.find((c) => c.slug === selectedCategory);
-    return found ? found.name.replace(/\s*Collection/gi, "").trim() : "Jewelry";
+    if (selectedCategory === "all") return "All Pieces";
+    const found = categoryList.find((c) => isCategorySlugMatch(c.slug, selectedCategory));
+    if (found) return found.name.replace(/\s*Collection/gi, "").trim();
+    return selectedCategory
+      .split("-")
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(" ");
   }, [selectedCategory, categoryList]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-5">
-      {/* 1. Category Header & Count (Exact Reference Style: e.g. "Jhumkas" / "48 pieces") */}
+      {/* 1. Category Header & Count (Exact Reference Style: e.g. "Bangles" / "41 pieces") */}
       <div className="space-y-0.5">
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-normal tracking-tight text-[#1C1917]">
           {currentCategoryName}
@@ -257,29 +373,32 @@ function ProductCatalogContent() {
       {/* 2. Horizontal Category Filter Pills (Exact Reference Style) */}
       <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden pt-1 -mx-4 px-4 sm:mx-0 sm:px-0">
         <button
-          onClick={() => setSelectedCategory("all")}
+          onClick={() => handleSelectCategory("all")}
           className={`px-5 py-2 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap transition-all ${
             selectedCategory === "all"
               ? "bg-[#2B2725] text-white shadow-xs"
               : "bg-stone-100/90 hover:bg-stone-200/70 text-stone-600 border border-stone-200/60"
           }`}
         >
-          All
+          All Pieces
         </button>
 
-        {sortedCategoryList.map((cat) => (
-          <button
-            key={cat.id || cat.slug}
-            onClick={() => setSelectedCategory(cat.slug)}
-            className={`px-5 py-2 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap transition-all ${
-              selectedCategory === cat.slug
-                ? "bg-[#2B2725] text-white shadow-xs"
-                : "bg-stone-100/90 hover:bg-stone-200/70 text-stone-600 border border-stone-200/60"
-            }`}
-          >
-            {cat.name.replace(/\s*Collection/gi, "").trim()}
-          </button>
-        ))}
+        {sortedCategoryList.map((cat) => {
+          const isActive = isCategorySlugMatch(cat.slug, selectedCategory);
+          return (
+            <button
+              key={cat.id || cat.slug}
+              onClick={() => handleSelectCategory(cat.slug)}
+              className={`px-5 py-2 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap transition-all ${
+                isActive
+                  ? "bg-[#2B2725] text-white shadow-xs"
+                  : "bg-stone-100/90 hover:bg-stone-200/70 text-stone-600 border border-stone-200/60"
+              }`}
+            >
+              {cat.name.replace(/\s*Collection/gi, "").trim()}
+            </button>
+          );
+        })}
       </div>
 
       {/* 3. Search Bar & Filters/Sort Toolbar (Exact Reference Style) */}

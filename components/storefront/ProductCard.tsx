@@ -75,6 +75,13 @@ export function ProductCard({ product }: ProductCardProps) {
       <Link
         href={productUrl}
         prefetch={true}
+        onClick={() => {
+          if (typeof window !== "undefined") {
+            try {
+              sessionStorage.setItem("gleamnest_catalog_scroll_y", String(window.scrollY));
+            } catch (e) {}
+          }
+        }}
         className="absolute inset-0 z-10 focus:outline-hidden"
         aria-label={product.title}
       />
