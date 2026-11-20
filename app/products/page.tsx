@@ -20,32 +20,103 @@ const ITEMS_PER_ROW = 4;
 const ROWS_PER_BATCH = 3;
 const BATCH_SIZE = ITEMS_PER_ROW * ROWS_PER_BATCH; // 12 items (3 rows of 4 items)
 
+export function isCategorySlugMatch(catSlug: string, targetSlug: string): boolean {
+  if (!catSlug || !targetSlug) return false;
+  const a = catSlug.toLowerCase().trim();
+  const b = targetSlug.toLowerCase().trim();
+  if (a === b) return true;
+  if (
+    (a === "bangles" || a === "bangles-kada" || a.includes("bangle")) &&
+    (b === "bangles" || b === "bangles-kada" || b.includes("bangle"))
+  ) return true;
+  if (
+    (a === "necklaces" || a === "necklaces-and-chains" || a.includes("necklace") || a.includes("chain")) &&
+    (b === "necklaces" || b === "necklaces-and-chains" || b.includes("necklace") || b.includes("chain"))
+  ) return true;
+  if (
+    (a === "pendants" || a === "charms" || a.includes("pendant") || a.includes("charm")) &&
+    (b === "pendants" || b === "charms" || b.includes("pendant") || b.includes("charm"))
+  ) return true;
+  if (
+    (a === "hand-chains" || a === "hip-chains" || a.includes("hip")) &&
+    (b === "hand-chains" || b === "hip-chains" || b.includes("hip"))
+  ) return true;
+  if (
+    (a === "rings" || a.includes("ring")) &&
+    (b === "rings" || b.includes("ring"))
+  ) return true;
+  if (
+    (a === "earrings" || a.includes("earring") || a.includes("jhumka")) &&
+    (b === "earrings" || b.includes("earring") || b.includes("jhumka"))
+  ) return true;
+  if (
+    (a === "bracelets" || a.includes("bracelet")) &&
+    (b === "bracelets" || b.includes("bracelet"))
+  ) return true;
+  if (
+    (a === "watches" || a.includes("watch")) &&
+    (b === "watches" || b.includes("watch"))
+  ) return true;
+  if (
+    (a === "anklets" || a.includes("anklet")) &&
+    (b === "anklets" || b.includes("anklet"))
+  ) return true;
+  if (
+    (a === "kids-collection" || a.includes("kid") || a.includes("baby")) &&
+    (b === "kids-collection" || b.includes("kid") || b.includes("baby"))
+  ) return true;
+  return false;
+}
+
 function matchesCategory(
   product: { category: string; isNewArrival?: boolean },
   targetSlug: string
 ): boolean {
-  if (targetSlug === "all") return true;
+  if (!targetSlug || targetSlug === "all") return true;
   if (targetSlug === "new-arrivals") {
     return Boolean(product.isNewArrival || product.category === "new-arrivals");
   }
   const pCat = (product.category || "").trim().toLowerCase();
   const tSlug = (targetSlug || "").trim().toLowerCase();
 
-  if (tSlug === "necklaces-and-chains" || tSlug === "necklaces") {
-    return pCat === "necklaces-and-chains" || pCat === "necklaces";
+  if (pCat === tSlug) return true;
+
+  if (tSlug === "bangles" || tSlug === "bangles-kada" || tSlug.includes("bangle")) {
+    return pCat === "bangles" || pCat === "bangles-kada" || pCat.includes("bangle") || pCat.includes("kada");
   }
-  if (tSlug === "bangles-kada" || tSlug === "bangles") {
-    return pCat === "bangles-kada" || pCat === "bangles";
+  if (tSlug === "necklaces" || tSlug === "necklaces-and-chains" || tSlug.includes("necklace")) {
+    return pCat === "necklaces" || pCat === "necklaces-and-chains" || pCat.includes("necklace") || pCat.includes("chain");
   }
-  if (tSlug === "kids-collection" || tSlug === "kids") {
-    return pCat === "kids-collection" || pCat === "kids";
+  if (tSlug === "bracelets" || tSlug.includes("bracelet")) {
+    return pCat === "bracelets" || pCat.includes("bracelet");
   }
-  return pCat === tSlug;
+  if (tSlug === "pendants" || tSlug === "charms" || tSlug.includes("pendant") || tSlug.includes("charm")) {
+    return pCat === "pendants" || pCat === "charms" || pCat.includes("pendant") || pCat.includes("charm");
+  }
+  if (tSlug === "watches" || tSlug.includes("watch")) {
+    return pCat === "watches" || pCat.includes("watch");
+  }
+  if (tSlug === "rings" || tSlug.includes("ring")) {
+    return pCat === "rings" || pCat.includes("ring");
+  }
+  if (tSlug === "hand-chains" || tSlug === "hip-chains" || tSlug.includes("hip")) {
+    return pCat === "hand-chains" || pCat === "hip-chains" || pCat.includes("hand-chain") || pCat.includes("hip");
+  }
+  if (tSlug === "anklets" || tSlug.includes("anklet")) {
+    return pCat === "anklets" || pCat.includes("anklet");
+  }
+  if (tSlug === "earrings" || tSlug.includes("earring")) {
+    return pCat === "earrings" || pCat.includes("earring") || pCat.includes("jhumka");
+  }
+  if (tSlug === "kids-collection" || tSlug.includes("kid")) {
+    return pCat.includes("kid") || pCat.includes("baby");
+  }
+  return pCat === tSlug || pCat.includes(tSlug) || tSlug.includes(pCat);
 }
 
 function ProductCatalogContent() {
   const searchParams = useSearchParams();
-  const initialCategory = searchParams.get("category") || "all";
+  const urlCategory = searchParams.get("category");
   const initialSearch = searchParams.get("search") || "";
 
   const products = useProductStore((s) => s.products);
@@ -80,7 +151,16 @@ function ProductCatalogContent() {
       .catch(() => {});
   }, [fetchProducts]);
 
-  const [selectedCategory, setSelectedCategory] = useState<string>(initialCategory);
+  const [selectedCategory, setSelectedCategory] = useState<string>(() => {
+    if (urlCategory) return urlCategory;
+    if (typeof window !== "undefined") {
+      try {
+        const saved = sessionStorage.getItem("gleamnest_browsed_category");
+        if (saved && saved !== "all") return saved;
+      } catch (e) {}
+    }
+    return "all";
+  });
   const [searchTerm, setSearchTerm] = useState<string>(initialSearch);
   const [priceRange, setPriceRange] = useState<string>("all");
   const [inStockOnly, setInStockOnly] = useState<boolean>(false);
@@ -91,17 +171,67 @@ function ProductCatalogContent() {
   // Sentinel ref for infinite scroll
   const sentinelRef = useRef<HTMLDivElement | null>(null);
 
+  // Sync category with URL searchParams & sessionStorage
+  const handleSelectCategory = (slug: string) => {
+    setSelectedCategory(slug);
+    if (typeof window !== "undefined") {
+      try {
+        sessionStorage.setItem("gleamnest_browsed_category", slug);
+      } catch (e) {}
+
+      // Keep URL address bar in sync without a full page reload or scroll reset
+      const url = new URL(window.location.href);
+      if (slug === "all") {
+        url.searchParams.delete("category");
+      } else {
+        url.searchParams.set("category", slug);
+      }
+      window.history.replaceState(null, "", url.toString());
+    }
+  };
+
   // Reset batch count when filters change
   useEffect(() => {
     setVisibleCount(BATCH_SIZE);
   }, [selectedCategory, searchTerm, priceRange, inStockOnly, sortBy]);
 
-  // Sync category if URL searchParams changes
+  // Sync category when browser back / forward buttons change urlCategory
   useEffect(() => {
-    if (searchParams.get("category")) {
-      setSelectedCategory(searchParams.get("category") || "all");
+    if (urlCategory) {
+      setSelectedCategory(urlCategory);
+      try {
+        sessionStorage.setItem("gleamnest_browsed_category", urlCategory);
+      } catch (e) {}
+    } else if (urlCategory === null && typeof window !== "undefined") {
+      // If returning back to /products without query param, restore last browsed category
+      try {
+        const saved = sessionStorage.getItem("gleamnest_browsed_category");
+        if (saved && saved !== "all" && window.history.state) {
+          setSelectedCategory(saved);
+          return;
+        }
+      } catch (e) {}
+      setSelectedCategory("all");
     }
-  }, [searchParams]);
+  }, [urlCategory]);
+
+  // Restore scroll position when returning from product detail page
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const savedY = sessionStorage.getItem("gleamnest_catalog_scroll_y");
+        if (savedY) {
+          const y = parseInt(savedY, 10);
+          if (!isNaN(y) && y > 0) {
+            setTimeout(() => {
+              window.scrollTo({ top: y, behavior: "instant" });
+              sessionStorage.removeItem("gleamnest_catalog_scroll_y");
+            }, 80);
+          }
+        }
+      } catch (e) {}
+    }
+  }, [hasLoaded]);
 
   // Filter & Sort Logic
   const filteredProducts = useMemo(() => {
@@ -175,7 +305,7 @@ function ProductCatalogContent() {
   };
 
   const resetFilters = () => {
-    setSelectedCategory("all");
+    handleSelectCategory("all");
     setSearchTerm("");
     setPriceRange("all");
     setInStockOnly(false);
@@ -201,7 +331,7 @@ function ProductCatalogContent() {
           <h1 className="text-2xl sm:text-3xl font-black text-foreground">
             {selectedCategory === "all"
               ? "All Jewelry Collection"
-              : categoryList.find((c) => c.slug === selectedCategory)?.name || "Jewelry Collection"}
+              : categoryList.find((c) => isCategorySlugMatch(c.slug, selectedCategory))?.name || "Jewelry Collection"}
           </h1>
           <p className="text-xs text-muted-foreground mt-0.5">
             {!hasLoaded && products.length === 0 ? (
@@ -239,7 +369,7 @@ function ProductCatalogContent() {
       {/* 2. Horizontal Category Filter Pills (All + 11 Categories) */}
       <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none pt-1 -mx-4 px-4 sm:mx-0 sm:px-0">
         <button
-          onClick={() => setSelectedCategory("all")}
+          onClick={() => handleSelectCategory("all")}
           className={`px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 ${
             selectedCategory === "all"
               ? "bg-primary text-primary-foreground shadow-sm"
@@ -254,13 +384,14 @@ function ProductCatalogContent() {
 
         {categoryList.map((cat) => {
           const count = products.filter((p) => matchesCategory(p, cat.slug)).length;
+          const isActive = isCategorySlugMatch(cat.slug, selectedCategory);
 
           return (
             <button
               key={cat.id}
-              onClick={() => setSelectedCategory(cat.slug)}
+              onClick={() => handleSelectCategory(cat.slug)}
               className={`px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 ${
-                selectedCategory === cat.slug
+                isActive
                   ? "bg-primary text-primary-foreground shadow-sm"
                   : "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground"
               }`}
