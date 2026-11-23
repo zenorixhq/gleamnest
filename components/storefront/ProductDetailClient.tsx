@@ -341,11 +341,11 @@ export function ProductDetailClient({
     if (lower.includes("watch")) {
       return { slug: "watches", name: "Watches" };
     }
-    if (lower.includes("ring")) {
-      return { slug: "rings", name: "Rings" };
-    }
     if (lower.includes("earring") || lower.includes("jhumka")) {
       return { slug: "earrings", name: "Earrings" };
+    }
+    if (lower.includes("ring") && !lower.includes("earring")) {
+      return { slug: "rings", name: "Rings" };
     }
     if (lower.includes("anklet")) {
       return { slug: "anklets", name: "Anklets" };

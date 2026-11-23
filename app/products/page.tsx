@@ -15,11 +15,24 @@ import {
 
 const BATCH_SIZE = 12;
 
-export function isCategorySlugMatch(catSlug: string, targetSlug: string): boolean {
+function isCategorySlugMatch(catSlug: string, targetSlug: string): boolean {
   if (!catSlug || !targetSlug) return false;
   const a = catSlug.toLowerCase().trim();
   const b = targetSlug.toLowerCase().trim();
   if (a === b) return true;
+
+  // Strictly isolate earrings vs rings first to avoid "ring" substring collisions
+  const aIsEarring = a === "earrings" || a === "earring" || a.includes("earring") || a.includes("jhumka");
+  const bIsEarring = b === "earrings" || b === "earring" || b.includes("earring") || b.includes("jhumka");
+  if (aIsEarring || bIsEarring) {
+    return aIsEarring && bIsEarring;
+  }
+  const aIsRing = a === "rings" || a === "ring" || a.includes("ring");
+  const bIsRing = b === "rings" || b === "ring" || b.includes("ring");
+  if (aIsRing || bIsRing) {
+    return aIsRing && bIsRing;
+  }
+
   if (
     (a === "bangles" || a === "bangles-kada" || a.includes("bangle")) &&
     (b === "bangles" || b === "bangles-kada" || b.includes("bangle"))
@@ -35,14 +48,6 @@ export function isCategorySlugMatch(catSlug: string, targetSlug: string): boolea
   if (
     (a === "hand-chains" || a === "hip-chains" || a.includes("hip")) &&
     (b === "hand-chains" || b === "hip-chains" || b.includes("hip"))
-  ) return true;
-  if (
-    (a === "rings" || a.includes("ring")) &&
-    (b === "rings" || b.includes("ring"))
-  ) return true;
-  if (
-    (a === "earrings" || a.includes("earring") || a.includes("jhumka")) &&
-    (b === "earrings" || b.includes("earring") || b.includes("jhumka"))
   ) return true;
   if (
     (a === "bracelets" || a.includes("bracelet")) &&
@@ -76,6 +81,22 @@ function matchesCategory(
 
   if (pCat === tSlug) return true;
 
+  // Earrings check MUST be strictly segregated from rings
+  const isTargetEarring = tSlug === "earrings" || tSlug === "earring" || tSlug.includes("earring");
+  const isTargetRing = (tSlug === "rings" || tSlug === "ring" || tSlug.includes("ring")) && !isTargetEarring;
+  const isProdEarring = pCat === "earrings" || pCat === "earring" || pCat.includes("earring") || pCat.includes("jhumka");
+  const isProdRing = (pCat === "rings" || pCat === "ring" || pCat.includes("ring")) && !isProdEarring;
+
+  if (isTargetEarring) {
+    return isProdEarring;
+  }
+  if (isTargetRing) {
+    return isProdRing;
+  }
+  // Prevent any earring from matching ring or vice versa
+  if (isProdEarring && (tSlug === "rings" || tSlug.includes("ring"))) return false;
+  if (isProdRing && (tSlug === "earrings" || tSlug.includes("earring"))) return false;
+
   if (tSlug === "bangles" || tSlug === "bangles-kada" || tSlug.includes("bangle")) {
     return pCat === "bangles" || pCat === "bangles-kada" || pCat.includes("bangle") || pCat.includes("kada");
   }
@@ -91,17 +112,11 @@ function matchesCategory(
   if (tSlug === "watches" || tSlug.includes("watch")) {
     return pCat === "watches" || pCat.includes("watch");
   }
-  if (tSlug === "rings" || tSlug.includes("ring")) {
-    return pCat === "rings" || pCat.includes("ring");
-  }
   if (tSlug === "hand-chains" || tSlug === "hip-chains" || tSlug.includes("hip")) {
     return pCat === "hand-chains" || pCat === "hip-chains" || pCat.includes("hand-chain") || pCat.includes("hip");
   }
   if (tSlug === "anklets" || tSlug.includes("anklet")) {
     return pCat === "anklets" || pCat.includes("anklet");
-  }
-  if (tSlug === "earrings" || tSlug.includes("earring")) {
-    return pCat === "earrings" || pCat.includes("earring") || pCat.includes("jhumka");
   }
   if (tSlug === "mangalsutra" || tSlug.includes("mangal")) {
     return pCat === "mangalsutra" || pCat.includes("mangalsutra");
@@ -109,6 +124,11 @@ function matchesCategory(
   if (tSlug === "kids-collection" || tSlug.includes("kid")) {
     return pCat.includes("kid") || pCat.includes("baby");
   }
+
+  // Safe fallback - ensure no earring/ring cross contamination
+  if (isProdEarring && !isTargetEarring) return false;
+  if (isProdRing && !isTargetRing) return false;
+
   return pCat === tSlug || pCat.includes(tSlug) || tSlug.includes(pCat);
 }
 

@@ -63,11 +63,21 @@ export function getProductSizeInfo(product?: {
   const desc = (product.description || "").toLowerCase();
   const tagsStr = (product.tags || []).join(" ").toLowerCase();
 
+  const isEarring =
+    cat === "earrings" ||
+    cat === "earring" ||
+    cat.includes("earring") ||
+    cat.includes("jhumka") ||
+    sub.includes("earring") ||
+    sub.includes("jhumka") ||
+    /\b(earring|earrings|jhumka|jhumkas|stud|studs|bali|balis|drops|danglers|hoop|hoops)\b/i.test(title);
+
   const isRing =
-    cat === "rings" ||
-    cat === "ring" ||
-    sub.includes("ring") ||
-    /\b(ring|rings|band|bands|solitaire)\b/i.test(title);
+    !isEarring &&
+    (cat === "rings" ||
+      cat === "ring" ||
+      (sub.includes("ring") && !sub.includes("earring")) ||
+      /\b(ring|rings|band|bands|solitaire)\b/i.test(title));
 
   const isBangle =
     cat === "bangles-kada" ||

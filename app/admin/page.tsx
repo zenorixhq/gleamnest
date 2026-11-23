@@ -1693,7 +1693,17 @@ export default function AdminDashboardPage() {
     const rawCat = (product.category || "").toLowerCase();
     const titleLower = (product.title || "").toLowerCase();
 
-    const isRing = isRingCategory(rawCat) || titleLower.includes("ring");
+    const isEarring =
+      rawCat === "earrings" ||
+      rawCat === "earring" ||
+      rawCat.includes("earring") ||
+      rawCat.includes("jhumka") ||
+      titleLower.includes("earring") ||
+      titleLower.includes("jhumka");
+
+    const isRing =
+      !isEarring &&
+      (isRingCategory(rawCat) || (/\brings?\b/i.test(titleLower) && !titleLower.includes("earring")));
     const isBangle = isBangleCategory(rawCat) || titleLower.includes("bangle") || titleLower.includes("kada");
 
     const normalizedCategory = isRing
@@ -2120,13 +2130,16 @@ export default function AdminDashboardPage() {
         const isRingMatch =
           (filterCat === "rings" || filterCat === "ring") &&
           (pCat === "rings" || pCat === "ring");
+        const isEarringMatch =
+          (filterCat === "earrings" || filterCat === "earring") &&
+          (pCat === "earrings" || pCat === "earring" || pCat.includes("earring") || pCat.includes("jhumka"));
 
         const targetCatObj = categoriesList.find(
           (c) => (c.slug || "").toLowerCase() === filterCat || (c.name || "").toLowerCase() === filterCat
         );
         const isNameMatch = targetCatObj && pCat === targetCatObj.name.toLowerCase().trim();
 
-        if (!isDirectMatch && !isBangleMatch && !isNecklaceMatch && !isRingMatch && !isNameMatch) {
+        if (!isDirectMatch && !isBangleMatch && !isNecklaceMatch && !isRingMatch && !isEarringMatch && !isNameMatch) {
           return false;
         }
       }
