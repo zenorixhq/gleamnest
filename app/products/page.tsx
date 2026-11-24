@@ -20,7 +20,7 @@ const ITEMS_PER_ROW = 4;
 const ROWS_PER_BATCH = 3;
 const BATCH_SIZE = ITEMS_PER_ROW * ROWS_PER_BATCH; // 12 items (3 rows of 4 items)
 
-export function isCategorySlugMatch(catSlug: string, targetSlug: string): boolean {
+function isCategorySlugMatch(catSlug: string, targetSlug: string): boolean {
   if (!catSlug || !targetSlug) return false;
   const a = catSlug.toLowerCase().trim();
   const b = targetSlug.toLowerCase().trim();
