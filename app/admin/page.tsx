@@ -9,6 +9,7 @@ import { formatPrice } from "@/lib/utils";
 import { Order, OrderStatus, Product, Category } from "@/types/store";
 import { RING_SPECIFIC_SIZES, BANGLE_SPECIFIC_SIZES } from "@/lib/productSizes";
 import { getColorSwatch, getLinkedColorProducts } from "@/lib/productColors";
+import { matchesCategory, normalizeCategorySlug } from "@/lib/categoryMatching";
 
 const isRingCategory = (cat: string) => cat === "rings" || cat === "ring";
 const isBangleCategory = (cat: string) =>
@@ -2050,40 +2051,18 @@ export default function AdminDashboardPage() {
     }
   };
 
-  // Dynamically extract categories with real-time live product counts
+  // Dynamically extract categories with real-time live product counts (100% matched with storefront)
   const categoryFilterOptions = useMemo(() => {
-    const countsMap = new Map<string, number>();
-
-    products.forEach((p) => {
-      const cat = (p.category || "uncategorized").toLowerCase().trim();
-      countsMap.set(cat, (countsMap.get(cat) || 0) + 1);
-    });
-
     const list: { slug: string; name: string; count: number }[] = [];
     const seenSlugs = new Set<string>();
 
     sortedCategories.forEach((c) => {
-      const slug = (c.slug || "").toLowerCase().trim();
-      if (!slug || seenSlugs.has(slug)) return;
-      seenSlugs.add(slug);
+      const slug = (c.slug || "").trim();
+      const norm = normalizeCategorySlug(slug);
+      if (!norm || seenSlugs.has(norm)) return;
+      seenSlugs.add(norm);
 
-      let count = 0;
-      products.forEach((p) => {
-        const pCat = (p.category || "").toLowerCase().trim();
-        const isBangle =
-          (slug === "bangles" || slug === "bangles-kada") &&
-          (pCat === "bangles" || pCat === "bangles-kada" || pCat === "bangle" || pCat === "kada");
-        const isNecklace =
-          (slug === "necklaces" || slug === "necklaces-and-chains" || slug === "necklaces-chains") &&
-          (pCat === "necklaces" || pCat === "necklace" || pCat === "necklaces-and-chains" || pCat === "necklaces-chains" || pCat === "chain" || pCat === "chains");
-        const isRing =
-          (slug === "rings" || slug === "ring") &&
-          (pCat === "rings" || pCat === "ring");
-        if (pCat === slug || pCat === c.name.toLowerCase().trim() || isBangle || isNecklace || isRing) {
-          count++;
-        }
-      });
-
+      const count = products.filter((p) => matchesCategory(p, slug)).length;
       list.push({
         slug: c.slug,
         name: c.name,
@@ -2095,9 +2074,10 @@ export default function AdminDashboardPage() {
     products.forEach((p) => {
       const cat = (p.category || "").trim();
       if (!cat) return;
-      const lower = cat.toLowerCase();
-      if (!seenSlugs.has(lower)) {
-        seenSlugs.add(lower);
+      const norm = normalizeCategorySlug(cat);
+      if (!seenSlugs.has(norm)) {
+        seenSlugs.add(norm);
+        const count = products.filter((item) => matchesCategory(item, cat)).length;
         const name = cat
           .split(/[-_]/)
           .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
@@ -2105,7 +2085,7 @@ export default function AdminDashboardPage() {
         list.push({
           slug: cat,
           name,
-          count: countsMap.get(lower) || 0,
+          count,
         });
       }
     });
@@ -2115,31 +2095,9 @@ export default function AdminDashboardPage() {
 
   const filteredInventory = useMemo(() => {
     return products.filter((p) => {
-      // 1. Category Filter
+      // 1. Category Filter - 100% unified with Storefront rules
       if (selectedCategoryFilter !== "all") {
-        const pCat = (p.category || "").toLowerCase().trim();
-        const filterCat = selectedCategoryFilter.toLowerCase().trim();
-
-        const isDirectMatch = pCat === filterCat;
-        const isBangleMatch =
-          (filterCat === "bangles" || filterCat === "bangles-kada") &&
-          (pCat === "bangles" || pCat === "bangles-kada" || pCat === "bangle" || pCat === "kada");
-        const isNecklaceMatch =
-          (filterCat === "necklaces" || filterCat === "necklaces-and-chains" || filterCat === "necklaces-chains") &&
-          (pCat === "necklaces" || pCat === "necklace" || pCat === "necklaces-and-chains" || pCat === "necklaces-chains" || pCat === "chain" || pCat === "chains");
-        const isRingMatch =
-          (filterCat === "rings" || filterCat === "ring") &&
-          (pCat === "rings" || pCat === "ring");
-        const isEarringMatch =
-          (filterCat === "earrings" || filterCat === "earring") &&
-          (pCat === "earrings" || pCat === "earring" || pCat.includes("earring") || pCat.includes("jhumka"));
-
-        const targetCatObj = categoriesList.find(
-          (c) => (c.slug || "").toLowerCase() === filterCat || (c.name || "").toLowerCase() === filterCat
-        );
-        const isNameMatch = targetCatObj && pCat === targetCatObj.name.toLowerCase().trim();
-
-        if (!isDirectMatch && !isBangleMatch && !isNecklaceMatch && !isRingMatch && !isEarringMatch && !isNameMatch) {
+        if (!matchesCategory(p, selectedCategoryFilter)) {
           return false;
         }
       }
@@ -2158,7 +2116,7 @@ export default function AdminDashboardPage() {
 
       return true;
     });
-  }, [products, selectedCategoryFilter, searchQuery, categoriesList]);
+  }, [products, selectedCategoryFilter, searchQuery]);
 
   if (isAuthenticated === null) {
     return (

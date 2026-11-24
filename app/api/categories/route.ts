@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { categories as defaultCategories } from "@/data/mockData";
 import { Category } from "@/types/store";
+import { matchesCategory } from "@/lib/categoryMatching";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -31,6 +32,23 @@ function sortCategories(list: Category[]): Category[] {
   });
 }
 
+async function enrichWithLiveProductCounts(categoriesList: Category[]): Promise<Category[]> {
+  try {
+    const products = await prisma.product.findMany({
+      select: { category: true, isNewArrival: true },
+    });
+    if (products && products.length > 0) {
+      return categoriesList.map((cat) => ({
+        ...cat,
+        productCount: products.filter((p) => matchesCategory(p, cat.slug)).length,
+      }));
+    }
+  } catch (err) {
+    console.warn("Could not calculate live product counts in /api/categories, using stored counts:", err);
+  }
+  return categoriesList;
+}
+
 async function getStoredCategories(forceFresh = false): Promise<Category[]> {
   if (!forceFresh && memoryCachedCategories && Date.now() - lastCategoriesCacheTime < CATEGORIES_CACHE_TTL) {
     return memoryCachedCategories;
@@ -39,19 +57,23 @@ async function getStoredCategories(forceFresh = false): Promise<Category[]> {
     const row = await prisma.siteContent.findUnique({
       where: { key: "site_categories" },
     });
+    let list = defaultCategories;
     if (row?.value) {
       const parsed = JSON.parse(row.value);
       if (Array.isArray(parsed) && parsed.length > 0) {
-        const sorted = sortCategories(parsed);
-        memoryCachedCategories = sorted;
-        lastCategoriesCacheTime = Date.now();
-        return sorted;
+        list = parsed;
       }
     }
+    const enriched = await enrichWithLiveProductCounts(list);
+    const sorted = sortCategories(enriched);
+    memoryCachedCategories = sorted;
+    lastCategoriesCacheTime = Date.now();
+    return sorted;
   } catch (err) {
     console.warn("Error reading site_categories from DB:", err);
   }
-  const defaultSorted = sortCategories(defaultCategories);
+  const enrichedDefault = await enrichWithLiveProductCounts(defaultCategories);
+  const defaultSorted = sortCategories(enrichedDefault);
   memoryCachedCategories = defaultSorted;
   lastCategoriesCacheTime = Date.now();
   return defaultSorted;
@@ -61,7 +83,8 @@ async function saveCategories(categoriesList: Category[]): Promise<boolean> {
   try {
     memoryCachedCategories = null;
     lastCategoriesCacheTime = 0;
-    const sorted = sortCategories(categoriesList);
+    const enriched = await enrichWithLiveProductCounts(categoriesList);
+    const sorted = sortCategories(enriched);
     const jsonStr = JSON.stringify(sorted);
     await prisma.siteContent.upsert({
       where: { key: "site_categories" },

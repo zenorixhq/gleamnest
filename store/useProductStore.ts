@@ -2,12 +2,12 @@ import { create } from "zustand";
 import { Product } from "@/types/store";
 import { products as fallbackProducts } from "@/data/mockData";
 
-const STORAGE_KEY = "noomis_catalog_live_v16";
+const STORAGE_KEY = "noomis_catalog_live_v17";
 
 // Auto-purge obsolete and legacy catalog cache keys from previous versions
 if (typeof window !== "undefined") {
   try {
-    for (let i = 1; i <= 15; i++) {
+    for (let i = 1; i <= 16; i++) {
       localStorage.removeItem(`noomis_catalog_live_v${i}`);
       sessionStorage.removeItem(`noomis_catalog_live_v${i}`);
       localStorage.removeItem(`noomis_products_catalog_v${i}`);
@@ -22,7 +22,7 @@ function getInitialProducts(): { products: Product[]; hasLoaded: boolean } {
       const cached = localStorage.getItem(STORAGE_KEY) || sessionStorage.getItem(STORAGE_KEY);
       if (cached) {
         const parsed = JSON.parse(cached);
-        if (Array.isArray(parsed) && parsed.length >= 50) {
+        if (Array.isArray(parsed) && parsed.length >= 100) {
           const isStale = parsed.some(
             (p: any) =>
               p.slug === "imperial-emerald-cuban-pendant" ||

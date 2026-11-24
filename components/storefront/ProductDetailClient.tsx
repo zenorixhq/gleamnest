@@ -32,6 +32,7 @@ import { storeConfig } from "@/config/store.config";
 import { PolicyModal, PolicyTab } from "@/components/storefront/PolicyModal";
 import { getProductSizeInfo } from "@/lib/productSizes";
 import { getAllColorOptionsForProduct, UnifiedColorOption } from "@/lib/productColors";
+import { matchesCategory } from "@/lib/categoryMatching";
 import { Product } from "@/types/store";
 
 interface ProductDetailClientProps {
@@ -382,7 +383,7 @@ export function ProductDetailClient({
 
   // 8 pieces total: same category first, followed by catalog favorites (2*4 desktop, 2*2 mobile)
   const categoryProducts = effectiveProducts.filter(
-    (p) => p.id !== product.id && (p.category === product.category || p.category.toLowerCase().includes(categoryInfo.name.toLowerCase().slice(0, 4)))
+    (p) => p.id !== product.id && matchesCategory(p, product.category)
   );
   const otherProducts = effectiveProducts.filter(
     (p) => p.id !== product.id && !categoryProducts.some((cp) => cp.id === p.id)

@@ -1,11 +1,15 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 import { useState, useMemo, useEffect, useRef, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { categories as defaultCategories } from "@/data/mockData";
 import { Category } from "@/types/store";
 import { useProductStore } from "@/store/useProductStore";
 import { ProductCard } from "@/components/storefront/ProductCard";
+import { isCategorySlugMatch, matchesCategory } from "@/lib/categoryMatching";
 import {
   SlidersHorizontal,
   X,
@@ -14,123 +18,6 @@ import {
 } from "lucide-react";
 
 const BATCH_SIZE = 12;
-
-function isCategorySlugMatch(catSlug: string, targetSlug: string): boolean {
-  if (!catSlug || !targetSlug) return false;
-  const a = catSlug.toLowerCase().trim();
-  const b = targetSlug.toLowerCase().trim();
-  if (a === b) return true;
-
-  // Strictly isolate earrings vs rings first to avoid "ring" substring collisions
-  const aIsEarring = a === "earrings" || a === "earring" || a.includes("earring") || a.includes("jhumka");
-  const bIsEarring = b === "earrings" || b === "earring" || b.includes("earring") || b.includes("jhumka");
-  if (aIsEarring || bIsEarring) {
-    return aIsEarring && bIsEarring;
-  }
-  const aIsRing = a === "rings" || a === "ring" || a.includes("ring");
-  const bIsRing = b === "rings" || b === "ring" || b.includes("ring");
-  if (aIsRing || bIsRing) {
-    return aIsRing && bIsRing;
-  }
-
-  if (
-    (a === "bangles" || a === "bangles-kada" || a.includes("bangle")) &&
-    (b === "bangles" || b === "bangles-kada" || b.includes("bangle"))
-  ) return true;
-  if (
-    (a === "necklaces" || a === "necklaces-and-chains" || a.includes("necklace") || a.includes("chain")) &&
-    (b === "necklaces" || b === "necklaces-and-chains" || b.includes("necklace") || b.includes("chain"))
-  ) return true;
-  if (
-    (a === "pendants" || a === "charms" || a.includes("pendant") || a.includes("charm")) &&
-    (b === "pendants" || b === "charms" || b.includes("pendant") || b.includes("charm"))
-  ) return true;
-  if (
-    (a === "hand-chains" || a === "hip-chains" || a.includes("hip")) &&
-    (b === "hand-chains" || b === "hip-chains" || b.includes("hip"))
-  ) return true;
-  if (
-    (a === "bracelets" || a.includes("bracelet")) &&
-    (b === "bracelets" || b.includes("bracelet"))
-  ) return true;
-  if (
-    (a === "watches" || a.includes("watch")) &&
-    (b === "watches" || b.includes("watch"))
-  ) return true;
-  if (
-    (a === "anklets" || a.includes("anklet")) &&
-    (b === "anklets" || b.includes("anklet"))
-  ) return true;
-  if (
-    (a === "kids-collection" || a.includes("kid") || a.includes("baby")) &&
-    (b === "kids-collection" || b.includes("kid") || b.includes("baby"))
-  ) return true;
-  return false;
-}
-
-function matchesCategory(
-  product: { category: string; isNewArrival?: boolean },
-  targetSlug: string
-): boolean {
-  if (!targetSlug || targetSlug === "all") return true;
-  if (targetSlug === "new-arrivals") {
-    return Boolean(product.isNewArrival || product.category === "new-arrivals");
-  }
-  const pCat = (product.category || "").trim().toLowerCase();
-  const tSlug = (targetSlug || "").trim().toLowerCase();
-
-  if (pCat === tSlug) return true;
-
-  // Earrings check MUST be strictly segregated from rings
-  const isTargetEarring = tSlug === "earrings" || tSlug === "earring" || tSlug.includes("earring");
-  const isTargetRing = (tSlug === "rings" || tSlug === "ring" || tSlug.includes("ring")) && !isTargetEarring;
-  const isProdEarring = pCat === "earrings" || pCat === "earring" || pCat.includes("earring") || pCat.includes("jhumka");
-  const isProdRing = (pCat === "rings" || pCat === "ring" || pCat.includes("ring")) && !isProdEarring;
-
-  if (isTargetEarring) {
-    return isProdEarring;
-  }
-  if (isTargetRing) {
-    return isProdRing;
-  }
-  // Prevent any earring from matching ring or vice versa
-  if (isProdEarring && (tSlug === "rings" || tSlug.includes("ring"))) return false;
-  if (isProdRing && (tSlug === "earrings" || tSlug.includes("earring"))) return false;
-
-  if (tSlug === "bangles" || tSlug === "bangles-kada" || tSlug.includes("bangle")) {
-    return pCat === "bangles" || pCat === "bangles-kada" || pCat.includes("bangle") || pCat.includes("kada");
-  }
-  if (tSlug === "necklaces" || tSlug === "necklaces-and-chains" || tSlug.includes("necklace")) {
-    return pCat === "necklaces" || pCat === "necklaces-and-chains" || pCat.includes("necklace") || pCat.includes("chain");
-  }
-  if (tSlug === "bracelets" || tSlug.includes("bracelet")) {
-    return pCat === "bracelets" || pCat.includes("bracelet");
-  }
-  if (tSlug === "pendants" || tSlug === "charms" || tSlug.includes("pendant") || tSlug.includes("charm")) {
-    return pCat === "pendants" || pCat === "charms" || pCat.includes("pendant") || pCat.includes("charm");
-  }
-  if (tSlug === "watches" || tSlug.includes("watch")) {
-    return pCat === "watches" || pCat.includes("watch");
-  }
-  if (tSlug === "hand-chains" || tSlug === "hip-chains" || tSlug.includes("hip")) {
-    return pCat === "hand-chains" || pCat === "hip-chains" || pCat.includes("hand-chain") || pCat.includes("hip");
-  }
-  if (tSlug === "anklets" || tSlug.includes("anklet")) {
-    return pCat === "anklets" || pCat.includes("anklet");
-  }
-  if (tSlug === "mangalsutra" || tSlug.includes("mangal")) {
-    return pCat === "mangalsutra" || pCat.includes("mangalsutra");
-  }
-  if (tSlug === "kids-collection" || tSlug.includes("kid")) {
-    return pCat.includes("kid") || pCat.includes("baby");
-  }
-
-  // Safe fallback - ensure no earring/ring cross contamination
-  if (isProdEarring && !isTargetEarring) return false;
-  if (isProdRing && !isTargetRing) return false;
-
-  return pCat === tSlug || pCat.includes(tSlug) || tSlug.includes(pCat);
-}
 
 function ProductCatalogContent() {
   const searchParams = useSearchParams();
@@ -155,8 +42,8 @@ function ProductCatalogContent() {
 
   // Sync with catalog on mount
   useEffect(() => {
-    fetchProducts();
-    fetch("/api/categories")
+    fetchProducts(true);
+    fetch("/api/categories?fresh=true", { cache: "no-store" })
       .then((r) => r.json())
       .then((data) => {
         if (Array.isArray(data) && data.length > 0) {
