@@ -31,6 +31,33 @@ export interface InstagramVideoItem {
 
 const defaultInstagramVideos: InstagramVideoItem[] = (initialReviewData.instagramVideos || []) as InstagramVideoItem[];
 
+function cleanCaptionText(text?: string): string {
+  if (!text) return "";
+  return text
+    .replace(/@noomi_s_couture\.in/gi, "@gleamnest.in")
+    .replace(/@noomi_s_couture/gi, "@gleamnest.in")
+    .replace(/#noomi_s_couturein/gi, "#GleamNestin")
+    .replace(/noomi_s_couture/gi, "gleamnest.in")
+    .replace(/noomiscouture/gi, "gleamnest.in")
+    .replace(/noomis/gi, "gleamnest")
+    .replace(/alnaya\.in/gi, "gleamnest.in")
+    .replace(/alnaya/gi, "GleamNest");
+}
+
+function cleanHandleText(handle?: string): string {
+  if (!handle || handle.toLowerCase().includes("alnaya") || handle.toLowerCase().includes("noomi")) {
+    return "@gleamnest.in";
+  }
+  return handle;
+}
+
+function cleanInstagramLink(link?: string): string {
+  if (!link || link.toLowerCase().includes("alnaya") || link.toLowerCase().includes("noomi")) {
+    return "https://www.instagram.com/gleamnest.in?igsh=c3I4M2h1YmprdXI5";
+  }
+  return link;
+}
+
 function AutoPlayingInstaCard({
   vid,
   onClick,
@@ -145,33 +172,6 @@ function AutoPlayingInstaCard({
         <div className="self-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 w-11 h-11 rounded-full bg-white/90 text-stone-900 flex items-center justify-center shadow-xl group-hover:scale-110">
           <Maximize2 className="w-4 h-4 text-[#1C1917]" />
         </div>
-
-function cleanCaptionText(text?: string): string {
-  if (!text) return "";
-  return text
-    .replace(/@noomi_s_couture\.in/gi, "@gleamnest.in")
-    .replace(/@noomi_s_couture/gi, "@gleamnest.in")
-    .replace(/#noomi_s_couturein/gi, "#GleamNestin")
-    .replace(/noomi_s_couture/gi, "gleamnest.in")
-    .replace(/noomiscouture/gi, "gleamnest.in")
-    .replace(/noomis/gi, "gleamnest")
-    .replace(/alnaya\.in/gi, "gleamnest.in")
-    .replace(/alnaya/gi, "GleamNest");
-}
-
-function cleanHandleText(handle?: string): string {
-  if (!handle || handle.toLowerCase().includes("alnaya") || handle.toLowerCase().includes("noomi")) {
-    return "@gleamnest.in";
-  }
-  return handle;
-}
-
-function cleanInstagramLink(link?: string): string {
-  if (!link || link.toLowerCase().includes("alnaya") || link.toLowerCase().includes("noomi")) {
-    return "https://www.instagram.com/gleamnest.in?igsh=c3I4M2h1YmprdXI5";
-  }
-  return link;
-}
 
         {/* Bottom Details */}
         <div className="space-y-1">
